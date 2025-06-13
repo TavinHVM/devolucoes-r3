@@ -8,6 +8,19 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { Textarea } from "../../components/ui/textarea";
 import { useForm } from "react-hook-form";
 
+type FormData = {
+  nome: string;
+  filial: string;
+  numero_nf: string;
+  carga: string;
+  codigo_cobranca: string;
+  rca: string;
+  motivo_devolucao: string;
+  codigo_produto: string;
+  tipo_devolucao: string;
+  arquivo?: File;
+};
+
 export default function Solicitacao() {
   const form = useForm({
     defaultValues: {
@@ -24,7 +37,7 @@ export default function Solicitacao() {
     },
   });
 
-  function onSubmit(data: any) {
+  function onSubmit(data: FormData) {
     // Aqui você pode lidar com o envio dos dados
     console.log(data);
   }

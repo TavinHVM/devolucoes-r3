@@ -14,7 +14,7 @@ export default function Login() {
     },
   });
 
-  function onSubmit(data: any) {
+  function onSubmit(data: { nome: string }) {
     // Redireciona para a página de solicitação
     router.push("/solicitacao");
   }

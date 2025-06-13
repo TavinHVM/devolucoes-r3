@@ -1,13 +1,13 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabaseClient';
-import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
+import { Card, CardContent, CardHeader } from '../../components/ui/card';
 import { Input } from '../../components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/ui/select';
 import { Button } from '../../components/ui/button';
 
 export default function VisualizacaoSolicitacoes() {
-  const [solicitacoes, setSolicitacoes] = useState<any[]>([]);
+  const [solicitacoes, setSolicitacoes] = useState<Record<string, any>[]>([]);
   const [status, setStatus] = useState('Todos');
   const [busca, setBusca] = useState('');
 
