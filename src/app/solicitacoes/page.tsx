@@ -6,8 +6,24 @@ import { Input } from '../../components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/ui/select';
 import { Button } from '../../components/ui/button';
 
+type Solicitacao = {
+  id: number;
+  nome: string;
+  filial: string;
+  numero_nf: string;
+  carga: string;
+  codigo_cobranca: string;
+  rca: string;
+  motivo_devolucao: string;
+  vale?: string;
+  codigo_produto: string;
+  tipo_devolucao: string;
+  status: string;
+  created_at: string;
+};
+
 export default function VisualizacaoSolicitacoes() {
-  const [solicitacoes, setSolicitacoes] = useState<Record<string, any>[]>([]);
+  const [solicitacoes, setSolicitacoes] = useState<Solicitacao[]>([]);
   const [status, setStatus] = useState('Todos');
   const [busca, setBusca] = useState('');
 
