@@ -13,6 +13,7 @@ type Solicitacao = {
   numero_nf: string;
   carga: string;
   codigo_cobranca: string;
+  codigo_cliente: string;
   rca: string;
   motivo_devolucao: string;
   vale?: string;
@@ -83,6 +84,7 @@ export default function VisualizacaoSolicitacoes() {
                   <th className="px-2 py-2 text-left">Nº NF</th>
                   <th className="px-2 py-2 text-left">Carga</th>
                   <th className="px-2 py-2 text-left">Cód. Cobrança</th>
+                  <th className="px-2 py-2 text-left">Código Cliente</th>
                   <th className="px-2 py-2 text-left">RCA</th>
                   <th className="px-2 py-2 text-left">Motivo da Devolução</th>
                   <th className="px-2 py-2 text-left">Vale</th>
@@ -101,6 +103,7 @@ export default function VisualizacaoSolicitacoes() {
                     <td className="px-2 py-2">{s.numero_nf}</td>
                     <td className="px-2 py-2">{s.carga}</td>
                     <td className="px-2 py-2">{s.codigo_cobranca}</td>
+                    <td className="px-2 py-2">{s.codigo_cliente}</td>
                     <td className="px-2 py-2">{s.rca}</td>
                     <td className="px-2 py-2">{s.motivo_devolucao}</td>
                     <td className="px-2 py-2">{s.vale}</td>
@@ -112,7 +115,7 @@ export default function VisualizacaoSolicitacoes() {
                 ))}
                 {solicitacoesFiltradas.length === 0 && (
                   <tr>
-                    <td colSpan={13} className="text-center py-8 text-gray-400">Nenhuma solicitação encontrada.</td>
+                    <td colSpan={14} className="text-center py-8 text-gray-400">Nenhuma solicitação encontrada.</td>
                   </tr>
                 )}
               </tbody>

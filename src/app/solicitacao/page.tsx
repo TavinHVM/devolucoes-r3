@@ -15,6 +15,7 @@ type FormData = {
   numero_nf: string;
   carga: string;
   codigo_cobranca: string;
+  codigo_cliente: string;
   rca: string;
   motivo_devolucao: string;
   codigo_produto: string;
@@ -30,6 +31,7 @@ export default function Solicitacao() {
       numero_nf: "",
       carga: "",
       codigo_cobranca: "",
+      codigo_cliente: "",
       rca: "",
       motivo_devolucao: "",
       codigo_produto: "",
@@ -80,6 +82,10 @@ export default function Solicitacao() {
               <div className="grid gap-2">
                 <Label htmlFor="codigo_cobranca">Cód. Cobrança:</Label>
                 <Input id="codigo_cobranca" {...form.register("codigo_cobranca")} />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="codigo_cliente">Código Cliente:</Label>
+                <Input id="codigo_cliente" {...form.register("codigo_cliente")} />
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="rca">RCA:</Label>
