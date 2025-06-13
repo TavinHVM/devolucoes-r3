@@ -27,7 +27,7 @@ export default function Usuarios() {
   }
 
   return (
-    <div className="p-8">
+    <>
       <h1 className="text-3xl font-bold text-center mb-4">Usuários Cadastrados</h1>
       <div className="flex justify-center mb-4">
         <button className="bg-green-500 text-white px-4 py-2 rounded">Ativar Manutenção</button>
@@ -66,6 +66,6 @@ export default function Usuarios() {
           <button className="bg-green-500 text-white px-4 py-2 rounded">Criar Novo Usuário</button>
         </div>
       </div>
-    </div>
+    </>
   );
 } 
