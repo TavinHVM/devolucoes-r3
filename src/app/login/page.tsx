@@ -4,19 +4,24 @@ import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/ca
 import { Input } from '../../components/ui/input';
 import { Button } from '../../components/ui/button';
 import { Label } from '../../components/ui/label';
-import { useForm } from 'react-hook-form';
+import { useForm, SubmitHandler } from 'react-hook-form';
 import { supabase } from '../../lib/supabaseClient';
+
+interface LoginForm {
+  email: string;
+  password: string;
+}
 
 export default function Login() {
   const router = useRouter();
-  const form = useForm({
+  const form = useForm<LoginForm>({
     defaultValues: {
       email: '',
       password: '',
     },
   });
 
-  async function onSubmit(data: any) {
+  const onSubmit: SubmitHandler<LoginForm> = async (data) => {
     const { error } = await supabase.auth.signInWithPassword({
       email: data.email,
       password: data.password,
@@ -27,7 +32,7 @@ export default function Login() {
     } else {
       router.push('/');
     }
-  }
+  };
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-50">
