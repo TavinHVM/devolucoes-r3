@@ -113,7 +113,7 @@ export default function VisualizacaoSolicitacoes() {
                         <SelectItem value="Rejeitado">Rejeitado</SelectItem>
                       </SelectContent>
                     </Select>
-                    <Button className="ml-4 bg-green-600 hover:bg-green-700 text-white">Baixar Relatório</Button>
+                    <Button className="ml-4 bg-green-600 hover:bg-green-700 text-white cursor-pointer">Baixar Relatório</Button>
                   </div>
                 </div>
               </CardHeader>

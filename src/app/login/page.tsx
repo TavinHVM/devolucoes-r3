@@ -64,7 +64,7 @@ export default function Login() {
                 autoComplete="current-password"
               />
             </div>
-            <Button type="submit" className="w-full mt-2 bg-green-600 hover:bg-green-700 text-white font-bold">
+            <Button type="submit" className="w-full mt-2 bg-green-600 hover:bg-green-700 text-white font-bold cursor-pointer">
               Entrar
             </Button>
           </form>
