@@ -104,9 +104,8 @@ export default function Solicitacao() {
                       <SelectValue placeholder="Selecione a Filial" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="matriz">Matriz</SelectItem>
                       <SelectItem value="filial1">Filial 1</SelectItem>
-                      <SelectItem value="filial2">Filial 2</SelectItem>
+                      <SelectItem value="filial5">Filial 5</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
