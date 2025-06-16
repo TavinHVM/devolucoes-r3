@@ -7,10 +7,10 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 
 const navLinks = [
-  { href: "/", label: "Início" },
-  { href: "/solicitacoes", label: "Solicitações" },
-  { href: "/criar-solicitacao", label: "Criar Solicitação" },
-  { href: "/usuarios", label: "Usuários" },
+  { href: "/", label: "Início", icon: "🏠" },
+  { href: "/solicitacoes", label: "Solicitações", icon: "📄" },
+  { href: "/criar-solicitacao", label: "Criar Solicitação", icon: "➕" },
+  { href: "/usuarios", label: "Usuários", icon: "👤" },
 ];
 
 export default function Sidebar() {
@@ -23,38 +23,54 @@ export default function Sidebar() {
   }
 
   return (
-    <aside className="flex flex-col h-screen w-64 bg-slate-800 text-white shadow-lg">
+    <aside
+      className={`
+        group/sidebar
+        fixed md:static
+        z-40
+        flex flex-col h-screen
+        bg-slate-800 text-white shadow-lg
+        transition-all duration-300
+        w-16 hover:w-64 md:w-16 md:hover:w-64
+        overflow-x-hidden
+      `}
+    >
       <div className="flex-1 flex flex-col min-h-0">
-        <div className="text-3xl font-extrabold mb-10 mt-8 text-center tracking-tight text-white drop-shadow">
-          <div className="flex justify-center mb-2">
-            <Image src="/favicon.ico" alt="Logo" width={64} height={64} />
+        <div className="flex flex-col items-center md:items-stretch">
+          <div className="flex justify-center mb-2 mt-8">
+            <Image src="/favicon.ico" alt="Logo" width={40} height={40} />
           </div>
-          Devoluções R3
+          <span className="hidden group-hover/sidebar:block text-2xl font-extrabold mb-10 mt-2 text-center tracking-tight text-white drop-shadow transition-all duration-300">
+            Devoluções R3
+          </span>
         </div>
-        <nav className="flex-1 flex flex-col gap-2 px-4 min-h-0 overflow-y-auto">
+        <nav className="flex-1 flex flex-col gap-2 px-2 min-h-0 overflow-y-auto mt-4">
           {navLinks.map(link => (
             <Link
               key={link.href}
               href={link.href}
               prefetch
-              className={`rounded-lg px-4 py-3 font-medium transition-all
+              className={`
+                flex items-center gap-3 rounded-lg px-3 py-3 font-medium transition-all
                 ${pathname === link.href
                   ? "bg-green-600 text-white shadow"
                   : "hover:bg-gray-600"
                 }
               `}
             >
-              {link.label}
+              <span className="text-xl">{link.icon}</span>
+              <span className="hidden group-hover/sidebar:inline transition-all duration-300">{link.label}</span>
             </Link>
           ))}
         </nav>
       </div>
-      <div className="px-4 pb-8">
+      <div className="px-2 pb-8">
         <button
-          className="w-full bg-red-600 hover:bg-red-700 text-white rounded-lg px-4 py-3 font-semibold shadow transition cursor-pointer"
+          className="w-full bg-red-600 hover:bg-red-700 text-white rounded-lg px-4 py-3 font-semibold shadow transition cursor-pointer flex items-center justify-center"
           onClick={handleLogout}
         >
-          Sair
+          <span className="text-xl">⏻</span>
+          <span className="hidden group-hover/sidebar:inline ml-2">Sair</span>
         </button>
       </div>
     </aside>
