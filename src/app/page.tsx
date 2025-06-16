@@ -1,40 +1,34 @@
 'use client';
-import { useRouter } from "next/navigation";
-import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
-import { Input } from "../components/ui/input";
-import { Button } from "../components/ui/button";
-import { Label } from "../components/ui/label";
-import { useForm } from "react-hook-form";
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { supabase } from '../lib/supabaseClient';
 
-export default function Login() {
+export default function Home() {
   const router = useRouter();
-  const form = useForm({
-    defaultValues: {
-      nome: "",
-    },
-  });
+  const [loading, setLoading] = useState(true);
 
-  function onSubmit() {
-    // Redireciona para a página de solicitação
-    router.push("/solicitacao");
+  useEffect(() => {
+    async function checkAuth() {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        router.replace('/login');
+      } else {
+        setLoading(false);
+      }
+    }
+    checkAuth();
+  }, [router]);
+
+  if (loading) {
+    return <div className="flex min-h-screen items-center justify-center bg-gray-50">Carregando...</div>;
   }
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-50">
-      <Card className="w-full max-w-sm shadow-lg">
-        <CardHeader>
-          <CardTitle className="text-center">Devoluções R3 - Login</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4">
-            <div className="grid gap-2">
-              <Label htmlFor="nome">Nome:</Label>
-              <Input id="nome" {...form.register("nome")} required />
-            </div>
-            <Button type="submit" className="w-full mt-4">Entrar</Button>
-          </form>
-        </CardContent>
-      </Card>
+      <div className="text-center">
+        <h1 className="text-4xl font-bold mb-4">Bem-vindo ao sistema de Devoluções R3</h1>
+        <p className="text-lg text-gray-700">Utilize o menu lateral para navegar entre as funcionalidades do sistema.</p>
+      </div>
     </div>
   );
 }

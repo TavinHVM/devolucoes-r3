@@ -1,4 +1,3 @@
-// Página de login conforme requisitos do sistema
 'use client';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
@@ -12,24 +11,21 @@ export default function Login() {
   const router = useRouter();
   const form = useForm({
     defaultValues: {
-      first_name: '',
-      last_name: '',
+      email: '',
       password: '',
     },
   });
 
   async function onSubmit(data: any) {
-    // Exemplo: autenticação customizada (ajuste conforme sua estratégia)
-    const { data: user } = await supabase
-      .from('usuarios')
-      .select('*')
-      .eq('first_name', data.first_name)
-      .eq('last_name', data.last_name)
-      .single();
-    if (user /* && user.password === data.password */) {
-      router.push('/solicitacoes');
-    } else {
+    const { error } = await supabase.auth.signInWithPassword({
+      email: data.email,
+      password: data.password,
+    });
+
+    if (error) {
       alert('Usuário ou senha inválidos');
+    } else {
+      router.push('/');
     }
   }
 
@@ -42,12 +38,8 @@ export default function Login() {
         <CardContent>
           <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4">
             <div className="grid gap-2">
-              <Label htmlFor="first_name">Nome:</Label>
-              <Input id="first_name" {...form.register('first_name')} required />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="last_name">Sobrenome:</Label>
-              <Input id="last_name" {...form.register('last_name')} required />
+              <Label htmlFor="email">Email:</Label>
+              <Input id="email" type="email" {...form.register('email')} required />
             </div>
             <div className="grid gap-2">
               <Label htmlFor="password">Senha:</Label>
