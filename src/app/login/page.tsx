@@ -35,22 +35,38 @@ export default function Login() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50">
-      <Card className="w-full max-w-sm shadow-lg">
+    <div className="flex min-h-screen items-center justify-center bg-gray-900">
+      <Card className="w-full max-w-sm shadow-2xl bg-slate-800 border-none">
         <CardHeader>
-          <CardTitle className="text-center">Devoluções R3 - Login</CardTitle>
+          <CardTitle className="text-center text-white text-2xl font-bold">Devoluções R3 - Login</CardTitle>
         </CardHeader>
         <CardContent>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-6">
             <div className="grid gap-2">
-              <Label htmlFor="email">Email:</Label>
-              <Input id="email" type="email" {...form.register('email')} required />
+              <Label htmlFor="email" className="text-white">Email:</Label>
+              <Input
+                id="email"
+                type="email"
+                {...form.register('email')}
+                required
+                className="bg-slate-700 text-white border-slate-600 placeholder:text-slate-400"
+                autoComplete="username"
+              />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="password">Senha:</Label>
-              <Input id="password" type="password" {...form.register('password')} required />
+              <Label htmlFor="password" className="text-white">Senha:</Label>
+              <Input
+                id="password"
+                type="password"
+                {...form.register('password')}
+                required
+                className="bg-slate-700 text-white border-slate-600 placeholder:text-slate-400"
+                autoComplete="current-password"
+              />
             </div>
-            <Button type="submit" className="w-full mt-4">Entrar</Button>
+            <Button type="submit" className="w-full mt-2 bg-green-600 hover:bg-green-700 text-white font-bold">
+              Entrar
+            </Button>
           </form>
         </CardContent>
       </Card>

@@ -28,7 +28,7 @@ export default function Sidebar() {
         group/sidebar
         fixed md:static
         z-40
-        flex flex-col h-screen
+        flex flex-col h-full
         bg-slate-800 text-white shadow-lg
         transition-all duration-300
         w-16 hover:w-64 md:w-16 md:hover:w-64
@@ -85,17 +85,25 @@ export default function Sidebar() {
       </div>
       <div className="px-2 pb-8">
         <button
-          className="w-full bg-red-600 hover:bg-red-700 text-white rounded-lg px-4 py-3 font-semibold shadow transition cursor-pointer flex items-center justify-center"
+          className={`
+            w-full bg-red-600 hover:bg-red-700 text-white rounded-lg px-4 py-3 font-semibold shadow transition cursor-pointer
+            flex items-center
+            h-14
+            justify-center items-center
+            group-hover/sidebar:justify-start
+          `}
           onClick={handleLogout}
         >
-          <span className="text-xl">⏻</span>
+          <span className="text-xl flex-shrink-0 flex items-center justify-center">
+            ⏻
+          </span>
           <div
             className={`
               h-6 flex items-center
               transition-all duration-300
               w-0 group-hover/sidebar:w-[60px]
               overflow-hidden
-              ml-2
+              ml-0 group-hover/sidebar:ml-2
             `}
           >
             <span className="whitespace-nowrap">Sair</span>

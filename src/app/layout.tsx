@@ -13,10 +13,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="pt-br">
-      <body className="flex h-screen min-h-screen">
+    <html lang="pt-br" className="h-full w-full">
+      <body className="flex h-full w-full min-h-screen min-w-0">
         <Sidebar />
-        <main className="flex-1 h-screen min-h-0 flex items-center justify-center bg-gray-900">
+        <main className="flex-1 h-full w-full min-h-0 min-w-0 overflow-auto bg-gray-900">
           {children}
         </main>
       </body>
