@@ -55,7 +55,7 @@ export default function Solicitacao() {
                 <Label htmlFor="nome">Nome:</Label>
                 <Input id="nome" {...form.register("nome")} required />
               </div>
-              
+
               {/* numeros */}
               <div className="grid grid-cols-1 gap-2 lg:grid-cols-2">
                 <div className="flex flex-col gap-2">
@@ -75,11 +75,11 @@ export default function Solicitacao() {
                   <Input id="rca" {...form.register("rca")} />
                 </div>
               </div>
-              
+
               <div className="flex flex-col gap-2">
                 <Label htmlFor="codigo_produto">Código do Produto:</Label>
                 <Input id="codigo_produto" {...form.register("codigo_produto")} />
-              </div>              
+              </div>
               <div className="flex flex-col gap-2">
                 <Label htmlFor="motivo_devolucao">Motivo da Devolução:</Label>
                 <Textarea className="resize-none" id="motivo_devolucao" {...form.register("motivo_devolucao")} />
@@ -100,7 +100,7 @@ export default function Solicitacao() {
                 <div className="flex flex-col gap-2 w-full">
                   <Label htmlFor="filial">Filial:</Label>
                   <Select onValueChange={value => form.setValue("filial", value)}>
-                    <SelectTrigger className="w-full"id="filial">
+                    <SelectTrigger className="w-full" id="filial">
                       <SelectValue placeholder="Selecione a Filial" />
                     </SelectTrigger>
                     <SelectContent>
@@ -112,15 +112,15 @@ export default function Solicitacao() {
               </div>
               <div className="flex flex-col gap-2">
                 <Label htmlFor="arquivo">Anexar Arquivo:</Label>
-                <Input 
-                  id="arquivo" 
-                  type="file" 
+                <Input
+                  id="arquivo"
+                  type="file"
                   onChange={e => {
                     const file = e.target.files?.[0];
                     if (file) {
                       form.setValue("arquivo", file as unknown as undefined);
                     }
-                  }} 
+                  }}
                 />
               </div>
               <Button type="submit" className="w-full mt-4">Criar Solicitação</Button>

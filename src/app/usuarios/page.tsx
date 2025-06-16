@@ -312,7 +312,7 @@ export default function Usuarios() {
               {error && (
                 <div className="text-red-600 text-sm">{error}</div>
               )}
-              <Button type="submit" className="w-full mt-2" disabled={creating}>
+              <Button type="submit" className="w-full mt-2 cursor-pointer" disabled={creating}>
                 {creating ? 'Criando...' : 'Criar Usuário'}
               </Button>
             </form>
@@ -320,17 +320,14 @@ export default function Usuarios() {
         </div>
       )}
       <div className="flex flex-col md:flex-row items-center justify-between w-full max-w-4xl mb-6 gap-4">
-        <h1 className="text-3xl font-bold text-center md:text-left">Usuários Cadastrados</h1>
-        <Button className="bg-green-500 hover:bg-green-600" type="button">
-          Ativar Manutenção
-        </Button>
+        <h1 className="text-3xl font-bold text-center md:text-left text-white">Usuários Cadastrados</h1>
       </div>
-      <Card className="w-full max-w-4xl">
+      <Card className="w-full max-w-4xl bg-slate-800 border-none">
         <CardHeader>
           <div className="flex justify-between items-center">
-            <span className="font-semibold">Lista de Usuários</span>
+            <span className="font-semibold text-white">Lista de Usuários</span>
             <Button
-              className="bg-green-500 hover:bg-green-600"
+              className="bg-green-600 hover:bg-green-700 cursor-pointer"
               type="button"
               onClick={() => setShowModal(true)}
             >
@@ -340,9 +337,9 @@ export default function Usuarios() {
         </CardHeader>
         <CardContent>
           <div className="overflow-x-auto">
-            <table className="min-w-full text-sm">
+            <table className="min-w-full text-sm bg-slate-800 text-white rounded-lg">
               <thead>
-                <tr className="bg-gray-100">
+                <tr className="bg-slate-900 text-slate-300">
                   <th className="px-4 py-2 text-left">ID</th>
                   <th className="px-4 py-2 text-left">Nome</th>
                   <th className="px-4 py-2 text-left">Sobrenome</th>
@@ -355,15 +352,18 @@ export default function Usuarios() {
               <tbody>
                 {loading ? (
                   <tr>
-                    <td colSpan={7} className="text-center py-8 text-gray-400">Carregando...</td>
+                    <td colSpan={7} className="text-center py-8 text-gray-400 bg-slate-800">Carregando...</td>
                   </tr>
                 ) : usuarios.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="text-center py-8 text-gray-400">Nenhum usuário encontrado.</td>
+                    <td colSpan={7} className="text-center py-8 text-gray-400 bg-slate-800">Nenhum usuário encontrado.</td>
                   </tr>
                 ) : (
                   usuarios.map(usuario => (
-                    <tr key={usuario.id} className="bg-white border-b">
+                    <tr
+                      key={usuario.id}
+                      className="even:bg-slate-700 odd:bg-slate-800 border-b border-slate-700"
+                    >
                       <td className="px-4 py-2 break-all">{usuario.id}</td>
                       <td className="px-4 py-2">{usuario.first_name}</td>
                       <td className="px-4 py-2">{usuario.last_name}</td>
@@ -371,15 +371,17 @@ export default function Usuarios() {
                       <td className="px-4 py-2">{usuario.role}</td>
                       <td className="px-4 py-2">{usuario.user_level}</td>
                       <td className="px-4 py-2">
-                        <div className="flex gap-2">
+                        <div className="flex gap-2 cursor-pointer">
                           <Button
-                            variant="outline"
+                            className='text-white cursor-pointer bg-blue-500 hover:bg-blue-600'
+                            variant="secondary"
                             size="sm"
                             onClick={() => openEditModal(usuario)}
                           >
                             Editar
                           </Button>
                           <Button
+                            className='cursor-pointer bg-red-500 hover:bg-red-600'
                             variant="destructive"
                             size="sm"
                             onClick={() => setConfirmDeleteId(usuario.id)}

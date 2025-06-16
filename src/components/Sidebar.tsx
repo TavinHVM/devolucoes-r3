@@ -40,7 +40,7 @@ export default function Sidebar() {
               className={`rounded-lg px-4 py-3 font-medium transition-all
                 ${pathname === link.href
                   ? "bg-green-500 text-white shadow"
-                  : "hover:bg-gray-600 hover:text-green-200"
+                  : "hover:bg-gray-600"
                 }
               `}
             >

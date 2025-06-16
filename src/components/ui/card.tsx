@@ -7,7 +7,7 @@ function Card({ className, ...props }: React.ComponentProps<"div">) {
     <div
       data-slot="card"
       className={cn(
-        "bg-card text-card-foreground flex flex-col gap-6 rounded-xl border py-6 shadow-sm",
+        "bg-card text-card-foreground flex flex-col gap-6 rounded-xl py-6 shadow-sm", // removido 'border'
         className
       )}
       {...props}
@@ -53,7 +53,7 @@ function CardAction({ className, ...props }: React.ComponentProps<"div">) {
     <div
       data-slot="card-action"
       className={cn(
-        "col-start-2 row-span-2 row-start-1 self-start justify-self-end",
+        "col-start-2 row-span-2 row-start-1 self-start justify-self-end bg-slate-800",
         className
       )}
       {...props}
@@ -65,7 +65,7 @@ function CardContent({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="card-content"
-      className={cn("px-6", className)}
+      className={cn("px-6 bg-slate-800", className)}
       {...props}
     />
   )
