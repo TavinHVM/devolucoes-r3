@@ -23,7 +23,7 @@ export default function Sidebar() {
   }
 
   return (
-    <aside className="flex flex-col h-screen w-64 bg-gradient-to-b from-gray-900 via-gray-800 to-gray-700 text-white shadow-lg">
+    <aside className="flex flex-col h-screen w-64 bg-slate-800 text-white shadow-lg">
       <div className="flex-1 flex flex-col min-h-0">
         <div className="text-3xl font-extrabold mb-10 mt-8 text-center tracking-tight text-white drop-shadow">
           <div className="flex justify-center mb-2">
