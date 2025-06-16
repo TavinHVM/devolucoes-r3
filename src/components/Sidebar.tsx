@@ -37,12 +37,22 @@ export default function Sidebar() {
     >
       <div className="flex-1 flex flex-col min-h-0">
         <div className="flex flex-col items-center md:items-stretch">
-          <div className="flex justify-center mb-2 mt-8">
+          <div className="flex flex-col items-center justify-center mb-2 mt-8">
             <Image src="/favicon.ico" alt="Logo" width={40} height={40} />
+            <div
+              className={`
+                h-10 flex items-center justify-center
+                transition-all duration-300
+                w-0 group-hover/sidebar:w-[180px]
+                overflow-hidden
+                mt-2
+              `}
+            >
+              <span className="text-2xl font-extrabold text-center tracking-tight text-white drop-shadow whitespace-nowrap">
+                Devoluções R3
+              </span>
+            </div>
           </div>
-          <span className="hidden group-hover/sidebar:block text-2xl font-extrabold mb-10 mt-2 text-center tracking-tight text-white drop-shadow transition-all duration-300">
-            Devoluções R3
-          </span>
         </div>
         <nav className="flex-1 flex flex-col gap-2 px-2 min-h-0 overflow-y-auto mt-4">
           {navLinks.map(link => (
@@ -59,7 +69,16 @@ export default function Sidebar() {
               `}
             >
               <span className="text-xl">{link.icon}</span>
-              <span className="hidden group-hover/sidebar:inline transition-all duration-300">{link.label}</span>
+              <div
+                className={`
+                  h-6 flex items-center
+                  transition-all duration-300
+                  w-0 group-hover/sidebar:w-[120px]
+                  overflow-hidden
+                `}
+              >
+                <span className="whitespace-nowrap">{link.label}</span>
+              </div>
             </Link>
           ))}
         </nav>
@@ -70,7 +89,17 @@ export default function Sidebar() {
           onClick={handleLogout}
         >
           <span className="text-xl">⏻</span>
-          <span className="hidden group-hover/sidebar:inline ml-2">Sair</span>
+          <div
+            className={`
+              h-6 flex items-center
+              transition-all duration-300
+              w-0 group-hover/sidebar:w-[60px]
+              overflow-hidden
+              ml-2
+            `}
+          >
+            <span className="whitespace-nowrap">Sair</span>
+          </div>
         </button>
       </div>
     </aside>
