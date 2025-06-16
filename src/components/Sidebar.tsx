@@ -39,7 +39,7 @@ export default function Sidebar() {
               prefetch
               className={`rounded-lg px-4 py-3 font-medium transition-all
                 ${pathname === link.href
-                  ? "bg-green-500 text-white shadow"
+                  ? "bg-green-600 text-white shadow"
                   : "hover:bg-gray-600"
                 }
               `}

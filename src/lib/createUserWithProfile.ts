@@ -27,7 +27,7 @@ const supabaseAdmin = createClient(supabaseUrl, serviceRoleKey);
 
 export async function createUserWithProfile(
   params: CreateUserProfileParams
-): Promise<{ success: boolean; error?: any; userId?: string }> {
+): Promise<{ success: boolean; error?: unknown; userId?: string }> {
   // 1. Cria usuário no Auth via Admin API
   const { data: userData, error: userError } = await supabaseAdmin.auth.admin.createUser({
     email: params.email,

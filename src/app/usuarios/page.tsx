@@ -138,7 +138,7 @@ export default function Usuarios() {
       {/* Modal de edição de usuário */}
       {editUser && (
         <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center">
-          <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-md relative">
+          <div className="bg-slate-800 rounded-lg shadow-lg p-8 w-full max-w-md relative text-white">
             <button
               className="absolute top-2 right-3 text-xl"
               onClick={() => setEditUser(null)}
@@ -146,7 +146,7 @@ export default function Usuarios() {
             >
               ×
             </button>
-            <h2 className="text-xl font-bold mb-4">Editar Usuário</h2>
+            <h2 className="text-xl font-bold mb-4 text-white">Editar Usuário</h2>
             <form onSubmit={handleEditUser} className="flex flex-col gap-3">
               <div>
                 <Label htmlFor="edit_email">E-mail</Label>
@@ -200,7 +200,7 @@ export default function Usuarios() {
                   </SelectContent>
                 </Select>
               </div>
-              <Button type="submit" className="w-full mt-2 cursor-pointer" disabled={editing}>
+              <Button type="submit" className="w-full mt-2 cursor-pointer bg-blue-500 hover:bg-blue-600" disabled={editing}>
                 {editing ? 'Salvando...' : 'Salvar Alterações'}
               </Button>
             </form>
@@ -210,11 +210,12 @@ export default function Usuarios() {
       {/* Modal de confirmação de exclusão */}
       {confirmDeleteId && (
         <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center">
-          <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-sm relative">
-            <h2 className="text-lg font-bold mb-4 text-center">Confirmar Exclusão</h2>
-            <p className="mb-6 text-center">Tem certeza que deseja excluir este usuário?</p>
+          <div className="bg-slate-800 rounded-lg shadow-lg p-8 w-full max-w-sm relative">
+            <h2 className="text-lg font-bold mb-4 text-center text-white">Confirmar Exclusão</h2>
+            <p className="mb-6 text-center text-white">Tem certeza que deseja excluir este usuário?</p>
             <div className="flex gap-4 justify-center">
               <Button
+                className="cursor-pointer bg-red-600 hover:bg-red-700"
                 variant="destructive"
                 onClick={() => excluirUsuario(confirmDeleteId)}
                 disabled={deleting}
@@ -222,7 +223,8 @@ export default function Usuarios() {
                 {deleting ? "Excluindo..." : "Sim, excluir"}
               </Button>
               <Button
-                variant="outline"
+                className="cursor-pointer bg-gray-500 hover:bg-gray-600 text-white border-none"
+                variant="secondary"
                 onClick={() => setConfirmDeleteId(null)}
                 disabled={deleting}
               >
