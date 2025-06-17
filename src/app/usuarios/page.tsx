@@ -6,6 +6,7 @@ import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '../../components/ui/select';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "../../components/ui/dialog";
 
 // Novo tipo do usuário
 type Usuario = {
@@ -208,32 +209,34 @@ export default function Usuarios() {
         </div>
       )}
       {/* Modal de confirmação de exclusão */}
-      {confirmDeleteId && (
-        <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center">
-          <div className="bg-slate-800 rounded-lg shadow-lg p-8 w-full max-w-sm relative">
-            <h2 className="text-lg font-bold mb-4 text-center text-white">Confirmar Exclusão</h2>
-            <p className="mb-6 text-center text-white">Tem certeza que deseja excluir este usuário?</p>
-            <div className="flex gap-4 justify-center">
-              <Button
-                className="cursor-pointer bg-red-600 hover:bg-red-700"
-                variant="destructive"
-                onClick={() => excluirUsuario(confirmDeleteId)}
-                disabled={deleting}
-              >
-                {deleting ? "Excluindo..." : "Sim, excluir"}
-              </Button>
-              <Button
-                className="cursor-pointer bg-gray-500 hover:bg-gray-600 text-white border-none"
-                variant="secondary"
-                onClick={() => setConfirmDeleteId(null)}
-                disabled={deleting}
-              >
-                Cancelar
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
+      <Dialog open={!!confirmDeleteId} onOpenChange={open => { if (!open) setConfirmDeleteId(null) }}>
+        <DialogContent className="bg-slate-800 border-none">
+          <DialogHeader>
+            <DialogTitle className="text-white">Confirmar Exclusão</DialogTitle>
+          </DialogHeader>
+          <div className="mb-6 text-center text-white">Tem certeza que deseja excluir este usuário?</div>
+          <DialogFooter className="flex flex-row gap-2 justify-end">
+            <Button
+              className="bg-gray-500 hover:bg-gray-600 text-white border-none cursor-pointer"
+              variant="secondary"
+              onClick={() => setConfirmDeleteId(null)}
+              disabled={deleting}
+              type="button"
+            >
+              Cancelar
+            </Button>
+            <Button
+              className="bg-red-600 hover:bg-red-700 cursor-pointer text-white"
+              variant="destructive"
+              onClick={() => excluirUsuario(confirmDeleteId!)}
+              disabled={deleting}
+              type="button"
+            >
+              {deleting ? "Excluindo..." : "Sim, excluir"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
       {/* Modal de criação de usuário */}
       {showModal && (
         <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center">
