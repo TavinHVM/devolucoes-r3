@@ -136,7 +136,7 @@ export default function VisualizacaoSolicitacoes() {
       case 'APROVADO': return 'bg-green-600 text-white font-bold px-1 py-1 rounded';
       case 'REJEITADO': return 'bg-red-600 text-white font-bold px-1 py-1 rounded';
       case 'PENDENTE': return 'bg-slate-400 text-white font-bold px-1 py-1 rounded';
-      case 'REENVIADA': return 'bg-blue-400 text-white font-bold px-1 py-1 rounded';
+      case 'REENVIADA': return 'bg-yellow-500 text-white font-bold px-1 py-1 rounded';
       case 'DESDOBRADA': return 'bg-blue-700 text-white font-bold px-1 py-1 rounded';
       case 'ABATIDA': return 'bg-stone-400 text-white font-bold px-1 py-1 rounded';
       case 'FINALIZADA': return 'bg-gray-500 text-white font-bold px-1 py-1 rounded';
@@ -199,7 +199,6 @@ export default function VisualizacaoSolicitacoes() {
                           <th className="px-2 py-2 text-left">Status</th>
                           <th className="px-2 py-2 text-left">Data de Criação</th>
                           <th className="px-2 py-2 text-left">Anexo</th>
-                          <th className="px-2 py-2 text-left">Ações</th>
                         </tr>
                       </thead>
                       <tbody>
