@@ -29,6 +29,15 @@ type Solicitacao = {
   arquivo_url?: string;
 };
 
+interface UserProfile {
+  id: string;
+  first_name: string;
+  last_name: string;
+  email?: string;
+  role: string;
+  user_level: string;
+}
+
 export default function VisualizacaoSolicitacoes() {
   const router = useRouter();
   const [solicitacoes, setSolicitacoes] = useState<Solicitacao[]>([]);
@@ -38,12 +47,10 @@ export default function VisualizacaoSolicitacoes() {
   const [page, setPage] = useState(1);
   const itemsPerPage = 10;
   const [loading, setLoading] = useState(true);
-  const [profile, setProfile] = useState<any>(null);
+  const [profile, setProfile] = useState<UserProfile | null>(null);
   const [modalAprovar, setModalAprovar] = useState<{ open: boolean, id?: number }>({ open: false });
   const [modalRecusar, setModalRecusar] = useState<{ open: boolean, id?: number }>({ open: false });
   const [aprovacaoVale, setAprovacaoVale] = useState('');
-  const [aprovacaoRecibo, setAprovacaoRecibo] = useState<File | null>(null);
-  const [aprovacaoNF, setAprovacaoNF] = useState<File | null>(null);
   const [motivoRecusa, setMotivoRecusa] = useState('');
   const [modalDetalhes, setModalDetalhes] = useState<{ open: boolean, solicitacao?: Solicitacao }>({ open: false });
 
@@ -93,8 +100,9 @@ export default function VisualizacaoSolicitacoes() {
       const { error } = await supabase.from('solicitacoes').update({ status: 'Aprovado' }).eq('id', id);
       if (error) throw error;
       setSolicitacoes(solicitacoes.map(s => s.id === id ? { ...s, status: 'Aprovado' } : s));
-    } catch (err: any) {
-      alert('Erro ao aprovar solicitação: ' + (err?.message || JSON.stringify(err)));
+    } catch (err: unknown) {
+      const msg = err && typeof err === 'object' && 'message' in err ? (err as { message: string }).message : JSON.stringify(err);
+      alert('Erro ao aprovar solicitação: ' + msg);
     }
   }
   async function recusarSolicitacao(id: number, motivo: string) {
@@ -102,8 +110,9 @@ export default function VisualizacaoSolicitacoes() {
       const { error } = await supabase.from('solicitacoes').update({ status: 'Rejeitado', motivo_devolucao: motivo }).eq('id', id);
       if (error) throw error;
       setSolicitacoes(solicitacoes.map(s => s.id === id ? { ...s, status: 'Rejeitado', motivo_devolucao: motivo } : s));
-    } catch (err: any) {
-      alert('Erro ao recusar solicitação: ' + (err?.message || JSON.stringify(err)));
+    } catch (err: unknown) {
+      const msg = err && typeof err === 'object' && 'message' in err ? (err as { message: string }).message : JSON.stringify(err);
+      alert('Erro ao recusar solicitação: ' + msg);
     }
   }
   async function reenviarSolicitacao(id: number) {
@@ -111,8 +120,9 @@ export default function VisualizacaoSolicitacoes() {
       const { error } = await supabase.from('solicitacoes').update({ status: 'Reenviada' }).eq('id', id);
       if (error) throw error;
       setSolicitacoes(solicitacoes.map(s => s.id === id ? { ...s, status: 'Reenviada' } : s));
-    } catch (err: any) {
-      alert('Erro ao reenviar solicitação: ' + (err?.message || JSON.stringify(err)));
+    } catch (err: unknown) {
+      const msg = err && typeof err === 'object' && 'message' in err ? (err as { message: string }).message : JSON.stringify(err);
+      alert('Erro ao reenviar solicitação: ' + msg);
     }
   }
   async function atualizarStatusFinanceiro(id: number, novoStatus: string) {
@@ -120,8 +130,9 @@ export default function VisualizacaoSolicitacoes() {
       const { error } = await supabase.from('solicitacoes').update({ status: novoStatus }).eq('id', id);
       if (error) throw error;
       setSolicitacoes(solicitacoes.map(s => s.id === id ? { ...s, status: novoStatus } : s));
-    } catch (err: any) {
-      alert('Erro ao atualizar status: ' + (err?.message || JSON.stringify(err)));
+    } catch (err: unknown) {
+      const msg = err && typeof err === 'object' && 'message' in err ? (err as { message: string }).message : JSON.stringify(err);
+      alert('Erro ao atualizar status: ' + msg);
     }
   }
   function baixarAnexo(arquivo_url: string | undefined) {
@@ -142,6 +153,14 @@ export default function VisualizacaoSolicitacoes() {
       case 'FINALIZADA': return 'bg-gray-500 text-white font-bold px-1 py-1 rounded';
       default: return 'bg-slate-700 text-white px-2 py-1 rounded';
     }
+  }
+
+  function setAprovacaoRecibo(arg0: File | null): void {
+    throw new Error('Function not implemented.');
+  }
+
+  function setAprovacaoNF(arg0: File | null): void {
+    throw new Error('Function not implemented.');
   }
 
   return (
@@ -410,9 +429,12 @@ export default function VisualizacaoSolicitacoes() {
                 // Aqui você pode fazer upload dos arquivos e atualizar a solicitação
                 await aprovarSolicitacao(modalAprovar.id!);
                 setModalAprovar({ open: false });
-                setAprovacaoVale(''); setAprovacaoRecibo(null); setAprovacaoNF(null);
+                setAprovacaoVale('');
               }}>Confirmar</Button>
-              <Button className="bg-gray-400" onClick={() => { setModalAprovar({ open: false }); setAprovacaoVale(''); setAprovacaoRecibo(null); setAprovacaoNF(null); }}>Cancelar</Button>
+              <Button className="bg-gray-400" onClick={() => {
+                setModalAprovar({ open: false });
+                setAprovacaoVale('');
+              }}>Cancelar</Button>
             </div>
           </div>
         </div>
