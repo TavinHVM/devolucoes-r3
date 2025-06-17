@@ -6,6 +6,7 @@ import { Button } from '../../components/ui/button';
 import { Label } from '../../components/ui/label';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { supabase } from '../../lib/supabaseClient';
+import { useEffect } from 'react';
 
 interface LoginForm {
   email: string;
@@ -20,6 +21,16 @@ export default function Login() {
       password: '',
     },
   });
+
+  useEffect(() => {
+    async function checkAuth() {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        router.replace('/');
+      }
+    }
+    checkAuth();
+  }, [router]);
 
   const onSubmit: SubmitHandler<LoginForm> = async (data) => {
     const { error } = await supabase.auth.signInWithPassword({
