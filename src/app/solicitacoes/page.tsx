@@ -39,12 +39,13 @@ export default function VisualizacaoSolicitacoes() {
   const itemsPerPage = 10;
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState<any>(null);
-  const [modalAprovar, setModalAprovar] = useState<{open: boolean, id?: number}>({open: false});
-  const [modalRecusar, setModalRecusar] = useState<{open: boolean, id?: number}>({open: false});
+  const [modalAprovar, setModalAprovar] = useState<{ open: boolean, id?: number }>({ open: false });
+  const [modalRecusar, setModalRecusar] = useState<{ open: boolean, id?: number }>({ open: false });
   const [aprovacaoVale, setAprovacaoVale] = useState('');
-  const [aprovacaoRecibo, setAprovacaoRecibo] = useState<File|null>(null);
-  const [aprovacaoNF, setAprovacaoNF] = useState<File|null>(null);
+  const [aprovacaoRecibo, setAprovacaoRecibo] = useState<File | null>(null);
+  const [aprovacaoNF, setAprovacaoNF] = useState<File | null>(null);
   const [motivoRecusa, setMotivoRecusa] = useState('');
+  const [modalDetalhes, setModalDetalhes] = useState<{ open: boolean, solicitacao?: Solicitacao }>({ open: false });
 
   useEffect(() => {
     async function checkAuth() {
@@ -88,24 +89,58 @@ export default function VisualizacaoSolicitacoes() {
   );
 
   async function aprovarSolicitacao(id: number) {
-    await supabase.from('solicitacoes').update({ status: 'Aprovado' }).eq('id', id);
-    setSolicitacoes(solicitacoes.map(s => s.id === id ? { ...s, status: 'Aprovado' } : s));
+    try {
+      const { error } = await supabase.from('solicitacoes').update({ status: 'Aprovado' }).eq('id', id);
+      if (error) throw error;
+      setSolicitacoes(solicitacoes.map(s => s.id === id ? { ...s, status: 'Aprovado' } : s));
+    } catch (err: any) {
+      alert('Erro ao aprovar solicitação: ' + (err?.message || JSON.stringify(err)));
+    }
   }
   async function recusarSolicitacao(id: number, motivo: string) {
-    await supabase.from('solicitacoes').update({ status: 'Rejeitado', motivo_devolucao: motivo }).eq('id', id);
-    setSolicitacoes(solicitacoes.map(s => s.id === id ? { ...s, status: 'Rejeitado', motivo_devolucao: motivo } : s));
+    try {
+      const { error } = await supabase.from('solicitacoes').update({ status: 'Rejeitado', motivo_devolucao: motivo }).eq('id', id);
+      if (error) throw error;
+      setSolicitacoes(solicitacoes.map(s => s.id === id ? { ...s, status: 'Rejeitado', motivo_devolucao: motivo } : s));
+    } catch (err: any) {
+      alert('Erro ao recusar solicitação: ' + (err?.message || JSON.stringify(err)));
+    }
   }
   async function reenviarSolicitacao(id: number) {
-    await supabase.from('solicitacoes').update({ status: 'Reenviada' }).eq('id', id);
-    setSolicitacoes(solicitacoes.map(s => s.id === id ? { ...s, status: 'Reenviada' } : s));
+    try {
+      const { error } = await supabase.from('solicitacoes').update({ status: 'Reenviada' }).eq('id', id);
+      if (error) throw error;
+      setSolicitacoes(solicitacoes.map(s => s.id === id ? { ...s, status: 'Reenviada' } : s));
+    } catch (err: any) {
+      alert('Erro ao reenviar solicitação: ' + (err?.message || JSON.stringify(err)));
+    }
   }
   async function atualizarStatusFinanceiro(id: number, novoStatus: string) {
-    await supabase.from('solicitacoes').update({ status: novoStatus }).eq('id', id);
-    setSolicitacoes(solicitacoes.map(s => s.id === id ? { ...s, status: novoStatus } : s));
+    try {
+      const { error } = await supabase.from('solicitacoes').update({ status: novoStatus }).eq('id', id);
+      if (error) throw error;
+      setSolicitacoes(solicitacoes.map(s => s.id === id ? { ...s, status: novoStatus } : s));
+    } catch (err: any) {
+      alert('Erro ao atualizar status: ' + (err?.message || JSON.stringify(err)));
+    }
   }
   function baixarAnexo(arquivo_url: string | undefined) {
     if (arquivo_url) {
       window.open(`https://<sua-url-supabase-storage>/${arquivo_url}`, '_blank');
+    }
+  }
+
+  // Função utilitária para cor do status
+  function getStatusClass(status: string) {
+    switch (status?.toUpperCase()) {
+      case 'APROVADO': return 'bg-green-600 text-white font-bold px-1 py-1 rounded';
+      case 'REJEITADO': return 'bg-red-600 text-white font-bold px-1 py-1 rounded';
+      case 'PENDENTE': return 'bg-slate-400 text-white font-bold px-1 py-1 rounded';
+      case 'REENVIADA': return 'bg-blue-400 text-white font-bold px-1 py-1 rounded';
+      case 'DESDOBRADA': return 'bg-blue-700 text-white font-bold px-1 py-1 rounded';
+      case 'ABATIDA': return 'bg-stone-400 text-white font-bold px-1 py-1 rounded';
+      case 'FINALIZADA': return 'bg-gray-500 text-white font-bold px-1 py-1 rounded';
+      default: return 'bg-slate-700 text-white px-2 py-1 rounded';
     }
   }
 
@@ -116,11 +151,6 @@ export default function VisualizacaoSolicitacoes() {
         <h1 className="text-3xl font-bold mb-4 text-center text-white">Painel de Solicitações</h1>
         <div className="w-full max-w-7xl mx-auto">
           <Tabs value={tab} onValueChange={setTab} className="w-full mb-8">
-            <TabsList className="mb-4">
-              <TabsTrigger value="vendas">Vendas</TabsTrigger>
-              <TabsTrigger value="logistica">Logística</TabsTrigger>
-              <TabsTrigger value="financeiro">Financeiro</TabsTrigger>
-            </TabsList>
             <TabsContent value="vendas">
               {/* Painel de Vendas */}
               <Card className="bg-slate-800 border-none">
@@ -174,21 +204,21 @@ export default function VisualizacaoSolicitacoes() {
                       </thead>
                       <tbody>
                         {paginatedSolicitacoes.map((s) => (
-                          <tr key={s.id} className="even:bg-slate-700 odd:bg-slate-800 border-b border-slate-700">
-                            <td className="px-2 py-2">{s.id}</td>
-                            <td className="px-2 py-2">{s.nome}</td>
-                            <td className="px-2 py-2">{s.filial}</td>
-                            <td className="px-2 py-2">{s.numero_nf}</td>
-                            <td className="px-2 py-2">{s.carga}</td>
-                            <td className="px-2 py-2">{s.codigo_cobranca}</td>
-                            <td className="px-2 py-2">{s.codigo_cliente}</td>
-                            <td className="px-2 py-2">{s.rca}</td>
-                            <td className="px-2 py-2">{s.motivo_devolucao}</td>
-                            <td className="px-2 py-2">{s.vale}</td>
-                            <td className="px-2 py-2">{s.codigo_produto}</td>
-                            <td className="px-2 py-2">{s.tipo_devolucao}</td>
-                            <td className="px-2 py-2">{s.status}</td>
-                            <td className="px-2 py-2">{new Date(s.created_at).toLocaleDateString()}</td>
+                          <tr key={s.id} className="even:bg-slate-700 odd:bg-slate-800 border-b border-slate-700 hover:bg-slate-700 hover:underline">
+                            <td className="px-2 py-2 cursor-pointer" onClick={() => setModalDetalhes({ open: true, solicitacao: s })}>{s.id}</td>
+                            <td className="px-2 py-2 cursor-pointer" onClick={() => setModalDetalhes({ open: true, solicitacao: s })}>{s.nome}</td>
+                            <td className="px-2 py-2 cursor-pointer" onClick={() => setModalDetalhes({ open: true, solicitacao: s })}>{s.filial}</td>
+                            <td className="px-2 py-2 cursor-pointer" onClick={() => setModalDetalhes({ open: true, solicitacao: s })}>{s.numero_nf}</td>
+                            <td className="px-2 py-2 cursor-pointer" onClick={() => setModalDetalhes({ open: true, solicitacao: s })}>{s.carga}</td>
+                            <td className="px-2 py-2 cursor-pointer" onClick={() => setModalDetalhes({ open: true, solicitacao: s })}>{s.codigo_cobranca}</td>
+                            <td className="px-2 py-2 cursor-pointer" onClick={() => setModalDetalhes({ open: true, solicitacao: s })}>{s.codigo_cliente}</td>
+                            <td className="px-2 py-2 cursor-pointer" onClick={() => setModalDetalhes({ open: true, solicitacao: s })}>{s.rca}</td>
+                            <td className="px-2 py-2 cursor-pointer" onClick={() => setModalDetalhes({ open: true, solicitacao: s })}>{s.motivo_devolucao}</td>
+                            <td className="px-2 py-2 cursor-pointer" onClick={() => setModalDetalhes({ open: true, solicitacao: s })}>{s.vale}</td>
+                            <td className="px-2 py-2 cursor-pointer" onClick={() => setModalDetalhes({ open: true, solicitacao: s })}>{s.codigo_produto}</td>
+                            <td className="px-2 py-2 cursor-pointer" onClick={() => setModalDetalhes({ open: true, solicitacao: s })}>{s.tipo_devolucao}</td>
+                            <td className={"px-2 py-2 cursor-pointer " + getStatusClass(s.status)} onClick={() => setModalDetalhes({ open: true, solicitacao: s })}>{s.status}</td>
+                            <td className="px-2 py-2 cursor-pointer" onClick={() => setModalDetalhes({ open: true, solicitacao: s })}>{new Date(s.created_at).toLocaleDateString()}</td>
                             <td className="px-2 py-2">
                               {s.arquivo_url && (
                                 <Button
@@ -201,9 +231,9 @@ export default function VisualizacaoSolicitacoes() {
                             <td className="px-2 py-2">
                               {profile?.user_level === 'televendas' && s.status === 'Pendente' && (
                                 <div className="flex gap-2">
-                                  <Button onClick={() => setModalAprovar({open: true, id: s.id})} className="bg-green-600 hover:bg-green-700 text-white">Aprovar</Button>
+                                  <Button onClick={() => setModalAprovar({ open: true, id: s.id })} className="bg-green-600 hover:bg-green-700 text-white">Aprovar</Button>
                                   <Button
-                                    onClick={() => setModalRecusar({open: true, id: s.id})}
+                                    onClick={() => setModalRecusar({ open: true, id: s.id })}
                                     variant="destructive"
                                     className="bg-red-600 hover:bg-red-700 text-white"
                                   >
@@ -287,15 +317,19 @@ export default function VisualizacaoSolicitacoes() {
                         </tr>
                       </thead>
                       <tbody>
-                        {solicitacoes.filter(s => s.status === 'Rejeitado').map((s) => (
-                          <tr key={s.id} className="even:bg-slate-700 odd:bg-slate-800 border-b border-slate-700">
-                            <td className="px-2 py-2">{s.id}</td>
-                            <td className="px-2 py-2">{s.status}</td>
-                            <td className="px-2 py-2">
-                              <Button className="bg-blue-600 hover:bg-blue-700 text-white" onClick={() => reenviarSolicitacao(s.id)}>Reenviar</Button>
-                            </td>
-                          </tr>
-                        ))}
+                        {profile?.user_level === 'logistica' ? (
+                          solicitacoes.filter(s => s.status === 'Rejeitado').map((s) => (
+                            <tr key={s.id} className="even:bg-slate-700 odd:bg-slate-800 border-b border-slate-700">
+                              <td className="px-2 py-2">{s.id}</td>
+                              <td className="px-2 py-2">{s.status}</td>
+                              <td className="px-2 py-2">
+                                <Button className="bg-blue-600 hover:bg-blue-700 text-white" onClick={() => reenviarSolicitacao(s.id)}>Reenviar</Button>
+                              </td>
+                            </tr>
+                          ))
+                        ) : (
+                          <tr><td colSpan={3} className="text-center py-8 text-gray-400 bg-slate-800">Apenas usuários de logística podem reenviar solicitações recusadas.</td></tr>
+                        )}
                       </tbody>
                     </table>
                   </div>
@@ -318,20 +352,30 @@ export default function VisualizacaoSolicitacoes() {
                           <th className="px-2 py-2 text-left">ID</th>
                           <th className="px-2 py-2 text-left">Status</th>
                           <th className="px-2 py-2 text-left">Ações</th>
+                          <th className="px-2 py-2 text-left">NF</th>
+                          <th className="px-2 py-2 text-left">Recibo</th>
+                          <th className="px-2 py-2 text-left">NF Devolução</th>
                         </tr>
                       </thead>
                       <tbody>
-                        {solicitacoes.filter(s => s.status === 'Aprovado').map((s) => (
-                          <tr key={s.id} className="even:bg-slate-700 odd:bg-slate-800 border-b border-slate-700">
-                            <td className="px-2 py-2">{s.id}</td>
-                            <td className="px-2 py-2">{s.status}</td>
-                            <td className="px-2 py-2 flex gap-2">
-                              <Button className="bg-blue-600 hover:bg-blue-700 text-white" onClick={() => atualizarStatusFinanceiro(s.id, 'DESDOBRADA')}>Desdobrada</Button>
-                              <Button className="bg-yellow-600 hover:bg-yellow-700 text-white" onClick={() => atualizarStatusFinanceiro(s.id, 'ABATIDA')}>Abatida</Button>
-                              <Button className="bg-green-600 hover:bg-green-700 text-white" onClick={() => atualizarStatusFinanceiro(s.id, 'FINALIZADA')}>Finalizada</Button>
-                            </td>
-                          </tr>
-                        ))}
+                        {profile?.user_level === 'financeiro' ? (
+                          solicitacoes.filter(s => s.status === 'Aprovado').map((s) => (
+                            <tr key={s.id} className="even:bg-slate-700 odd:bg-slate-800 border-b border-slate-700">
+                              <td className="px-2 py-2">{s.id}</td>
+                              <td className="px-2 py-2">{s.status}</td>
+                              <td className="px-2 py-2 flex gap-2">
+                                <Button className="bg-blue-600 hover:bg-blue-700 text-white" onClick={() => atualizarStatusFinanceiro(s.id, 'DESDOBRADA')}>Desdobrar</Button>
+                                <Button className="bg-yellow-600 hover:bg-yellow-700 text-white" onClick={() => atualizarStatusFinanceiro(s.id, 'ABATIDA')}>Abater</Button>
+                                <Button className="bg-green-600 hover:bg-green-700 text-white" onClick={() => atualizarStatusFinanceiro(s.id, 'FINALIZADA')}>Finalizar</Button>
+                              </td>
+                              <td className="px-2 py-2"><Button className="bg-green-600" onClick={() => baixarAnexo(s.arquivo_url)}>NF</Button></td>
+                              <td className="px-2 py-2"><Button className="bg-green-600">Recibo</Button></td>
+                              <td className="px-2 py-2"><Button className="bg-green-600">NF Devolução</Button></td>
+                            </tr>
+                          ))
+                        ) : (
+                          <tr><td colSpan={6} className="text-center py-8 text-gray-400 bg-slate-800">Apenas usuários do financeiro podem atualizar status e baixar documentos.</td></tr>
+                        )}
                       </tbody>
                     </table>
                   </div>
@@ -366,10 +410,10 @@ export default function VisualizacaoSolicitacoes() {
               <Button className="bg-green-600" onClick={async () => {
                 // Aqui você pode fazer upload dos arquivos e atualizar a solicitação
                 await aprovarSolicitacao(modalAprovar.id!);
-                setModalAprovar({open: false});
+                setModalAprovar({ open: false });
                 setAprovacaoVale(''); setAprovacaoRecibo(null); setAprovacaoNF(null);
               }}>Confirmar</Button>
-              <Button className="bg-gray-400" onClick={() => {setModalAprovar({open: false}); setAprovacaoVale(''); setAprovacaoRecibo(null); setAprovacaoNF(null);}}>Cancelar</Button>
+              <Button className="bg-gray-400" onClick={() => { setModalAprovar({ open: false }); setAprovacaoVale(''); setAprovacaoRecibo(null); setAprovacaoNF(null); }}>Cancelar</Button>
             </div>
           </div>
         </div>
@@ -383,9 +427,58 @@ export default function VisualizacaoSolicitacoes() {
             <div className="flex gap-2 justify-end">
               <Button className="bg-green-600" onClick={async () => {
                 await recusarSolicitacao(modalRecusar.id!, motivoRecusa);
-                setModalRecusar({open: false}); setMotivoRecusa('');
+                setModalRecusar({ open: false }); setMotivoRecusa('');
               }}>Confirmar</Button>
-              <Button className="bg-gray-400" onClick={() => {setModalRecusar({open: false}); setMotivoRecusa('');}}>Cancelar</Button>
+              <Button className="bg-gray-400" onClick={() => { setModalRecusar({ open: false }); setMotivoRecusa(''); }}>Cancelar</Button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* Modal de Detalhes/Editar Solicitação */}
+      {modalDetalhes.open && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+          <div className="bg-slate-800 text-white rounded-lg p-8 w-full max-w-md">
+            <h2 className="text-xl font-bold mb-4">Detalhes da Solicitação</h2>
+            {modalDetalhes.solicitacao ? (
+              <>
+                <div className="mb-2"><b className="bg-slate-700 p-1 rounded-md">ID:</b> {modalDetalhes.solicitacao.id}</div>
+                <div className="mb-2"><b className="bg-slate-700 p-1 rounded-md">Nome:</b> {modalDetalhes.solicitacao.nome}</div>
+                <div className="mb-2"><b className="bg-slate-700 p-1 rounded-md">Filial:</b> {modalDetalhes.solicitacao.filial}</div>
+                <div className="mb-2"><b className="bg-slate-700 p-1 rounded-md">Nº NF:</b> {modalDetalhes.solicitacao.numero_nf}</div>
+                <div className="mb-2"><b className="bg-slate-700 p-1 rounded-md">Carga:</b> {modalDetalhes.solicitacao.carga}</div>
+                <div className="mb-2"><b className="bg-slate-700 p-1 rounded-md">Cód. Cobrança:</b> {modalDetalhes.solicitacao.codigo_cobranca}</div>
+                <div className="mb-2"><b className="bg-slate-700 p-1 rounded-md">Código Cliente:</b> {modalDetalhes.solicitacao.codigo_cliente}</div>
+                <div className="mb-2"><b className="bg-slate-700 p-1 rounded-md">RCA:</b> {modalDetalhes.solicitacao.rca}</div>
+                <div className="mb-2"><b className="bg-slate-700 p-1 rounded-md">Motivo da Devolução:</b> {modalDetalhes.solicitacao.motivo_devolucao}</div>
+                <div className="mb-2"><b className="bg-slate-700 p-1 rounded-md">Vale:</b> {modalDetalhes.solicitacao.vale}</div>
+                <div className="mb-2"><b className="bg-slate-700 p-1 rounded-md">Código do Produto:</b> {modalDetalhes.solicitacao.codigo_produto}</div>
+                <div className="mb-2"><b className="bg-slate-700 p-1 rounded-md">Tipo de Devolução:</b> {modalDetalhes.solicitacao.tipo_devolucao}</div>
+                <div className="mb-2"><b className="bg-slate-700 p-1 rounded-md">Status Atual:</b> {modalDetalhes.solicitacao.status}</div>
+                <div className="mb-2"><b className="bg-slate-700 p-1 rounded-md">Data de Criação:</b> {new Date(modalDetalhes.solicitacao.created_at).toLocaleString()}</div>
+                <div className="mb-4">
+                  <label className="block mb-2 font-bold">Editar Status:</label>
+                  <select
+                    value={modalDetalhes.solicitacao.status}
+                    onChange={async (e) => {
+                      const novoStatus = e.target.value;
+                      await atualizarStatusFinanceiro(modalDetalhes.solicitacao!.id, novoStatus);
+                      setModalDetalhes((prev) => prev.solicitacao ? { ...prev, solicitacao: { ...prev.solicitacao, status: novoStatus } } : prev);
+                    }}
+                    className="w-full border rounded p-2 bg-slate-700 text-white"
+                  >
+                    <option value="PENDENTE" className="bg-slate-700 font-bold text-white">Pendente</option>
+                    <option value="APROVADO" className="bg-slate-700 font-bold text-green-500">Aprovado</option>
+                    <option value="REJEITADO" className="bg-slate-700 font-bold text-red-500">Rejeitado</option>
+                    <option value="REENVIADA" className="bg-slate-700 font-bold text-yellow-500">Reenviada</option>
+                    <option value="DESDOBRADA" className="bg-slate-700 font-bold text-blue-400">Desdobrada</option>
+                    <option value="ABATIDA" className="bg-slate-700 font-bold text-stone-300">Abatida</option>
+                    <option value="FINALIZADA" className="bg-slate-700 font-bold text-gray-400">Finalizada</option>
+                  </select>
+                </div>
+              </>
+            ) : <div>Selecione uma solicitação para ver detalhes.</div>}
+            <div className="flex gap-2 justify-end mt-4">
+              <Button className="bg-gray-400" onClick={() => setModalDetalhes({ open: false })}>Fechar</Button>
             </div>
           </div>
         </div>
