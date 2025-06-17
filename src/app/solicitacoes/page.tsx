@@ -4,7 +4,7 @@ import { supabase } from '../../lib/supabaseClient';
 import { Card, CardContent, CardHeader } from '../../components/ui/card';
 import { Input } from '../../components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/ui/select';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/tabs';
+import { Tabs, TabsContent } from '../../components/ui/tabs';
 import { Button } from '../../components/ui/button';
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "../../components/ui/pagination";
 import { useRouter } from 'next/navigation';
@@ -153,14 +153,6 @@ export default function VisualizacaoSolicitacoes() {
       case 'FINALIZADA': return 'bg-gray-500 text-white font-bold px-1 py-1 rounded';
       default: return 'bg-slate-700 text-white px-2 py-1 rounded';
     }
-  }
-
-  function setAprovacaoRecibo(arg0: File | null): void {
-    throw new Error('Function not implemented.');
-  }
-
-  function setAprovacaoNF(arg0: File | null): void {
-    throw new Error('Function not implemented.');
   }
 
   return (
@@ -418,15 +410,14 @@ export default function VisualizacaoSolicitacoes() {
             </div>
             <div className="mb-4">
               <label className="block mb-2">Recibo:</label>
-              <input type="file" onChange={e => setAprovacaoRecibo(e.target.files?.[0] || null)} className="w-full" />
+              <input type="file" className="w-full" />
             </div>
             <div className="mb-4">
               <label className="block mb-2">Nota de Devolução:</label>
-              <input type="file" onChange={e => setAprovacaoNF(e.target.files?.[0] || null)} className="w-full" />
+              <input type="file" className="w-full" />
             </div>
             <div className="flex gap-2 justify-end">
               <Button className="bg-green-600" onClick={async () => {
-                // Aqui você pode fazer upload dos arquivos e atualizar a solicitação
                 await aprovarSolicitacao(modalAprovar.id!);
                 setModalAprovar({ open: false });
                 setAprovacaoVale('');
