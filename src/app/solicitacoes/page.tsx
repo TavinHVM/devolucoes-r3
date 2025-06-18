@@ -74,7 +74,13 @@ export default function VisualizacaoSolicitacoes() {
       if (status !== 'Todos') {
         query = query.eq('status', status);
       }
-      const { data } = await query;
+      const { data, error } = await query;
+      if (error) {
+        console.error('Erro ao buscar solicitações:', error);
+        alert('Erro ao buscar solicitações: ' + (error.message || JSON.stringify(error)));
+        setSolicitacoes([]);
+        return;
+      }
       setSolicitacoes(data || []);
     }
     fetchSolicitacoes();
@@ -181,9 +187,12 @@ export default function VisualizacaoSolicitacoes() {
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="Todos">Todos</SelectItem>
-                          <SelectItem value="Pendente">Pendente</SelectItem>
-                          <SelectItem value="Aprovado">Aprovado</SelectItem>
-                          <SelectItem value="Rejeitado">Rejeitado</SelectItem>
+                          <SelectItem value="PENDENTE">Pendente</SelectItem>
+                          <SelectItem value="APROVADO">Aprovado</SelectItem>
+                          <SelectItem value="REJEITADO">Rejeitado</SelectItem>
+                          <SelectItem value="DESDOBRADA">Desdobrada</SelectItem>
+                          <SelectItem value="ABATIDA">Abatida</SelectItem>
+                          <SelectItem value="FINALIZADA">Finalizada</SelectItem>
                         </SelectContent>
                       </Select>
                       <Button className="ml-4 bg-green-600 hover:bg-green-700 text-white">Baixar Relatório</Button>

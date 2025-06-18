@@ -8,8 +8,9 @@ export async function getCurrentUserProfile() {
     .from('user_profiles')
     .select('*')
     .eq('id', session.user.id)
-    .single();
+    .maybeSingle();
 
   if (error) throw error;
+  if (!profile) return null;
   return profile;
 }
