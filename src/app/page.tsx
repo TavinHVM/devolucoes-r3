@@ -34,7 +34,7 @@ export default function Home() {
           </h1>
           <div className="w-full flex flex-col gap-2 mt-4">
             <span className="text-base text-white text-center text-lg">
-              Utilize o menu lateral para navegar entre as funcionalidades do sistema.
+              Utilize o menu para navegar entre as funcionalidades do sistema.
             </span>
           </div>
         </div>

@@ -10,7 +10,14 @@ export async function getCurrentUserProfile() {
     .eq('id', session.user.id)
     .maybeSingle();
 
+<<<<<<< HEAD
   if (error) throw error;
   if (!profile) return null;
+=======
+  if (error) {
+    console.error('Erro ao buscar perfil do usuário:', error);
+    return null;
+  }
+>>>>>>> gustavo-branch
   return profile;
 }

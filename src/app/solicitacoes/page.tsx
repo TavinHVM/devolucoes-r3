@@ -53,6 +53,7 @@ export default function VisualizacaoSolicitacoes() {
   const [aprovacaoVale, setAprovacaoVale] = useState('');
   const [motivoRecusa, setMotivoRecusa] = useState('');
   const [modalDetalhes, setModalDetalhes] = useState<{ open: boolean, solicitacao?: Solicitacao }>({ open: false });
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     async function checkAuth() {
@@ -67,6 +68,7 @@ export default function VisualizacaoSolicitacoes() {
     getCurrentUserProfile().then(setProfile);
   }, [router]);
 
+<<<<<<< HEAD
   useEffect(() => {
     if (loading) return;
     async function fetchSolicitacoes() {
@@ -81,9 +83,28 @@ export default function VisualizacaoSolicitacoes() {
         setSolicitacoes([]);
         return;
       }
+=======
+  async function fetchSolicitacoes() {
+    setRefreshing(true);
+    let query = supabase.from('solicitacoes').select('*');
+    if (status !== 'Todos') {
+      query = query.eq('status', status);
+    }
+    const { data, error } = await query;
+    if (error) {
+      console.error('Erro ao buscar solicitações:', error);
+      setSolicitacoes([]);
+    } else {
+>>>>>>> gustavo-branch
       setSolicitacoes(data || []);
     }
+    setRefreshing(false);
+  }
+
+  useEffect(() => {
+    if (loading) return;
     fetchSolicitacoes();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [status, loading]);
 
   if (loading) {
@@ -179,6 +200,13 @@ export default function VisualizacaoSolicitacoes() {
                       onChange={e => setBusca(e.target.value)}
                       className="max-w-md bg-slate-700 text-white border-slate-600 placeholder:text-slate-400"
                     />
+                    <Button
+                      className="ml-2 bg-slate-600 hover:bg-slate-700 text-white"
+                      onClick={fetchSolicitacoes}
+                      disabled={refreshing}
+                    >
+                      {refreshing ? 'Atualizando...' : 'Atualizar'}
+                    </Button>
                     <div className="flex gap-4 items-center">
                       <span className="text-white">Filtrar por status:</span>
                       <Select value={status} onValueChange={v => setStatus(v || 'Todos')}>

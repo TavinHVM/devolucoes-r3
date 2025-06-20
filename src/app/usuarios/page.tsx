@@ -176,35 +176,43 @@ export default function Usuarios() {
                   <Label htmlFor="edit_email">E-mail</Label>
                   <Input
                     id="edit_email"
+                    name="email"
                     value={editUser.email}
                     disabled
+                    autoComplete="email"
                   />
                 </div>
                 <div>
                   <Label htmlFor="edit_first_name">Nome</Label>
                   <Input
                     id="edit_first_name"
+                    name="first_name"
                     value={editForm.first_name}
                     onChange={e => setEditForm(f => ({ ...f, first_name: e.target.value }))}
                     required
+                    autoComplete="given-name"
                   />
                 </div>
                 <div>
                   <Label htmlFor="edit_last_name">Sobrenome</Label>
                   <Input
                     id="edit_last_name"
+                    name="last_name"
                     value={editForm.last_name}
                     onChange={e => setEditForm(f => ({ ...f, last_name: e.target.value }))}
                     required
+                    autoComplete="family-name"
                   />
                 </div>
                 <div>
                   <Label htmlFor="edit_role">Cargo</Label>
                   <Input
                     id="edit_role"
+                    name="role"
                     value={editForm.role}
                     onChange={e => setEditForm(f => ({ ...f, role: e.target.value }))}
                     required
+                    autoComplete="organization-title"
                   />
                 </div>
                 <div>
@@ -213,7 +221,7 @@ export default function Usuarios() {
                     value={editForm.user_level}
                     onValueChange={value => setEditForm(f => ({ ...f, user_level: value }))}
                   >
-                    <SelectTrigger id="edit_user_level" className="w-full">
+                    <SelectTrigger id="edit_user_level" name="user_level" className="w-full">
                       <SelectValue placeholder="Selecione o nível" />
                     </SelectTrigger>
                     <SelectContent>
@@ -277,47 +285,57 @@ export default function Usuarios() {
                   <Label htmlFor="email" className='mb-2'>E-mail</Label>
                   <Input
                     id="email"
+                    name="email"
                     type="email"
                     value={form.email}
                     onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
                     required
+                    autoComplete="email"
                   />
                 </div>
                 <div>
                   <Label htmlFor="password" className='mb-2'>Senha</Label>
                   <Input
                     id="password"
+                    name="password"
                     type="password"
                     value={form.password}
                     onChange={e => setForm(f => ({ ...f, password: e.target.value }))}
                     required
+                    autoComplete="new-password"
                   />
                 </div>
                 <div>
                   <Label htmlFor="first_name" className='mb-2'>Nome</Label>
                   <Input
                     id="first_name"
+                    name="first_name"
                     value={form.first_name}
                     onChange={e => setForm(f => ({ ...f, first_name: e.target.value }))}
                     required
+                    autoComplete="given-name"
                   />
                 </div>
                 <div>
                   <Label htmlFor="last_name" className='mb-2'>Sobrenome</Label>
                   <Input
                     id="last_name"
+                    name="last_name"
                     value={form.last_name}
                     onChange={e => setForm(f => ({ ...f, last_name: e.target.value }))}
                     required
+                    autoComplete="family-name"
                   />
                 </div>
                 <div>
                   <Label htmlFor="role" className='mb-2'>Cargo</Label>
                   <Input
                     id="role"
+                    name="role"
                     value={form.role}
                     onChange={e => setForm(f => ({ ...f, role: e.target.value }))}
                     required
+                    autoComplete="organization-title"
                   />
                 </div>
                 <div>
@@ -326,7 +344,7 @@ export default function Usuarios() {
                     value={form.user_level}
                     onValueChange={value => setForm(f => ({ ...f, user_level: value }))}
                   >
-                    <SelectTrigger id="user_level" className="w-full">
+                    <SelectTrigger id="user_level" name="user_level" className="w-full">
                       <SelectValue placeholder="Selecione o nível" />
                     </SelectTrigger>
                     <SelectContent>
@@ -338,7 +356,14 @@ export default function Usuarios() {
                   </Select>
                 </div>
                 {error && (
-                  <div className="text-red-600 text-sm">{error}</div>
+                  <div className="text-red-600 text-sm">
+                    {typeof error === 'object' && error !== null
+                      ? // Try to show error.message if it exists, else JSON.stringify
+                        'message' in error && typeof (error as any).message === 'string'
+                          ? (error as any).message
+                          : JSON.stringify(error)
+                      : String(error)}
+                  </div>
                 )}
                 <Button type="submit" className="w-full mt-2 cursor-pointer bg-blue-500 hover:bg-blue-600" disabled={creating}>
                   {creating ? 'Criando...' : 'Criar Usuário'}
