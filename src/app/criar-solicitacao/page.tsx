@@ -8,8 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { Textarea } from "../../components/ui/textarea";
 import { useForm } from "react-hook-form";
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
-import { supabase } from '../../lib/supabaseClient';
+import { useState } from 'react';
 import Header from '../../components/header';
 
 type FormData = {
@@ -43,22 +42,6 @@ export default function Solicitacao() {
       arquivo: undefined,
     },
   });
-
-  useEffect(() => {
-    async function checkAuth() {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        router.replace('/login');
-      } else {
-        setLoading(false);
-      }
-    }
-    checkAuth();
-  }, [router]);
-
-  if (loading) {
-    return <div className="flex h-screen items-center justify-center bg-gray-900 text-white">Carregando...</div>;
-  }
 
   function onSubmit(data: FormData) {
     // Aqui você pode lidar com o envio dos dados

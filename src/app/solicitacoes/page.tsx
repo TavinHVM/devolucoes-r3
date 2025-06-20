@@ -9,7 +9,6 @@ import { Button } from '../../components/ui/button';
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "../../components/ui/pagination";
 import { useRouter } from 'next/navigation';
 import Header from '../../components/header';
-import { getCurrentUserProfile } from '../../lib/getCurrentUserProfile';
 
 type Solicitacao = {
   id: number;
@@ -55,19 +54,6 @@ export default function VisualizacaoSolicitacoes() {
   const [modalDetalhes, setModalDetalhes] = useState<{ open: boolean, solicitacao?: Solicitacao }>({ open: false });
   const [refreshing, setRefreshing] = useState(false);
 
-  useEffect(() => {
-    async function checkAuth() {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        router.replace('/login');
-      } else {
-        setLoading(false);
-      }
-    }
-    checkAuth();
-    getCurrentUserProfile().then(setProfile);
-  }, [router]);
-
   async function fetchSolicitacoes() {
     setRefreshing(true);
     let query = supabase.from('solicitacoes').select('*');
@@ -82,16 +68,6 @@ export default function VisualizacaoSolicitacoes() {
       setSolicitacoes(data || []);
     }
     setRefreshing(false);
-  }
-
-  useEffect(() => {
-    if (loading) return;
-    fetchSolicitacoes();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [status, loading]);
-
-  if (loading) {
-    return <div className="flex h-screen items-center justify-center bg-gray-900 text-white">Carregando...</div>;
   }
 
   const solicitacoesFiltradas = solicitacoes.filter(s =>
