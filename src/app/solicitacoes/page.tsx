@@ -68,22 +68,6 @@ export default function VisualizacaoSolicitacoes() {
     getCurrentUserProfile().then(setProfile);
   }, [router]);
 
-<<<<<<< HEAD
-  useEffect(() => {
-    if (loading) return;
-    async function fetchSolicitacoes() {
-      let query = supabase.from('solicitacoes').select('*');
-      if (status !== 'Todos') {
-        query = query.eq('status', status);
-      }
-      const { data, error } = await query;
-      if (error) {
-        console.error('Erro ao buscar solicitações:', error);
-        alert('Erro ao buscar solicitações: ' + (error.message || JSON.stringify(error)));
-        setSolicitacoes([]);
-        return;
-      }
-=======
   async function fetchSolicitacoes() {
     setRefreshing(true);
     let query = supabase.from('solicitacoes').select('*');
@@ -95,7 +79,6 @@ export default function VisualizacaoSolicitacoes() {
       console.error('Erro ao buscar solicitações:', error);
       setSolicitacoes([]);
     } else {
->>>>>>> gustavo-branch
       setSolicitacoes(data || []);
     }
     setRefreshing(false);
