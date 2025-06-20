@@ -8,8 +8,11 @@ export async function getCurrentUserProfile() {
     .from('user_profiles')
     .select('*')
     .eq('id', session.user.id)
-    .single();
+    .maybeSingle();
 
-  if (error) throw error;
+  if (error) {
+    console.error('Erro ao buscar perfil do usuário:', error);
+    return null;
+  }
   return profile;
 }

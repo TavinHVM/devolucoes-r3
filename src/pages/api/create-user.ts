@@ -7,6 +7,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   if (result.success) {
     res.status(200).json(result)
   } else {
-    res.status(400).json(result)
+    res.status(400).json({ error: result.error })
   }
 }

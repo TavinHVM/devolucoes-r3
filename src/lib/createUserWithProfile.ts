@@ -44,14 +44,14 @@ export async function createUserWithProfile(
   // 2. Atualiza user_profiles com dados adicionais (incluindo email)
   const { error: profileError } = await supabaseAdmin
     .from('user_profiles')
-    .update({
+    .upsert([{
+      id: userId,
       first_name: params.first_name,
       last_name: params.last_name,
-      email: params.email, // salva o email também
+      email: params.email,
       role: params.role,
       user_level: params.user_level,
-    })
-    .eq('id', userId);
+    }]);
 
   if (profileError) {
     return { success: false, error: profileError, userId };
