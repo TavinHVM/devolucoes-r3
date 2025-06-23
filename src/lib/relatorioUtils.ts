@@ -2,6 +2,24 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 
+// Definição do tipo para as solicitações
+export type Solicitacao = {
+  id: number;
+  nome: string;
+  filial: string;
+  numero_nf: string;
+  carga: string;
+  codigo_cobranca: string;
+  codigo_cliente: string;
+  rca: string;
+  motivo_devolucao: string;
+  vale?: string;
+  codigo_produto: string;
+  tipo_devolucao: string;
+  status: string;
+  created_at: string;
+};
+
 // Função utilitária para carregar imagem base64 da public
 export async function getLogoBase64(path = '/r3logo.png') {
   const response = await fetch(path);
@@ -22,7 +40,7 @@ export async function gerarRelatorioPDF({
   subtitulo = 'Relatório de Solicitações',
   logoBase64,
 }: {
-  solicitacoes: any[];
+  solicitacoes: Solicitacao[];
   status: string;
   filtroDescricao?: string;
   titulo?: string;
@@ -87,14 +105,8 @@ export async function gerarRelatorioPDF({
 
 export function gerarRelatorioXLSX({
   solicitacoes,
-  status,
-  filtroDescricao = '',
-  titulo = 'Relatório de Solicitações',
 }: {
-  solicitacoes: any[];
-  status: string;
-  filtroDescricao?: string;
-  titulo?: string;
+  solicitacoes: Solicitacao[];
 }) {
   const wsData = [
     [
