@@ -9,9 +9,7 @@ import { Button } from '../../components/ui/button';
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "../../components/ui/pagination";
 import Header from '../../components/header';
 import { useRouter } from 'next/navigation';
-import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
-import * as XLSX from 'xlsx';
+import { gerarRelatorioPDF, gerarRelatorioXLSX, getLogoBase64 } from '../../lib/relatorioUtils';
 
 type Solicitacao = {
   id: number;
@@ -138,7 +136,7 @@ export default function VisualizacaoSolicitacoes() {
   }
   function baixarAnexo(arquivo_url: string | undefined) {
     if (arquivo_url) {
-      window.open(`https://<sua-url-supabase-storage>/${arquivo_url}`, '_blank');
+      window.open(`https://${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${arquivo_url}`, '_blank');
     }
   }
 
@@ -154,78 +152,6 @@ export default function VisualizacaoSolicitacoes() {
       case 'FINALIZADA': return 'bg-gray-500 text-white font-bold px-1 py-1 rounded';
       default: return 'bg-slate-700 text-white px-2 py-1 rounded';
     }
-  }
-
-  function gerarRelatorioPDF() {
-    const doc = new jsPDF('l', 'pt', 'a4');
-    // Espaço para logo (você pode adicionar depois com doc.addImage)
-    doc.setFontSize(22);
-    doc.text('R3 Suprimentos', 40, 50);
-    doc.setFontSize(14);
-    const dataAtual = new Date().toLocaleString();
-    doc.text(`Relatório de Solicitações - ${dataAtual}`, 40, 75);
-    doc.setFontSize(12);
-    doc.text(`Filtro aplicado: ${status}`, 40, 95);
-    doc.text(`Total de itens: ${solicitacoesFiltradas.length}`, 40, 115);
-    doc.text('---', 40, 130);
-    // Montar dados da tabela
-    const tableData = solicitacoesFiltradas.map(s => [
-      s.id,
-      s.nome,
-      s.filial,
-      s.numero_nf,
-      s.carga,
-      s.codigo_cobranca,
-      s.codigo_cliente,
-      s.rca,
-      s.motivo_devolucao,
-      s.vale || '',
-      s.codigo_produto,
-      s.tipo_devolucao,
-      s.status,
-      new Date(s.created_at).toLocaleDateString()
-    ]);
-    autoTable(doc, {
-      startY: 140,
-      head: [[
-        'ID', 'Nome', 'Filial', 'Nº NF', 'Carga', 'Cód. Cobrança', 'Código Cliente', 'RCA', 'Motivo', 'Vale', 'Cód. Produto', 'Tipo', 'Status', 'Data'
-      ]],
-      body: tableData,
-      styles: { fontSize: 8 },
-      headStyles: { fillColor: [44, 62, 80] },
-      margin: { left: 40, right: 40 },
-      theme: 'grid',
-    });
-    doc.save(`relatorio-solicitacoes-${dataAtual.replace(/\D/g, '')}.pdf`);
-  }
-
-  function gerarRelatorioXLSX() {
-    const wsData = [
-      [
-        'ID', 'Nome', 'Filial', 'Nº NF', 'Carga', 'Cód. Cobrança', 'Código Cliente', 'RCA', 'Motivo', 'Vale', 'Cód. Produto', 'Tipo', 'Status', 'Data'
-      ],
-      ...solicitacoesFiltradas.map(s => [
-        s.id,
-        s.nome,
-        s.filial,
-        s.numero_nf,
-        s.carga,
-        s.codigo_cobranca,
-        s.codigo_cliente,
-        s.rca,
-        s.motivo_devolucao,
-        s.vale || '',
-        s.codigo_produto,
-        s.tipo_devolucao,
-        s.status,
-        new Date(s.created_at).toLocaleDateString()
-      ])
-    ];
-    const ws = XLSX.utils.aoa_to_sheet(wsData);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Relatório');
-    const dataAtual = new Date().toLocaleString().replace(/\D/g, '');
-    XLSX.writeFile(wb, `relatorio-solicitacoes-${dataAtual}.xlsx`);
   }
 
   return (
@@ -587,8 +513,12 @@ export default function VisualizacaoSolicitacoes() {
             <p className="mb-4">Você está prestes a baixar um relatório em PDF ou Excel contendo <b>{solicitacoesFiltradas.length}</b> solicitações filtradas pelo status: <b>{status}</b>.<br />Escolha o formato desejado:</p>
             <div className="flex gap-2 justify-end">
               <Button className="bg-gray-500 hover:bg-gray-600 cursor-pointer" onClick={() => setModalRelatorio(false)}>Cancelar</Button>
-              <Button className="bg-blue-600 hover:bg-blue-700 cursor-pointer" onClick={() => { gerarRelatorioPDF(); setModalRelatorio(false); }}>Baixar em PDF</Button>
-              <Button className="bg-green-600 hover:bg-green-700 cursor-pointer" onClick={() => { gerarRelatorioXLSX(); setModalRelatorio(false); }}>Baixar em Excel</Button>
+              <Button className="bg-blue-600 hover:bg-blue-700 cursor-pointer" onClick={async () => {
+                const logoBase64 = await getLogoBase64('/r3logo.png');
+                await gerarRelatorioPDF({ solicitacoes: solicitacoesFiltradas, status, logoBase64 });
+                setModalRelatorio(false);
+              }}>Baixar em PDF</Button>
+              <Button className="bg-green-600 hover:bg-green-700 cursor-pointer" onClick={() => { gerarRelatorioXLSX({ solicitacoes: solicitacoesFiltradas, status }); setModalRelatorio(false); }}>Baixar em Excel</Button>
             </div>
           </div>
         </div>
