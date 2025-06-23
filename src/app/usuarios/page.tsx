@@ -5,6 +5,7 @@ import Header from '../../components/header';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../../components/ui/dialog';
 
 // Tipo do usuário conforme a tabela user_profiles
 interface Usuario {
@@ -39,6 +40,8 @@ export default function Usuarios() {
     email: '',
   });
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+  const [resetEmail, setResetEmail] = useState<string | null>(null);
+  const [resetStatus, setResetStatus] = useState<string | null>(null);
 
   useEffect(() => {
     fetchUsuarios();
@@ -127,6 +130,16 @@ export default function Usuarios() {
     fetchUsuarios();
   }
 
+  async function handleResetPassword(email: string) {
+    setResetStatus(null);
+    const { error } = await supabase.auth.resetPasswordForEmail(email);
+    if (error) {
+      setResetStatus('Erro ao enviar e-mail de redefinição: ' + error.message);
+    } else {
+      setResetStatus('E-mail de redefinição enviado com sucesso!');
+    }
+  }
+
   return (
     <>
       <Header />
@@ -196,6 +209,7 @@ export default function Usuarios() {
                     <option value="logistica">Logística</option>
                   </select>
                 </div>
+                <Button className="bg-yellow-500 hover:bg-yellow-600" onClick={() => setResetEmail(editUser.email)} size="sm">Redefinir senha</Button>
                 <Button type="submit" className="w-full mt-2 cursor-pointer bg-blue-500 hover:bg-blue-600">Salvar</Button>
               </form>
             </div>
@@ -214,6 +228,33 @@ export default function Usuarios() {
             </div>
           </div>
         )}
+        {/* Dialog de redefinir senha */}
+        <Dialog open={!!resetEmail} onOpenChange={open => { if (!open) { setResetEmail(null); setResetStatus(null); } }}>
+          <DialogContent className="bg-slate-800 border-none">
+            <DialogHeader>
+              <DialogTitle className="text-white">Redefinir senha</DialogTitle>
+            </DialogHeader>
+            <div className="mb-6 text-center text-white">Tem certeza que quer redefinir a senha?</div>
+            {resetStatus && <div className="mb-4 text-center text-sm text-green-400">{resetStatus}</div>}
+            <DialogFooter className="flex flex-row gap-2 justify-end">
+              <Button
+                className="bg-gray-500 hover:bg-gray-600 text-white border-none cursor-pointer"
+                variant="secondary"
+                onClick={() => { setResetEmail(null); setResetStatus(null); }}
+                type="button"
+              >
+                Cancelar
+              </Button>
+              <Button
+                className="bg-yellow-600 hover:bg-yellow-700 cursor-pointer text-white"
+                onClick={async () => { if (resetEmail) await handleResetPassword(resetEmail); }}
+                type="button"
+              >
+                Sim
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
         {/* Tabela de usuários */}
         <div className="w-full max-w-4xl mt-6">
           <div className="overflow-x-auto">
