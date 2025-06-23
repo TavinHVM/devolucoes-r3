@@ -518,7 +518,7 @@ export default function VisualizacaoSolicitacoes() {
                 await gerarRelatorioPDF({ solicitacoes: solicitacoesFiltradas, status, logoBase64 });
                 setModalRelatorio(false);
               }}>Baixar em PDF</Button>
-              <Button className="bg-green-600 hover:bg-green-700 cursor-pointer" onClick={() => { gerarRelatorioXLSX({ solicitacoes: solicitacoesFiltradas, status }); setModalRelatorio(false); }}>Baixar em Excel</Button>
+              <Button className="bg-green-600 hover:bg-green-700 cursor-pointer" onClick={() => { gerarRelatorioXLSX({ solicitacoes: solicitacoesFiltradas }); setModalRelatorio(false); }}>Baixar em Excel</Button>
             </div>
           </div>
         </div>
