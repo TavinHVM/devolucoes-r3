@@ -9,6 +9,8 @@ import { Button } from '../../components/ui/button';
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "../../components/ui/pagination";
 import Header from '../../components/header';
 import { useRouter } from 'next/navigation';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 type Solicitacao = {
   id: number;
@@ -51,6 +53,7 @@ export default function VisualizacaoSolicitacoes() {
   const [motivoRecusa, setMotivoRecusa] = useState('');
   const [modalDetalhes, setModalDetalhes] = useState<{ open: boolean, solicitacao?: Solicitacao }>({ open: false });
   const [refreshing, setRefreshing] = useState(false);
+  const [modalRelatorio, setModalRelatorio] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -152,6 +155,49 @@ export default function VisualizacaoSolicitacoes() {
     }
   }
 
+  function gerarRelatorioPDF() {
+    const doc = new jsPDF('l', 'pt', 'a4');
+    // Espaço para logo (você pode adicionar depois com doc.addImage)
+    doc.setFontSize(22);
+    doc.text('R3 Suprimentos', 40, 50);
+    doc.setFontSize(14);
+    const dataAtual = new Date().toLocaleString();
+    doc.text(`Relatório de Solicitações - ${dataAtual}`, 40, 75);
+    doc.setFontSize(12);
+    doc.text(`Filtro aplicado: ${status}`, 40, 95);
+    doc.text(`Total de itens: ${solicitacoesFiltradas.length}`, 40, 115);
+    doc.text('---', 40, 130);
+    // Montar dados da tabela
+    const tableData = solicitacoesFiltradas.map(s => [
+      s.id,
+      s.nome,
+      s.filial,
+      s.numero_nf,
+      s.carga,
+      s.codigo_cobranca,
+      s.codigo_cliente,
+      s.rca,
+      s.motivo_devolucao,
+      s.vale || '',
+      s.codigo_produto,
+      s.tipo_devolucao,
+      s.status,
+      new Date(s.created_at).toLocaleDateString()
+    ]);
+    autoTable(doc, {
+      startY: 140,
+      head: [[
+        'ID', 'Nome', 'Filial', 'Nº NF', 'Carga', 'Cód. Cobrança', 'Código Cliente', 'RCA', 'Motivo', 'Vale', 'Cód. Produto', 'Tipo', 'Status', 'Data'
+      ]],
+      body: tableData,
+      styles: { fontSize: 8 },
+      headStyles: { fillColor: [44, 62, 80] },
+      margin: { left: 40, right: 40 },
+      theme: 'grid',
+    });
+    doc.save(`relatorio-solicitacoes-${dataAtual.replace(/\D/g, '')}.pdf`);
+  }
+
   return (
     <>
       <Header />
@@ -193,7 +239,9 @@ export default function VisualizacaoSolicitacoes() {
                           <SelectItem value="FINALIZADA">Finalizada</SelectItem>
                         </SelectContent>
                       </Select>
-                      <Button className="ml-4 bg-green-600 hover:bg-green-700 text-white cursor-pointer">Baixar Relatório</Button>
+                      <Button className="ml-4 bg-green-600 hover:bg-green-700 text-white cursor-pointer" onClick={() => setModalRelatorio(true)}>
+                        Baixar Relatório
+                      </Button>
                     </div>
                   </div>
                 </CardHeader>
@@ -498,6 +546,18 @@ export default function VisualizacaoSolicitacoes() {
             ) : <div>Selecione uma solicitação para ver detalhes.</div>}
             <div className="flex gap-2 justify-end mt-4">
               <Button className="bg-gray-400" onClick={() => setModalDetalhes({ open: false })}>Fechar</Button>
+            </div>
+          </div>
+        </div>
+      )}
+      {modalRelatorio && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+          <div className="bg-slate-800 text-white rounded-lg p-8 w-full max-w-md">
+            <h2 className="text-xl font-bold mb-4">Confirmar Download do Relatório</h2>
+            <p className="mb-4">Você está prestes a baixar um relatório em PDF contendo <b>{solicitacoesFiltradas.length}</b> solicitações filtradas pelo status: <b>{status}</b>.<br />Deseja continuar?</p>
+            <div className="flex gap-2 justify-end">
+              <Button className="bg-gray-500 hover:bg-gray-600 cursor-pointer" onClick={() => setModalRelatorio(false)}>Cancelar</Button>
+              <Button className="bg-green-600 hover:bg-green-700 cursor-pointer" onClick={() => { gerarRelatorioPDF(); setModalRelatorio(false); }}>Baixar Relatório</Button>
             </div>
           </div>
         </div>
