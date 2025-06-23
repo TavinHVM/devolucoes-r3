@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { supabase } from '../../lib/supabaseClient';
 import { Card, CardContent, CardHeader } from '../../components/ui/card';
 import { Input } from '../../components/ui/input';
@@ -38,15 +38,13 @@ interface UserProfile {
 }
 
 export default function VisualizacaoSolicitacoes() {
-  const router = useRouter();
   const [solicitacoes, setSolicitacoes] = useState<Solicitacao[]>([]);
   const [status, setStatus] = useState('Todos');
   const [busca, setBusca] = useState('');
   const [tab, setTab] = useState('vendas');
   const [page, setPage] = useState(1);
   const itemsPerPage = 10;
-  const [loading, setLoading] = useState(true);
-  const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [profile] = useState<UserProfile | null>(null);
   const [modalAprovar, setModalAprovar] = useState<{ open: boolean, id?: number }>({ open: false });
   const [modalRecusar, setModalRecusar] = useState<{ open: boolean, id?: number }>({ open: false });
   const [aprovacaoVale, setAprovacaoVale] = useState('');

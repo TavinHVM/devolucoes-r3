@@ -6,6 +6,7 @@ import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../../components/ui/dialog';
+import { useRouter } from 'next/navigation';
 
 // Tipo do usuário conforme a tabela user_profiles
 interface Usuario {
@@ -19,6 +20,7 @@ interface Usuario {
 }
 
 export default function Usuarios() {
+  const router = useRouter();
   const [usuarios, setUsuarios] = useState<Usuario[]>([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
@@ -44,8 +46,16 @@ export default function Usuarios() {
   const [resetStatus, setResetStatus] = useState<string | null>(null);
 
   useEffect(() => {
-    fetchUsuarios();
-  }, []);
+    async function checkAuth() {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        router.replace('/login');
+      } else {
+        fetchUsuarios();
+      }
+    }
+    checkAuth();
+  }, [router]);
 
   async function fetchUsuarios() {
     setLoading(true);
@@ -138,6 +148,10 @@ export default function Usuarios() {
     } else {
       setResetStatus('E-mail de redefinição enviado com sucesso!');
     }
+  }
+
+  if (loading) {
+    return <div className="flex h-screen items-center justify-center bg-gray-50">Carregando...</div>;
   }
 
   return (

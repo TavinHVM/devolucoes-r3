@@ -7,8 +7,6 @@ import { Form } from "../../components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/select";
 import { Textarea } from "../../components/ui/textarea";
 import { useForm } from "react-hook-form";
-import { useRouter } from 'next/navigation';
-import { useState } from 'react';
 import Header from '../../components/header';
 
 type FormData = {
@@ -25,8 +23,6 @@ type FormData = {
 };
 
 export default function Solicitacao() {
-  const router = useRouter();
-  const [loading, setLoading] = useState(true);
 
   const form = useForm({
     defaultValues: {
