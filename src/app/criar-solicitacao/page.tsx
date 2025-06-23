@@ -49,7 +49,7 @@ export default function Solicitacao() {
       <Header />
       <div className="flex items-center justify-center h-full min-h-screen w-full bg-gray-900">
         <Card className="w-full max-w-[90%] lg:max-w-[30%] shadow-2xl bg-slate-800 border-none">
-          <CardHeader className="bg-gray-800 rounded-t-xl px-8 py-6">
+          <CardHeader className="bg-slate-800 rounded-t-xl px-8 py-6">
             <CardTitle className="text-center text-2xl font-bold text-white">Criar Solicitação</CardTitle>
           </CardHeader>
           <CardContent className="w-full max-w-full px-8 py-8">

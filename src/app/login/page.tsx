@@ -140,14 +140,14 @@ export default function Login() {
               </div>
               {forgotStatus && <div className="text-center text-sm text-green-400">{forgotStatus}</div>}
               <div className="flex gap-2">
-                <Button type="button" className="bg-gray-500 hover:bg-gray-600 text-white" onClick={() => {
+                <Button type="button" className="bg-gray-500 hover:bg-gray-600 text-white cursor-pointer" onClick={() => {
                   setShowForgot(false);
                   setForgotEmail('');
                   setForgotStatus(null);
                 }}>
                   Voltar
                 </Button>
-                <Button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white">
+                <Button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white cursor-pointer">
                   Enviar e-mail
                 </Button>
               </div>

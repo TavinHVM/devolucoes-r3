@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabaseClient';
 import { Card, CardContent, CardHeader } from '../../components/ui/card';
 import { Input } from '../../components/ui/input';
@@ -8,6 +8,7 @@ import { Tabs, TabsContent } from '../../components/ui/tabs';
 import { Button } from '../../components/ui/button';
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "../../components/ui/pagination";
 import Header from '../../components/header';
+import { useRouter } from 'next/navigation';
 
 type Solicitacao = {
   id: number;
@@ -50,12 +51,25 @@ export default function VisualizacaoSolicitacoes() {
   const [motivoRecusa, setMotivoRecusa] = useState('');
   const [modalDetalhes, setModalDetalhes] = useState<{ open: boolean, solicitacao?: Solicitacao }>({ open: false });
   const [refreshing, setRefreshing] = useState(false);
+  const router = useRouter();
 
-  async function fetchSolicitacoes() {
+  useEffect(() => {
+    async function checkAuth() {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        router.replace('/login');
+      } else {
+        fetchSolicitacoes();
+      }
+    }
+    checkAuth();
+  }, [router]);
+
+  async function fetchSolicitacoes(statusParam = status) {
     setRefreshing(true);
     let query = supabase.from('solicitacoes').select('*');
-    if (status !== 'Todos') {
-      query = query.eq('status', status);
+    if (statusParam !== 'Todos') {
+      query = query.eq('status', statusParam);
     }
     const { data, error } = await query;
     if (error) {
@@ -157,16 +171,16 @@ export default function VisualizacaoSolicitacoes() {
                       className="max-w-md bg-slate-700 text-white border-slate-600 placeholder:text-slate-400"
                     />
                     <Button
-                      className="ml-2 bg-slate-600 hover:bg-slate-700 text-white"
-                      onClick={fetchSolicitacoes}
+                      className="ml-2 bg-blue-500 hover:bg-blue-600 text-white cursor-pointer"
+                      onClick={() => fetchSolicitacoes()}
                       disabled={refreshing}
                     >
                       {refreshing ? 'Atualizando...' : 'Atualizar'}
                     </Button>
                     <div className="flex gap-4 items-center">
                       <span className="text-white">Filtrar por status:</span>
-                      <Select value={status} onValueChange={v => setStatus(v || 'Todos')}>
-                        <SelectTrigger className="w-40 bg-slate-700 text-white border-slate-600">
+                      <Select value={status} onValueChange={v => { setStatus(v || 'Todos'); fetchSolicitacoes(v || 'Todos'); }}>
+                        <SelectTrigger className="w-40 bg-slate-700 text-white border-slate-600 cursor-pointer">
                           <SelectValue placeholder="Todos" />
                         </SelectTrigger>
                         <SelectContent>
@@ -179,7 +193,7 @@ export default function VisualizacaoSolicitacoes() {
                           <SelectItem value="FINALIZADA">Finalizada</SelectItem>
                         </SelectContent>
                       </Select>
-                      <Button className="ml-4 bg-green-600 hover:bg-green-700 text-white">Baixar Relatório</Button>
+                      <Button className="ml-4 bg-green-600 hover:bg-green-700 text-white cursor-pointer">Baixar Relatório</Button>
                     </div>
                   </div>
                 </CardHeader>

@@ -151,15 +151,15 @@ export default function Usuarios() {
   }
 
   if (loading) {
-    return <div className="flex h-screen items-center justify-center bg-gray-50">Carregando...</div>;
+    return <div className="flex h-screen items-center justify-center bg-gray-900 text-white">Carregando...</div>;
   }
 
   return (
     <>
       <Header />
       <div className="flex flex-col items-center justify-center w-full h-full">
-        <h1 className="text-3xl font-bold text-center md:text-left text-white mt-10">Usuários</h1>
-        <Button className="bg-green-600 hover:bg-green-700 mt-6 mb-4" onClick={() => setShowModal(true)}>
+        <h1 className="text-3xl font-bold text-center md:text-left text-white">Usuários</h1>
+        <Button className="bg-green-600 hover:bg-green-700 mt-6 mb-4 cursor-pointer" onClick={() => setShowModal(true)}>
           Cadastrar novo usuário
         </Button>
         {/* Modal de criação */}
@@ -223,7 +223,7 @@ export default function Usuarios() {
                     <option value="logistica">Logística</option>
                   </select>
                 </div>
-                <Button className="bg-yellow-500 hover:bg-yellow-600" onClick={() => setResetEmail(editUser.email)} size="sm">Redefinir senha</Button>
+                <Button className="bg-slate-500 hover:bg-slate-600 cursor-pointer" onClick={() => setResetEmail(editUser.email)} size="sm">Redefinir senha</Button>
                 <Button type="submit" className="w-full mt-2 cursor-pointer bg-blue-500 hover:bg-blue-600">Salvar</Button>
               </form>
             </div>
@@ -236,8 +236,8 @@ export default function Usuarios() {
               <h2 className="text-xl font-bold mb-4">Confirmar exclusão</h2>
               <div className="mb-6 text-center">Tem certeza que deseja excluir este usuário?</div>
               <div className="flex flex-row gap-2 justify-end">
-                <Button className="bg-gray-500 hover:bg-gray-600" onClick={() => setConfirmDeleteId(null)} type="button">Cancelar</Button>
-                <Button className="bg-red-600 hover:bg-red-700" onClick={() => excluirUsuario(confirmDeleteId)} type="button">Excluir</Button>
+                <Button className="bg-gray-500 hover:bg-gray-600 cursor-pointer" onClick={() => setConfirmDeleteId(null)} type="button">Cancelar</Button>
+                <Button className="bg-red-600 hover:bg-red-700 cursor-pointer" onClick={() => excluirUsuario(confirmDeleteId)} type="button">Excluir</Button>
               </div>
             </div>
           </div>
@@ -286,7 +286,7 @@ export default function Usuarios() {
               </thead>
               <tbody>
                 {loading ? (
-                  <tr><td colSpan={7} className="text-center py-8 text-gray-400 bg-slate-800">Carregando...</td></tr>
+                  <tr><td colSpan={7} className="text-center py-8 text-gray-400 bg-gray-900">Carregando...</td></tr>
                 ) : usuarios.length === 0 ? (
                   <tr><td colSpan={7} className="text-center py-8 text-gray-400 bg-slate-800">Nenhum usuário encontrado.</td></tr>
                 ) : (
@@ -300,8 +300,8 @@ export default function Usuarios() {
                       <td className="px-4 py-2">{usuario.user_level}</td>
                       <td className="px-4 py-2">
                         <div className="flex gap-2">
-                          <Button className="bg-blue-500 hover:bg-blue-600" onClick={() => openEditModal(usuario)} size="sm">Editar</Button>
-                          <Button className="bg-red-500 hover:bg-red-600" onClick={() => setConfirmDeleteId(usuario.id)} size="sm">Excluir</Button>
+                          <Button className="bg-blue-500 hover:bg-blue-600 cursor-pointer" onClick={() => openEditModal(usuario)} size="sm">Editar</Button>
+                          <Button className="bg-red-500 hover:bg-red-600 cursor-pointer" onClick={() => setConfirmDeleteId(usuario.id)} size="sm">Excluir</Button>
                         </div>
                       </td>
                     </tr>
