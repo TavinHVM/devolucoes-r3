@@ -22,7 +22,6 @@ type FormData = {
   codigo_produto: string;
   codigo_cliente: string;
   tipo_devolucao: string;
-  arquivo?: File;
 };
 
 // Toast Component
@@ -39,8 +38,6 @@ function Toast({ message, type, onClose }: { message: string, type: 'success' | 
 }
 
 export default function Solicitacao() {
-  const [successMsg, setSuccessMsg] = useState<string | null>(null);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [toast, setToast] = useState<{ message: string, type: 'success' | 'error' } | null>(null);
 
   const form = useForm<FormData>({
@@ -55,21 +52,16 @@ export default function Solicitacao() {
       codigo_produto: "",
       codigo_cliente: "",
       tipo_devolucao: "",
-      arquivo: undefined,
     },
   });
 
   async function onSubmit(data: FormData) {
-    setSuccessMsg(null);
-    setErrorMsg(null);
     setToast(null);
-    const { arquivo, ...dadosParaSalvar } = data;
+    const dadosParaSalvar = data;
     const { error } = await supabase.from('solicitacoes').insert([dadosParaSalvar]);
     if (error) {
-      setErrorMsg('Erro ao salvar solicitação: ' + error.message);
       setToast({ message: 'Erro ao salvar solicitação: ' + error.message, type: 'error' });
     } else {
-      setSuccessMsg('Solicitação criada com sucesso!');
       setToast({ message: 'Solicitação criada com sucesso!', type: 'success' });
       form.reset();
     }
@@ -255,24 +247,6 @@ export default function Solicitacao() {
                       )}
                     />
                   </div>
-                </div>
-                <div className="flex flex-col gap-2">
-                  <Label htmlFor="arquivo" className="text-white">Anexar Arquivo:</Label>
-                  <Controller
-                    name="arquivo"
-                    control={form.control}
-                    render={({ field }) => (
-                      <Input
-                        id="arquivo"
-                        type="file"
-                        className="bg-slate-700 text-white border-slate-600 file:bg-slate-700 file:text-white placeholder:text-white"
-                        onChange={e => {
-                          const file = e.target.files?.[0];
-                          field.onChange(file);
-                        }}
-                      />
-                    )}
-                  />
                 </div>
                 <Button type="submit" className="w-full mt-4 bg-green-600 hover:bg-green-700 text-white font-bold cursor-pointer">
                   Criar Solicitação

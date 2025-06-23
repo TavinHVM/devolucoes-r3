@@ -11,6 +11,7 @@ import Header from '../../components/header';
 import { useRouter } from 'next/navigation';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import * as XLSX from 'xlsx';
 
 type Solicitacao = {
   id: number;
@@ -196,6 +197,35 @@ export default function VisualizacaoSolicitacoes() {
       theme: 'grid',
     });
     doc.save(`relatorio-solicitacoes-${dataAtual.replace(/\D/g, '')}.pdf`);
+  }
+
+  function gerarRelatorioXLSX() {
+    const wsData = [
+      [
+        'ID', 'Nome', 'Filial', 'Nº NF', 'Carga', 'Cód. Cobrança', 'Código Cliente', 'RCA', 'Motivo', 'Vale', 'Cód. Produto', 'Tipo', 'Status', 'Data'
+      ],
+      ...solicitacoesFiltradas.map(s => [
+        s.id,
+        s.nome,
+        s.filial,
+        s.numero_nf,
+        s.carga,
+        s.codigo_cobranca,
+        s.codigo_cliente,
+        s.rca,
+        s.motivo_devolucao,
+        s.vale || '',
+        s.codigo_produto,
+        s.tipo_devolucao,
+        s.status,
+        new Date(s.created_at).toLocaleDateString()
+      ])
+    ];
+    const ws = XLSX.utils.aoa_to_sheet(wsData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Relatório');
+    const dataAtual = new Date().toLocaleString().replace(/\D/g, '');
+    XLSX.writeFile(wb, `relatorio-solicitacoes-${dataAtual}.xlsx`);
   }
 
   return (
@@ -554,10 +584,11 @@ export default function VisualizacaoSolicitacoes() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
           <div className="bg-slate-800 text-white rounded-lg p-8 w-full max-w-md">
             <h2 className="text-xl font-bold mb-4">Confirmar Download do Relatório</h2>
-            <p className="mb-4">Você está prestes a baixar um relatório em PDF contendo <b>{solicitacoesFiltradas.length}</b> solicitações filtradas pelo status: <b>{status}</b>.<br />Deseja continuar?</p>
+            <p className="mb-4">Você está prestes a baixar um relatório em PDF ou Excel contendo <b>{solicitacoesFiltradas.length}</b> solicitações filtradas pelo status: <b>{status}</b>.<br />Escolha o formato desejado:</p>
             <div className="flex gap-2 justify-end">
               <Button className="bg-gray-500 hover:bg-gray-600 cursor-pointer" onClick={() => setModalRelatorio(false)}>Cancelar</Button>
-              <Button className="bg-green-600 hover:bg-green-700 cursor-pointer" onClick={() => { gerarRelatorioPDF(); setModalRelatorio(false); }}>Baixar Relatório</Button>
+              <Button className="bg-blue-600 hover:bg-blue-700 cursor-pointer" onClick={() => { gerarRelatorioPDF(); setModalRelatorio(false); }}>Baixar em PDF</Button>
+              <Button className="bg-green-600 hover:bg-green-700 cursor-pointer" onClick={() => { gerarRelatorioXLSX(); setModalRelatorio(false); }}>Baixar em Excel</Button>
             </div>
           </div>
         </div>
