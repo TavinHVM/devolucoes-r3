@@ -19,6 +19,19 @@ interface Usuario {
   email: string;
 }
 
+// Toast Component
+function Toast({ message, type, onClose }: { message: string, type: 'success' | 'error', onClose: () => void }) {
+  return (
+    <div className={`fixed z-50 bottom-6 right-6 min-w-[220px] max-w-xs px-4 py-3 rounded shadow-lg text-white font-bold transition-all animate-fade-in-up ${type === 'success' ? 'bg-green-600' : 'bg-red-500'}`}
+      role="alert">
+      <div className="flex items-center justify-between gap-2">
+        <span>{message}</span>
+        <button onClick={onClose} className="ml-2 text-lg leading-none">×</button>
+      </div>
+    </div>
+  );
+}
+
 export default function Usuarios() {
   const router = useRouter();
   const [usuarios, setUsuarios] = useState<Usuario[]>([]);
@@ -44,6 +57,7 @@ export default function Usuarios() {
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [resetEmail, setResetEmail] = useState<string | null>(null);
   const [resetStatus, setResetStatus] = useState<string | null>(null);
+  const [toast, setToast] = useState<{ message: string, type: 'success' | 'error' } | null>(null);
 
   useEffect(() => {
     async function checkAuth() {
@@ -72,9 +86,11 @@ export default function Usuarios() {
   async function handleCreateUser(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
+    setToast(null);
     // Validação simples
     if (!form.first_name || !form.last_name || !form.role || !form.user_level || !form.email || !form.password) {
       setError('Preencha todos os campos.');
+      setToast({ message: 'Preencha todos os campos.', type: 'error' });
       return;
     }
     // 1. Cria o usuário no Auth
@@ -84,10 +100,12 @@ export default function Usuarios() {
     });
     if (authError) {
       setError(authError.message);
+      setToast({ message: 'Erro ao criar usuário: ' + authError.message, type: 'error' });
       return;
     }
     if (!data?.user) {
       setError('Erro ao criar usuário no Auth.');
+      setToast({ message: 'Erro ao criar usuário no Auth.', type: 'error' });
       return;
     }
     // 2. Cria o perfil com o mesmo id do Auth
@@ -101,10 +119,12 @@ export default function Usuarios() {
     }]);
     if (profileError) {
       setError(profileError.message);
+      setToast({ message: 'Erro ao criar perfil: ' + profileError.message, type: 'error' });
       return;
     }
     setShowModal(false);
     setForm({ first_name: '', last_name: '', role: '', user_level: '', email: '', password: '' });
+    setToast({ message: 'Usuário criado com sucesso!', type: 'success' });
     fetchUsuarios();
   }
 
@@ -128,16 +148,23 @@ export default function Usuarios() {
       .eq('id', editUser.id);
     if (!error) {
       setEditUser(null);
+      setToast({ message: 'Usuário editado com sucesso!', type: 'success' });
       fetchUsuarios();
     } else {
       setError(error.message);
+      setToast({ message: 'Erro ao editar usuário: ' + error.message, type: 'error' });
     }
   }
 
   async function excluirUsuario(id: string) {
-    await supabase.from('user_profiles').delete().eq('id', id);
+    const { error } = await supabase.from('user_profiles').delete().eq('id', id);
     setConfirmDeleteId(null);
-    fetchUsuarios();
+    if (!error) {
+      setToast({ message: 'Usuário excluído com sucesso!', type: 'success' });
+      fetchUsuarios();
+    } else {
+      setToast({ message: 'Erro ao excluir usuário: ' + error.message, type: 'error' });
+    }
   }
 
   async function handleResetPassword(email: string) {
@@ -150,6 +177,14 @@ export default function Usuarios() {
     }
   }
 
+  // Toast auto-hide
+  useEffect(() => {
+    if (toast) {
+      const timer = setTimeout(() => setToast(null), 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [toast]);
+
   if (loading) {
     return <div className="flex h-screen items-center justify-center bg-gray-900 text-white">Carregando...</div>;
   }
@@ -158,6 +193,8 @@ export default function Usuarios() {
     <>
       <Header />
       <div className="flex flex-col items-center justify-center w-full h-full">
+        {/* Toast Overlay */}
+        {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
         <h1 className="text-3xl font-bold text-center md:text-left text-white">Usuários</h1>
         <Button className="bg-green-600 hover:bg-green-700 mt-6 mb-4 cursor-pointer" onClick={() => setShowModal(true)}>
           Cadastrar novo usuário
@@ -237,7 +274,7 @@ export default function Usuarios() {
               <div className="mb-6 text-center">Tem certeza que deseja excluir este usuário?</div>
               <div className="flex flex-row gap-2 justify-end">
                 <Button className="bg-gray-500 hover:bg-gray-600 cursor-pointer" onClick={() => setConfirmDeleteId(null)} type="button">Cancelar</Button>
-                <Button className="bg-red-600 hover:bg-red-700 cursor-pointer" onClick={() => excluirUsuario(confirmDeleteId)} type="button">Excluir</Button>
+                <Button className="bg-red-500 hover:bg-red-600 cursor-pointer" onClick={() => excluirUsuario(confirmDeleteId)} type="button">Excluir</Button>
               </div>
             </div>
           </div>
@@ -274,7 +311,7 @@ export default function Usuarios() {
           <div className="overflow-x-auto">
             <table className="min-w-full text-sm bg-slate-800 text-white rounded-lg">
               <thead>
-                <tr className="bg-slate-900 text-slate-300">
+                <tr className="bg-slate-700 text-slate-300">
                   <th className="px-4 py-2 text-left">ID</th>
                   <th className="px-4 py-2 text-left">Nome</th>
                   <th className="px-4 py-2 text-left">Sobrenome</th>

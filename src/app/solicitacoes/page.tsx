@@ -252,7 +252,7 @@ export default function VisualizacaoSolicitacoes() {
                                   <Button
                                     onClick={() => setModalRecusar({ open: true, id: s.id })}
                                     variant="destructive"
-                                    className="bg-red-600 hover:bg-red-700 text-white"
+                                    className="bg-red-500 hover:bg-red-600 text-white"
                                   >
                                     Recusar
                                   </Button>
