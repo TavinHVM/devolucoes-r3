@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { supabase } from '../../lib/supabaseClient';
 import { Card, CardContent, CardHeader } from '../../components/ui/card';
 import { Input } from '../../components/ui/input';
@@ -57,21 +57,8 @@ export default function VisualizacaoSolicitacoes() {
   const [sortColumn, setSortColumn] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc' | null>(null);
 
-  // Verifica se o usuário está autenticado
-  useEffect(() => {
-    async function checkAuth() {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        router.replace('/login');
-      } else {
-        fetchSolicitacoes();
-      }
-    }
-    checkAuth();
-  }, [router, fetchSolicitacoes]);
-
   // Função para buscar as solicitações
-  async function fetchSolicitacoes(statusParam = status) {
+  const fetchSolicitacoes = useCallback(async (statusParam = status) => {
     setRefreshing(true);
     let query = supabase.from('solicitacoes').select('*');
     if (statusParam !== 'Todos') {
@@ -85,15 +72,23 @@ export default function VisualizacaoSolicitacoes() {
       setSolicitacoes(data || []);
     }
     setRefreshing(false);
-  }
+  }, [status]);
 
-  // Função para filtrar as solicitações
-  const solicitacoesFiltradas = solicitacoes.filter(s =>
-    Object.values(s).join(' ').toLowerCase().includes(busca.toLowerCase())
-  );
+  // Verifica se o usuário está autenticado
+  useEffect(() => {
+    async function checkAuth() {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        router.replace('/login');
+      } else {
+        fetchSolicitacoes();
+      }
+    }
+    checkAuth();
+  }, [router, fetchSolicitacoes]);
 
   // Ordenação das solicitações
-  const sortedSolicitacoes = [...solicitacoesFiltradas];
+  const sortedSolicitacoes = [...solicitacoes];
   if (sortColumn && sortDirection) {
     sortedSolicitacoes.sort((a, b) => {
       const aValue = a[sortColumn as keyof Solicitacao] ?? '';
@@ -571,15 +566,15 @@ export default function VisualizacaoSolicitacoes() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
           <div className="bg-slate-800 text-white rounded-lg p-8 w-full max-w-md">
             <h2 className="text-xl font-bold mb-4">Confirmar Download do Relatório</h2>
-            <p className="mb-4">Você está prestes a baixar um relatório em PDF ou Excel contendo <b>{solicitacoesFiltradas.length}</b> solicitações filtradas pelo status: <b>{status}</b>.<br />Escolha o formato desejado:</p>
+            <p className="mb-4">Você está prestes a baixar um relatório em PDF ou Excel contendo <b>{sortedSolicitacoes.length}</b> solicitações filtradas pelo status: <b>{status}</b>.<br />Escolha o formato desejado:</p>
             <div className="flex gap-2 justify-end">
               <Button className="bg-gray-500 hover:bg-gray-600 cursor-pointer" onClick={() => setModalRelatorio(false)}>Cancelar</Button>
               <Button className="bg-blue-600 hover:bg-blue-700 cursor-pointer" onClick={async () => {
                 const logoBase64 = await getLogoBase64('/r3logo.png');
-                await gerarRelatorioPDF({ solicitacoes: solicitacoesFiltradas, status, logoBase64 });
+                await gerarRelatorioPDF({ solicitacoes: sortedSolicitacoes, status, logoBase64 });
                 setModalRelatorio(false);
               }}>Baixar em PDF</Button>
-              <Button className="bg-green-600 hover:bg-green-700 cursor-pointer" onClick={() => { gerarRelatorioXLSX({ solicitacoes: solicitacoesFiltradas }); setModalRelatorio(false); }}>Baixar em Excel</Button>
+              <Button className="bg-green-600 hover:bg-green-700 cursor-pointer" onClick={() => { gerarRelatorioXLSX({ solicitacoes: sortedSolicitacoes }); setModalRelatorio(false); }}>Baixar em Excel</Button>
             </div>
           </div>
         </div>
