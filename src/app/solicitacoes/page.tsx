@@ -68,7 +68,7 @@ export default function VisualizacaoSolicitacoes() {
       }
     }
     checkAuth();
-  }, [router]);
+  }, [router, fetchSolicitacoes]);
 
   // Função para buscar as solicitações
   async function fetchSolicitacoes(statusParam = status) {
