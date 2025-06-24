@@ -93,11 +93,11 @@ export default function VisualizacaoSolicitacoes() {
   );
 
   // Ordenação das solicitações
-  let sortedSolicitacoes = [...solicitacoesFiltradas];
+  const sortedSolicitacoes = [...solicitacoesFiltradas];
   if (sortColumn && sortDirection) {
     sortedSolicitacoes.sort((a, b) => {
-      let aValue = (a as any)[sortColumn] ?? '';
-      let bValue = (b as any)[sortColumn] ?? '';
+      const aValue = a[sortColumn as keyof Solicitacao] ?? '';
+      const bValue = b[sortColumn as keyof Solicitacao] ?? '';
       // Ordenação especial para datas
       if (sortColumn === 'created_at') {
         const aDate = new Date(aValue);
