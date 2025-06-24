@@ -54,7 +54,10 @@ export default function VisualizacaoSolicitacoes() {
   const [refreshing, setRefreshing] = useState(false);
   const [modalRelatorio, setModalRelatorio] = useState(false);
   const router = useRouter();
+  const [sortColumn, setSortColumn] = useState<string | null>(null);
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc' | null>(null);
 
+  // Verifica se o usuário está autenticado
   useEffect(() => {
     async function checkAuth() {
       const { data: { session } } = await supabase.auth.getSession();
@@ -67,6 +70,7 @@ export default function VisualizacaoSolicitacoes() {
     checkAuth();
   }, [router]);
 
+  // Função para buscar as solicitações
   async function fetchSolicitacoes(statusParam = status) {
     setRefreshing(true);
     let query = supabase.from('solicitacoes').select('*');
@@ -83,17 +87,43 @@ export default function VisualizacaoSolicitacoes() {
     setRefreshing(false);
   }
 
+  // Função para filtrar as solicitações
   const solicitacoesFiltradas = solicitacoes.filter(s =>
     Object.values(s).join(' ').toLowerCase().includes(busca.toLowerCase())
   );
 
-  // Paginação dos dados filtrados
-  const totalPages = Math.ceil(solicitacoesFiltradas.length / itemsPerPage);
-  const paginatedSolicitacoes = solicitacoesFiltradas.slice(
+  // Ordenação das solicitações
+  let sortedSolicitacoes = [...solicitacoesFiltradas];
+  if (sortColumn && sortDirection) {
+    sortedSolicitacoes.sort((a, b) => {
+      let aValue = (a as any)[sortColumn] ?? '';
+      let bValue = (b as any)[sortColumn] ?? '';
+      // Ordenação especial para datas
+      if (sortColumn === 'created_at') {
+        const aDate = new Date(aValue);
+        const bDate = new Date(bValue);
+        return sortDirection === 'asc' ? aDate.getTime() - bDate.getTime() : bDate.getTime() - aDate.getTime();
+      }
+      if (typeof aValue === 'string' && typeof bValue === 'string') {
+        return sortDirection === 'asc'
+          ? aValue.localeCompare(bValue, 'pt-BR', { sensitivity: 'base' })
+          : bValue.localeCompare(aValue, 'pt-BR', { sensitivity: 'base' });
+      }
+      if (typeof aValue === 'number' && typeof bValue === 'number') {
+        return sortDirection === 'asc' ? aValue - bValue : bValue - aValue;
+      }
+      return 0;
+    });
+  }
+
+  // Paginação dos dados ordenados
+  const totalPages = Math.ceil(sortedSolicitacoes.length / itemsPerPage);
+  const paginatedSolicitacoes = sortedSolicitacoes.slice(
     (page - 1) * itemsPerPage,
     page * itemsPerPage
   );
 
+  // Função para aprovar uma solicitação
   async function aprovarSolicitacao(id: number) {
     try {
       const { error } = await supabase.from('solicitacoes').update({ status: 'Aprovado' }).eq('id', id);
@@ -104,6 +134,8 @@ export default function VisualizacaoSolicitacoes() {
       alert('Erro ao aprovar solicitação: ' + msg);
     }
   }
+
+  // Função para recusar uma solicitação
   async function recusarSolicitacao(id: number, motivo: string) {
     try {
       const { error } = await supabase.from('solicitacoes').update({ status: 'Rejeitado', motivo_devolucao: motivo }).eq('id', id);
@@ -114,6 +146,8 @@ export default function VisualizacaoSolicitacoes() {
       alert('Erro ao recusar solicitação: ' + msg);
     }
   }
+
+  // Função para reenviar uma solicitação
   async function reenviarSolicitacao(id: number) {
     try {
       const { error } = await supabase.from('solicitacoes').update({ status: 'Reenviada' }).eq('id', id);
@@ -124,6 +158,8 @@ export default function VisualizacaoSolicitacoes() {
       alert('Erro ao reenviar solicitação: ' + msg);
     }
   }
+
+  // Função para atualizar o status de uma solicitação
   async function atualizarStatusFinanceiro(id: number, novoStatus: string) {
     try {
       const { error } = await supabase.from('solicitacoes').update({ status: novoStatus }).eq('id', id);
@@ -134,13 +170,15 @@ export default function VisualizacaoSolicitacoes() {
       alert('Erro ao atualizar status: ' + msg);
     }
   }
+
+  // Função para baixar o anexo de uma solicitação
   function baixarAnexo(arquivo_url: string | undefined) {
     if (arquivo_url) {
       window.open(`https://${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${arquivo_url}`, '_blank');
     }
   }
 
-  // Função utilitária para cor do status
+  // Função para obter a classe do status
   function getStatusClass(status: string) {
     switch (status?.toUpperCase()) {
       case 'APROVADO': return 'bg-green-600 text-white font-bold px-1 py-1 rounded';
@@ -151,6 +189,19 @@ export default function VisualizacaoSolicitacoes() {
       case 'ABATIDA': return 'bg-stone-400 text-white font-bold px-1 py-1 rounded';
       case 'FINALIZADA': return 'bg-gray-500 text-white font-bold px-1 py-1 rounded';
       default: return 'bg-slate-700 text-white px-2 py-1 rounded';
+    }
+  }
+
+  // Função para ordenar as solicitações
+  function handleSort(column: string) {
+    if (sortColumn !== column) {
+      setSortColumn(column);
+      setSortDirection('asc');
+    } else if (sortDirection === 'asc') {
+      setSortDirection('desc');
+    } else if (sortDirection === 'desc') {
+      setSortColumn(null);
+      setSortDirection(null);
     }
   }
 
@@ -206,20 +257,30 @@ export default function VisualizacaoSolicitacoes() {
                     <table className="min-w-full text-sm bg-slate-800 text-white rounded-lg">
                       <thead>
                         <tr className="bg-slate-900 text-slate-300">
-                          <th className="px-2 py-2 text-left">ID</th>
-                          <th className="px-2 py-2 text-left">Nome</th>
-                          <th className="px-2 py-2 text-left">Filial</th>
-                          <th className="px-2 py-2 text-left">Nº NF</th>
-                          <th className="px-2 py-2 text-left">Carga</th>
-                          <th className="px-2 py-2 text-left">Cód. Cobrança</th>
-                          <th className="px-2 py-2 text-left">Código Cliente</th>
-                          <th className="px-2 py-2 text-left">RCA</th>
-                          <th className="px-2 py-2 text-left">Motivo da Devolução</th>
-                          <th className="px-2 py-2 text-left">Vale</th>
-                          <th className="px-2 py-2 text-left">Código do Produto</th>
-                          <th className="px-2 py-2 text-left">Tipo de Devolução</th>
-                          <th className="px-2 py-2 text-left">Status</th>
-                          <th className="px-2 py-2 text-left">Data de Criação</th>
+                          <th className="px-2 py-2 text-left cursor-pointer" onClick={() => handleSort('id')}>ID{sortColumn === 'id' && sortDirection && (<span>{sortDirection === 'asc' ? ' ▲' : ' ▼'}</span>)}</th>
+                          <th className="px-2 py-2 text-left cursor-pointer" onClick={() => handleSort('nome')}>Nome{sortColumn === 'nome' && sortDirection && (<span>{sortDirection === 'asc' ? ' ▲' : ' ▼'}</span>)}</th>
+                          <th className="px-2 py-2 text-left cursor-pointer" onClick={() => handleSort('filial')}>Filial{sortColumn === 'filial' && sortDirection && (<span>{sortDirection === 'asc' ? ' ▲' : ' ▼'}</span>)}</th>
+                          <th className="px-2 py-2 text-left cursor-pointer" onClick={() => handleSort('numero_nf')}>Nº NF{sortColumn === 'numero_nf' && sortDirection && (<span>{sortDirection === 'asc' ? ' ▲' : ' ▼'}</span>)}</th>
+                          <th className="px-2 py-2 text-left cursor-pointer" onClick={() => handleSort('carga')}>Carga{sortColumn === 'carga' && sortDirection && (<span>{sortDirection === 'asc' ? ' ▲' : ' ▼'}</span>)}</th>
+                          <th className="px-2 py-2 text-left cursor-pointer" onClick={() => handleSort('codigo_cobranca')}>Cód. Cobrança{sortColumn === 'codigo_cobranca' && sortDirection && (<span>{sortDirection === 'asc' ? ' ▲' : ' ▼'}</span>)}</th>
+                          <th className="px-2 py-2 text-left cursor-pointer" onClick={() => handleSort('codigo_cliente')}>Código Cliente{sortColumn === 'codigo_cliente' && sortDirection && (<span>{sortDirection === 'asc' ? ' ▲' : ' ▼'}</span>)}</th>
+                          <th className="px-2 py-2 text-left cursor-pointer" onClick={() => handleSort('rca')}>RCA{sortColumn === 'rca' && sortDirection && (<span>{sortDirection === 'asc' ? ' ▲' : ' ▼'}</span>)}</th>
+                          <th
+                            className="px-2 py-2 text-left cursor-pointer select-none"
+                            onClick={() => handleSort('motivo_devolucao')}
+                          >
+                            Motivo da Devolução
+                            {sortColumn === 'motivo_devolucao' && sortDirection && (
+                              <span>
+                                {sortDirection === 'asc' ? ' ▲' : ' ▼'}
+                              </span>
+                            )}
+                          </th>
+                          <th className="px-2 py-2 text-left cursor-pointer" onClick={() => handleSort('vale')}>Vale{sortColumn === 'vale' && sortDirection && (<span>{sortDirection === 'asc' ? ' ▲' : ' ▼'}</span>)}</th>
+                          <th className="px-2 py-2 text-left cursor-pointer" onClick={() => handleSort('codigo_produto')}>Código do Produto{sortColumn === 'codigo_produto' && sortDirection && (<span>{sortDirection === 'asc' ? ' ▲' : ' ▼'}</span>)}</th>
+                          <th className="px-2 py-2 text-left cursor-pointer" onClick={() => handleSort('tipo_devolucao')}>Tipo de Devolução{sortColumn === 'tipo_devolucao' && sortDirection && (<span>{sortDirection === 'asc' ? ' ▲' : ' ▼'}</span>)}</th>
+                          <th className="px-2 py-2 text-left cursor-pointer" onClick={() => handleSort('status')}>Status{sortColumn === 'status' && sortDirection && (<span>{sortDirection === 'asc' ? ' ▲' : ' ▼'}</span>)}</th>
+                          <th className="px-2 py-2 text-left cursor-pointer" onClick={() => handleSort('created_at')}>Data de Criação{sortColumn === 'created_at' && sortDirection && (<span>{sortDirection === 'asc' ? ' ▲' : ' ▼'}</span>)}</th>
                           <th className="px-2 py-2 text-left">Anexo</th>
                         </tr>
                       </thead>
