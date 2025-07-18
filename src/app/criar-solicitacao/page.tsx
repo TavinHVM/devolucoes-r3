@@ -55,6 +55,12 @@ const formSchema = z.object({
   tipo_devolucao: z
     .string()
     .min(1, { message: "Tipo de Devolução obrigatório" }),
+  lista_produtos: z
+    .string()
+    .min(1, { message: "Tipo de Devolução obrigatório" }),
+  quantidade: z
+    .string()
+    .min(1, { message: "Tipo de Devolução obrigatório" }),
 });
 
 // Toast Component
@@ -96,14 +102,20 @@ export default function Solicitacao() {
     type: "success" | "error";
   } | null>(null);
   const [codigo, setCodigo] = useState<string>("");
+  const [codigoRca, setCodigoRca] = useState<string>("");
+  const [numeroNota, setNumeroNota] = useState<string>("");
   const [nomeProd, setNomeProd] = useState<string>("");
-  const [produtcsLists[], setProductsList[]] = useState<string[]>("");
+  const [numeroQuantidade, setNumeroQuantidade] = useState<string>("");
+  const [numeroCarga, setNumeroCarga] = useState<string>("");
+  const [numeroCodigoCobranca, setNumeroCodigoCobranca] = useState<string>("");
+  const [numeroCodigoCliente, setNumeroCodigoCliente] = useState<string>("");
+  // const [produtcsLists[], setProductsList[]] = useState<string[]>("");
 
-interface productsList {
-  name: string;
-  codprod: string;
-  quantidade: string; 
-}
+// interface productsList {
+//   name: string;
+//   codprod: string;
+//   quantidade: string; 
+// }
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -118,6 +130,7 @@ interface productsList {
       codigo_produto: "",
       codigo_cliente: "",
       tipo_devolucao: "",
+      quantidade: "",
     },
   });
 
@@ -176,6 +189,7 @@ interface productsList {
       formData.append("tipo_devolucao", data.tipo_devolucao);
       formData.append("carga", data.carga);
       formData.append("numero_nf", data.numero_nf);
+      formData.append("numero_nf", data.lista_produtos);
 
       const response = await fetch("/api/registerAdm", {
         method: "POST",
@@ -254,6 +268,12 @@ interface productsList {
                             {...field}
                             className="w-full"
                             placeholder="Número da Nota"
+                            value={numeroNota}
+                            maxLength={6}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              if (/^\d*$/.test(val)) setNumeroNota(val); // permite apenas números
+                            }}
                           />
                         </FormControl>
                         <FormMessage />
@@ -272,6 +292,12 @@ interface productsList {
                             {...field}
                             className="w-full"
                             placeholder="Número da carga"
+                            value={numeroCarga}
+                            maxLength={6}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              if (/^\d*$/.test(val)) setNumeroCarga(val); // permite apenas números
+                            }}
                           />
                         </FormControl>
                         <FormMessage />
@@ -293,6 +319,12 @@ interface productsList {
                               {...field}
                               className="w-full"
                               placeholder="Código da cobrança"
+                              value={numeroCodigoCobranca}
+                              maxLength={4}
+                              onChange={(e) => {
+                                const val = e.target.value;
+                                if (/^\d*$/.test(val)) setNumeroCodigoCobranca(val); // permite apenas números
+                              }}
                             />
                           </FormControl>
                           <FormMessage />
@@ -311,6 +343,12 @@ interface productsList {
                               {...field}
                               className="w-full"
                               placeholder="Código do RCA"
+                              value={codigoRca}
+                              maxLength={3}
+                              onChange={(e) => {
+                                const val = e.target.value;
+                                if (/^\d*$/.test(val)) setCodigoRca(val); // permite apenas números
+                              }}
                             />
                           </FormControl>
                           <FormMessage />
@@ -331,6 +369,12 @@ interface productsList {
                               {...field}
                               className="w-full"
                               placeholder="Código do Cliente"
+                              value={numeroCodigoCliente}
+                              maxLength={5}
+                              onChange={(e) => {
+                                const val = e.target.value;
+                                if (/^\d*$/.test(val)) setNumeroCodigoCliente(val); // permite apenas números
+                              }}
                             />
                           </FormControl>
                           <FormMessage />
@@ -473,7 +517,7 @@ interface productsList {
                   />
                   <FormField
                     control={form.control}
-                    name="codigo_cliente"
+                    name="quantidade"
                     render={({ field }) => (
                       <FormItem className="w-full">
                         <FormLabel className="text-white">
@@ -485,6 +529,12 @@ interface productsList {
                             {...field}
                             className="w-full"
                             placeholder="Quantidade"
+                            value={numeroQuantidade}
+                            maxLength={6}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              if (/^\d*$/.test(val)) setNumeroQuantidade(val); // permite apenas números
+                            }}
                           />
                         </FormControl>
                         <FormMessage />
