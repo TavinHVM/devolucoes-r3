@@ -231,7 +231,7 @@ export default function Usuarios() {
                 </Dialog>
               </div>
             </CardTitle>
-            <CardContent>
+            <CardContent className="max-h-[400px] h-[400px] overflow-y-auto scrollbar-dark">
               <Table>
                 <TableHeader>
                   <TableRow className="text-white font-bold hover:bg-slate-700">
