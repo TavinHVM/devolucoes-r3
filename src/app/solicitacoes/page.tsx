@@ -25,10 +25,7 @@ import { useRouter } from "next/navigation";
 import {
   Dialog,
   DialogContent,
-  DialogHeader,
   DialogTitle,
-  DialogDescription,
-  DialogFooter,
   DialogTrigger,
 } from "../../components/ui/dialog";
 import {
