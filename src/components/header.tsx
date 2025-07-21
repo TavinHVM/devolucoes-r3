@@ -8,12 +8,13 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Button } from "@/components/ui/button";
 
 // Ícones Lucide
-import { Home, FileText, Plus, Users, Power } from 'lucide-react';
+import { Home, FileText, Plus, Users, Power, Receipt } from 'lucide-react';
 
 const navLinks = [
   { href: "/", label: "Início", icon: <Home size={20} /> },
   { href: "/solicitacoes", label: "Solicitações", icon: <FileText size={20} /> },
   { href: "/criar-solicitacao", label: "Criar Solicitação", icon: <Plus size={20} /> },
+  { href: "/criar-codcobranca", label: "Códigos Cobrança", icon: <Receipt size={20} /> },
   { href: "/usuarios", label: "Usuários", icon: <Users size={20} /> },
 ];
 
@@ -68,7 +69,7 @@ export default function Header() {
       </Dialog>
 
       {/* Header */}
-      <header className="flex items-center justify-between px-6 py-4 bg-slate-800 text-white shadow-md">
+      <header className="flex items-center justify-between px-6 py-4 bg-slate-800 text-white shadow-md w-full">
         {/* Logo e Nome */}
         <div className="flex items-center gap-3">
           <Image src="/favicon.ico" alt="Logo" width={50} height={50} className="w-10 h-10" />
