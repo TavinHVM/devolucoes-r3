@@ -39,6 +39,7 @@ import {
 import OrderBtn from "@/components/orderBtn";
 import { X } from 'lucide-react';
 import { DialogClose } from "@radix-ui/react-dialog";
+import { RefreshCw } from 'lucide-react';
 
 type Solicitacao = {
   id: number;
@@ -264,6 +265,7 @@ export default function VisualizacaoSolicitacoes() {
                   onClick={() => fetchSolicitacoes()}
                   disabled={refreshing}
                 >
+                  <RefreshCw />
                   {refreshing ? "Atualizando..." : "Atualizar"}
                 </Button>
                 <div className="flex gap-4 items-center">
