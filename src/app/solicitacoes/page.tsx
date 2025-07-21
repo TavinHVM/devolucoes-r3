@@ -148,9 +148,27 @@ export default function VisualizacaoSolicitacoes() {
     });
   }
 
-  // Paginação dos dados ordenados
-  const totalPages = Math.ceil(sortedSolicitacoes.length / itemsPerPage);
-  const paginatedSolicitacoes = sortedSolicitacoes.slice(
+  // Função para filtrar solicitações com base na busca
+  const filteredSolicitacoes = sortedSolicitacoes.filter((s) => {
+    const searchTerm = busca.toLowerCase();
+    return (
+      s.nome.toLowerCase().includes(searchTerm) ||
+      s.filial.toLowerCase().includes(searchTerm) ||
+      s.numero_nf.toLowerCase().includes(searchTerm) ||
+      s.carga.toLowerCase().includes(searchTerm) ||
+      s.codigo_cobranca.toLowerCase().includes(searchTerm) ||
+      s.codigo_cliente.toLowerCase().includes(searchTerm) ||
+      s.rca.toLowerCase().includes(searchTerm) ||
+      s.motivo_devolucao.toLowerCase().includes(searchTerm) ||
+      s.vale?.toLowerCase().includes(searchTerm) ||
+      s.tipo_devolucao.toLowerCase().includes(searchTerm) ||
+      s.status.toLowerCase().includes(searchTerm)
+    );
+  });
+
+  // Paginação dos dados filtrados
+  const totalPages = Math.ceil(filteredSolicitacoes.length / itemsPerPage);
+  const paginatedSolicitacoes = filteredSolicitacoes.slice(
     (page - 1) * itemsPerPage,
     page * itemsPerPage
   );
