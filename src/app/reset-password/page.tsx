@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import ResetPasswordInner from "./(logic)/ResetPasswordInner";
+import ResetPasswordInner from "./(functions)/ResetPasswordInner";
 
 export default function Page() {
   return (
