@@ -21,7 +21,11 @@ export default function Home() {
   }, [router]);
 
   if (loading) {
+<<<<<<< HEAD
     return <div className="flex h-screen items-center justify-center bg-gray-50">Carregando...</div>;
+=======
+    return <div className="flex h-screen items-center justify-center bg-gray-900 text-white">Carregando...</div>;
+>>>>>>> main
   }
 
   return (

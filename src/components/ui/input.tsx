@@ -2,7 +2,11 @@ import * as React from "react"
 
 import { cn } from "@/lib/utils"
 
+<<<<<<< HEAD
 function Input({ className, type, ...props }: React.ComponentProps<"input">) {
+=======
+function Input({ className, type, value, ...props }: React.ComponentProps<"input">) {
+>>>>>>> main
   return (
     <input
       type={type}
@@ -13,9 +17,16 @@ function Input({ className, type, ...props }: React.ComponentProps<"input">) {
         "aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
         className
       )}
+<<<<<<< HEAD
       {...props}
     />
   )
+=======
+      value={value ?? ''}
+      {...props}
+    />
+  );
+>>>>>>> main
 }
 
 export { Input }

@@ -57,7 +57,11 @@ export default function Header() {
             </Button>
             <Button
               variant="destructive"
+<<<<<<< HEAD
               className="bg-red-600 hover:bg-red-700 text-white cursor-pointer"
+=======
+              className="bg-red-500 hover:bg-red-600 text-white cursor-pointer"
+>>>>>>> main
               onClick={() => { handleLogout(); setOpen(false); }}
               type="button"
             >
@@ -71,7 +75,11 @@ export default function Header() {
       <header className="flex items-center justify-between px-6 py-4 bg-slate-800 text-white shadow-md">
         {/* Logo e Nome */}
         <div className="flex items-center gap-3">
+<<<<<<< HEAD
           <Image src="/favicon.ico" alt="Logo" width={50} height={50} />
+=======
+          <Image src="/favicon.ico" alt="Logo" width={50} height={50} className="w-10 h-10" />
+>>>>>>> main
           <span className="text-xl font-bold">Devoluções R3</span>
         </div>
 
@@ -94,7 +102,11 @@ export default function Header() {
           {/* Botão de Sair */}
           <button
             onClick={() => setOpen(true)}
+<<<<<<< HEAD
             className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-md transition cursor-pointer"
+=======
+            className="flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-md transition cursor-pointer"
+>>>>>>> main
           >
             <Power size={20} />
             <span>Sair</span>

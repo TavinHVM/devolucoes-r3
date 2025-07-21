@@ -53,7 +53,11 @@ function CardAction({ className, ...props }: React.ComponentProps<"div">) {
     <div
       data-slot="card-action"
       className={cn(
+<<<<<<< HEAD
         "col-start-2 row-span-2 row-start-1 self-start justify-self-end bg-slate-800",
+=======
+        "col-start-2 row-span-2 row-start-1 self-start justify-self-end",
+>>>>>>> main
         className
       )}
       {...props}
@@ -65,7 +69,11 @@ function CardContent({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="card-content"
+<<<<<<< HEAD
       className={cn("px-6 bg-slate-800", className)}
+=======
+      className={cn("", className)}
+>>>>>>> main
       {...props}
     />
   )
