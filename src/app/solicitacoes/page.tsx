@@ -160,18 +160,18 @@ export default function VisualizacaoSolicitacoes() {
     nome: string;
     quantidade: number;
   }[] = [
-    { codigo_produto: "1001", nome: "Chamex - Resma", quantidade: 5 },
-    { codigo_produto: "1002", nome: "Caneta Azul", quantidade: 12 },
-    { codigo_produto: "1003", nome: "Lápis Preto", quantidade: 20 },
-    { codigo_produto: "1004", nome: "Borracha Branca", quantidade: 8 },
-    { codigo_produto: "1005", nome: "Caderno 200 folhas", quantidade: 3 },
-    { codigo_produto: "1006", nome: "Apontador", quantidade: 15 },
-    { codigo_produto: "1007", nome: "Marcador de Texto", quantidade: 7 },
-    { codigo_produto: "1008", nome: "Régua 30cm", quantidade: 6 },
-    { codigo_produto: "1009", nome: "Cola Branca", quantidade: 9 },
-    { codigo_produto: "1010", nome: "Pasta Plástica", quantidade: 11 },
-    
-  ];
+      { codigo_produto: "1001", nome: "Chamex - Resma", quantidade: 5 },
+      { codigo_produto: "1002", nome: "Caneta Azul", quantidade: 12 },
+      { codigo_produto: "1003", nome: "Lápis Preto", quantidade: 20 },
+      { codigo_produto: "1004", nome: "Borracha Branca", quantidade: 8 },
+      { codigo_produto: "1005", nome: "Caderno 200 folhas", quantidade: 3 },
+      { codigo_produto: "1006", nome: "Apontador", quantidade: 15 },
+      { codigo_produto: "1007", nome: "Marcador de Texto", quantidade: 7 },
+      { codigo_produto: "1008", nome: "Régua 30cm", quantidade: 6 },
+      { codigo_produto: "1009", nome: "Cola Branca", quantidade: 9 },
+      { codigo_produto: "1010", nome: "Pasta Plástica", quantidade: 11 },
+
+    ];
 
   // Função para aprovar uma solicitação
   async function aprovarSolicitacao(id: number) {
@@ -228,16 +228,9 @@ export default function VisualizacaoSolicitacoes() {
   }
 
   // Função para ordenar as solicitações
-  function handleSort(column: string) {
-    if (sortColumn !== column) {
-      setSortColumn(column);
-      setSortDirection("asc");
-    } else if (sortDirection === "asc") {
-      setSortDirection("desc");
-    } else if (sortDirection === "desc") {
-      setSortColumn(null);
-      setSortDirection(null);
-    }
+  function handleSort(column: string, direction: "asc" | "desc") {
+    setSortColumn(column);
+    setSortDirection(direction);
   }
 
   return (
@@ -342,102 +335,102 @@ export default function VisualizacaoSolicitacoes() {
                 <Table className="bg-slate-800 text-white rounded-lg">
                   <TableHeader>
                     <TableRow className="border-slate-700 text-white hover:bg-slate-800 h-20 items-center">
-                      <TableHead className="text-white">
+                      <TableHead className="text-white whitespace-nowrap">
                         <OrderBtn
                           label="ID"
-                          onAscClick={() => console.log("Ordem crescente")}
-                          onDescClick={() => console.log("Ordem decrescente")}
+                          onAscClick={() => handleSort("id", "asc")}
+                          onDescClick={() => handleSort("id", "desc")}
                         />
                       </TableHead>
-                      <TableHead className="text-white">
+                      <TableHead className="text-white whitespace-nowrap">
                         <OrderBtn
                           label="Nome"
-                          onAscClick={() => console.log("Ordem crescente")}
-                          onDescClick={() => console.log("Ordem decrescente")}
+                          onAscClick={() => handleSort("nome", "asc")}
+                          onDescClick={() => handleSort("nome", "desc")}
                         />
                       </TableHead>
-                      <TableHead className="text-white">
+                      <TableHead className="text-white whitespace-nowrap">
                         <OrderBtn
                           label="Filial"
-                          onAscClick={() => console.log("Ordem crescente")}
-                          onDescClick={() => console.log("Ordem decrescente")}
+                          onAscClick={() => handleSort("filial", "asc")}
+                          onDescClick={() => handleSort("filial", "desc")}
                         />
                       </TableHead>
-                      <TableHead className="text-white">
+                      <TableHead className="text-white whitespace-nowrap">
                         <OrderBtn
                           label="NºNF"
-                          onAscClick={() => console.log("Ordem crescente")}
-                          onDescClick={() => console.log("Ordem decrescente")}
+                          onAscClick={() => handleSort("numero_nf", "asc")}
+                          onDescClick={() => handleSort("numero_nf", "desc")}
                         />
                       </TableHead>
-                      <TableHead className="text-white">
+                      <TableHead className="text-white whitespace-nowrap">
                         <OrderBtn
                           label="Carga"
-                          onAscClick={() => console.log("Ordem crescente")}
-                          onDescClick={() => console.log("Ordem decrescente")}
+                          onAscClick={() => handleSort("carga", "asc")}
+                          onDescClick={() => handleSort("carga", "desc")}
                         />
                       </TableHead>
-                      <TableHead className="text-white max-w-8">
+                      <TableHead className="text-white whitespace-nowrap">
                         <OrderBtn
                           label="Cód. Cobrança"
-                          onAscClick={() => console.log("Ordem crescente")}
-                          onDescClick={() => console.log("Ordem decrescente")}
+                          onAscClick={() => handleSort("codigo_cobranca", "asc")}
+                          onDescClick={() => handleSort("codigo_cobranca", "desc")}
                         />
                       </TableHead>
-                      <TableHead className="text-white max-w-20">
+                      <TableHead className="text-white whitespace-nowrap">
                         <OrderBtn
                           label="Código Cliente"
-                          onAscClick={() => console.log("Ordem crescente")}
-                          onDescClick={() => console.log("Ordem decrescente")}
+                          onAscClick={() => handleSort("codigo_cliente", "asc")}
+                          onDescClick={() => handleSort("codigo_cliente", "desc")}
                         />
                       </TableHead>
-                      <TableHead className="text-white max-w-">
+                      <TableHead className="text-white whitespace-nowrap">
                         <OrderBtn
                           label="RCA"
-                          onAscClick={() => console.log("Ordem crescente")}
-                          onDescClick={() => console.log("Ordem decrescente")}
+                          onAscClick={() => handleSort("rca", "asc")}
+                          onDescClick={() => handleSort("rca", "desc")}
                         />
                       </TableHead>
-                      <TableHead className="text-white">
+                      <TableHead className="text-white whitespace-nowrap">
                         <OrderBtn
                           label="Motivo da Devolução"
-                          onAscClick={() => console.log("Ordem crescente")}
-                          onDescClick={() => console.log("Ordem decrescente")}
+                          onAscClick={() => handleSort("motivo_devolucao", "asc")}
+                          onDescClick={() => handleSort("motivo_devolucao", "desc")}
                         />
                       </TableHead>
-                      <TableHead className="text-white max-w-16">
+                      <TableHead className="text-white whitespace-nowrap">
                         <OrderBtn
                           label="Vale"
-                          onAscClick={() => console.log("Ordem crescente")}
-                          onDescClick={() => console.log("Ordem decrescente")}
+                          onAscClick={() => handleSort("vale", "asc")}
+                          onDescClick={() => handleSort("vale", "desc")}
                         />
                       </TableHead>
-                      <TableHead className="text-white text-center max-w-24">
+                      <TableHead className="text-white whitespace-nowrap">
                         <OrderBtn
                           label="Tipo de Devolução"
-                          onAscClick={() => console.log("Ordem crescente")}
-                          onDescClick={() => console.log("Ordem decrescente")}
+                          onAscClick={() => handleSort("tipo_devolucao", "asc")}
+                          onDescClick={() => handleSort("tipo_devolucao", "desc")}
                         />
                       </TableHead>
-                      <TableHead className="text-white">
+                      <TableHead className="text-white whitespace-nowrap">
                         <OrderBtn
                           label="Data de Criação"
-                          onAscClick={() => console.log("Ordem crescente")}
-                          onDescClick={() => console.log("Ordem decrescente")}
+                          onAscClick={() => handleSort("created_at", "asc")}
+                          onDescClick={() => handleSort("created_at", "desc")}
                         />
                       </TableHead>
-                      <TableHead className="text-white max-w-28">
+                      <TableHead className="text-white whitespace-nowrap">
                         <OrderBtn
                           label="Status"
-                          onAscClick={() => console.log("Ordem crescente")}
-                          onDescClick={() => console.log("Ordem decrescente")}
+                          onAscClick={() => handleSort("status", "asc")}
+                          onDescClick={() => handleSort("status", "desc")}
                         />
                       </TableHead>
-                      <TableHead className="text-white">
+                      <TableHead className="text-white whitespace-nowrap">
                         <OrderBtn
                           label="Anexo"
-                          onAscClick={() => console.log("Ordem crescente")}
-                          onDescClick={() => console.log("Ordem decrescente")}
+                          onAscClick={() => handleSort("arquivo_url", "asc")}
+                          onDescClick={() => handleSort("arquivo_url", "desc")}
                         />
                       </TableHead>
                     </TableRow>
@@ -448,9 +441,8 @@ export default function VisualizacaoSolicitacoes() {
                         <Dialog key={s.id}>
                           <DialogTrigger asChild>
                             <TableRow
-                              className={`border-slate-700 cursor-pointer transition-all hover:bg-slate-600 ${
-                                idx % 2 === 0 ? "bg-slate-700" : ""
-                              }`}
+                              className={`border-slate-700 cursor-pointer transition-all hover:bg-slate-600 ${idx % 2 === 0 ? "bg-slate-700" : ""
+                                }`}
                             >
                               <TableCell className="pl-6">{s.id}</TableCell>
                               <TableCell>{truncateText(s.nome, 15)}</TableCell>
@@ -499,13 +491,13 @@ export default function VisualizacaoSolicitacoes() {
                           <DialogTitle></DialogTitle>
                           <DialogContent className="min-w-[50%] max-h-[95%] overflow-y-auto rounded-xl scrollbar-dark">
                             <div className="grid grid-cols-3 gap-4 p-6 text-white rounded-lg relative">
-                            <DialogClose className="absolute right-0">
+                              <DialogClose className="absolute right-0">
                                 <Button className="cursor-pointer p-0 py-2 w-8 h-auto m-0 bg-red-500 hover:bg-red-700 transition-all flex items-center justify-center shadow-transparent">
                                   <X className="items-center p-0" style={{
                                     width: "18px",
                                     height: "18px",
                                     strokeWidth: "5px"
-                                    }}/>
+                                  }} />
                                 </Button>
                               </DialogClose>
                               <div className="flex gap-2 items-center">
@@ -564,11 +556,11 @@ export default function VisualizacaoSolicitacoes() {
                                 </CardHeader>
                                 <CardContent className="w-[96%] p-6 rounded-md h-40 overflow-y-scroll scrollbar-dark">
                                   <span className="text-white text-lg min-h-[100%] max-h-[100%]">
-                                    {s.motivo_devolucao}                                    
+                                    {s.motivo_devolucao}
                                   </span>
                                 </CardContent>
                               </Card>
-                              
+
                               <Card className="bg-slate-600 text-white col-span-3 max-h-80 flex gap-0 p-0">
                                 <span className="text-center font-bold text-xl py-2">
                                   PRODUTOS
