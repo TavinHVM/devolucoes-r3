@@ -1,12 +1,6 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-<<<<<<< HEAD
-  /* config options here */
-};
-
-export default nextConfig;
-=======
   webpack: (config, { isServer }) => {
     if (isServer) {
       // Evita incluir esses módulos no bundle do servidor
@@ -27,4 +21,3 @@ export default nextConfig;
 export default nextConfig;
 
 
->>>>>>> main
