@@ -5,10 +5,11 @@ import {
     getLogoBase64,
   } from "../lib/relatorioUtils";
 
-interface 
-
-
-export default function BaixarRelatorio(sortedSolicitacoes:Props){
+interface Props {
+    sortedSolicitacoes: any[]; // Replace 'any' with the correct type if available
+    status: string;
+}
+export default function BaixarRelatorio({ sortedSolicitacoes, status }: Props) {
     return (
         <>
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">

@@ -231,7 +231,7 @@ export default function Usuarios() {
               </div>
             </CardTitle>
             <CardContent className="max-h-[400px] h-[400px] overflow-y-auto scrollbar-dark">
-              <Table className="max-h-[400px] h-[400px] overflow-y-auto scrollbar-dark">
+              <Table>
                 <TableHeader>
                   <TableRow className="text-white font-bold hover:bg-slate-700">
                     <TableHead className="text-white font-bold w-full flex items-center justify-center">

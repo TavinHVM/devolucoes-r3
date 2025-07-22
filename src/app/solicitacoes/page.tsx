@@ -39,6 +39,7 @@ import {
 import OrderBtn from "@/components/orderBtn";
 import { X } from 'lucide-react';
 import { DialogClose } from "@radix-ui/react-dialog";
+import { RefreshCw } from 'lucide-react';
 
 type Solicitacao = {
   id: number;
@@ -147,23 +148,47 @@ export default function VisualizacaoSolicitacoes() {
     });
   }
 
+  // Função para filtrar solicitações com base na busca
+  const filteredSolicitacoes = sortedSolicitacoes.filter((s) => {
+    const searchTerm = busca.toLowerCase();
+    return (
+      s.nome.toLowerCase().includes(searchTerm) ||
+      s.filial.toLowerCase().includes(searchTerm) ||
+      s.numero_nf.toLowerCase().includes(searchTerm) ||
+      s.carga.toLowerCase().includes(searchTerm) ||
+      s.codigo_cobranca.toLowerCase().includes(searchTerm) ||
+      s.codigo_cliente.toLowerCase().includes(searchTerm) ||
+      s.rca.toLowerCase().includes(searchTerm) ||
+      s.motivo_devolucao.toLowerCase().includes(searchTerm) ||
+      s.vale?.toLowerCase().includes(searchTerm) ||
+      s.tipo_devolucao.toLowerCase().includes(searchTerm) ||
+      s.status.toLowerCase().includes(searchTerm)
+    );
+  });
+
+  // // Paginação dos dados filtrados
+  // const paginatedSolicitacoes = filteredSolicitacoes.slice(
+  //   (currentPage - 1) * itemsPerPage,
+  //   currentPage * itemsPerPage
+  // );
+
   const productsList: {
     codigo_produto: string;
     nome: string;
     quantidade: number;
   }[] = [
-    { codigo_produto: "1001", nome: "Chamex - Resma", quantidade: 5 },
-    { codigo_produto: "1002", nome: "Caneta Azul", quantidade: 12 },
-    { codigo_produto: "1003", nome: "Lápis Preto", quantidade: 20 },
-    { codigo_produto: "1004", nome: "Borracha Branca", quantidade: 8 },
-    { codigo_produto: "1005", nome: "Caderno 200 folhas", quantidade: 3 },
-    { codigo_produto: "1006", nome: "Apontador", quantidade: 15 },
-    { codigo_produto: "1007", nome: "Marcador de Texto", quantidade: 7 },
-    { codigo_produto: "1008", nome: "Régua 30cm", quantidade: 6 },
-    { codigo_produto: "1009", nome: "Cola Branca", quantidade: 9 },
-    { codigo_produto: "1010", nome: "Pasta Plástica", quantidade: 11 },
-    
-  ];
+      { codigo_produto: "1001", nome: "Chamex - Resma", quantidade: 5 },
+      { codigo_produto: "1002", nome: "Caneta Azul", quantidade: 12 },
+      { codigo_produto: "1003", nome: "Lápis Preto", quantidade: 20 },
+      { codigo_produto: "1004", nome: "Borracha Branca", quantidade: 8 },
+      { codigo_produto: "1005", nome: "Caderno 200 folhas", quantidade: 3 },
+      { codigo_produto: "1006", nome: "Apontador", quantidade: 15 },
+      { codigo_produto: "1007", nome: "Marcador de Texto", quantidade: 7 },
+      { codigo_produto: "1008", nome: "Régua 30cm", quantidade: 6 },
+      { codigo_produto: "1009", nome: "Cola Branca", quantidade: 9 },
+      { codigo_produto: "1010", nome: "Pasta Plástica", quantidade: 11 },
+
+    ];
 
   // Função para aprovar uma solicitação
   async function aprovarSolicitacao(id: number) {
@@ -220,25 +245,17 @@ export default function VisualizacaoSolicitacoes() {
   }
 
   // Função para ordenar as solicitações
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  function handleSort(column: string) {
-    if (sortColumn !== column) {
-      setSortColumn(column);
-      setSortDirection("asc");
-    } else if (sortDirection === "asc") {
-      setSortDirection("desc");
-    } else if (sortDirection === "desc") {
-      setSortColumn(null);
-      setSortDirection(null);
-    }
+  function handleSort(column: string, direction: "asc" | "desc") {
+    setSortColumn(column);
+    setSortDirection(direction);
   }
 
-    const indexOfLastItem = currentPage * itemsPerPage;
-    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentItems = sortedSolicitacoes.slice(indexOfFirstItem, indexOfLastItem);
-    const totalPages = Math.ceil(sortedSolicitacoes.length / itemsPerPage);
-    const startPage = Math.max(1, currentPage - 7); // Começa 7 páginas antes do número atual
-    const endPage = Math.min(totalPages, startPage + 14); // Termina 15 páginas após o início
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = sortedSolicitacoes.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(sortedSolicitacoes.length / itemsPerPage);
+  const startPage = Math.max(1, currentPage - 7); // Começa 7 páginas antes do número atual
+  const endPage = Math.min(totalPages, startPage + 14); // Termina 15 páginas após o início
 
   return (
     <>
@@ -265,6 +282,7 @@ export default function VisualizacaoSolicitacoes() {
                   onClick={() => fetchSolicitacoes()}
                   disabled={refreshing}
                 >
+                  <RefreshCw />
                   {refreshing ? "Atualizando..." : "Atualizar"}
                 </Button>
                 <div className="flex gap-4 items-center">
@@ -341,102 +359,102 @@ export default function VisualizacaoSolicitacoes() {
                 <Table className="bg-slate-800 text-white rounded-lg">
                   <TableHeader>
                     <TableRow className="border-slate-700 text-white hover:bg-slate-800 h-20 items-center">
-                      <TableHead className="text-white">
+                      <TableHead className="text-white whitespace-nowrap">
                         <OrderBtn
                           label="ID"
-                          onAscClick={() => console.log("Ordem crescente")}
-                          onDescClick={() => console.log("Ordem decrescente")}
+                          onAscClick={() => handleSort("id", "asc")}
+                          onDescClick={() => handleSort("id", "desc")}
                         />
                       </TableHead>
-                      <TableHead className="text-white">
+                      <TableHead className="text-white whitespace-nowrap">
                         <OrderBtn
                           label="Nome"
-                          onAscClick={() => console.log("Ordem crescente")}
-                          onDescClick={() => console.log("Ordem decrescente")}
+                          onAscClick={() => handleSort("nome", "asc")}
+                          onDescClick={() => handleSort("nome", "desc")}
                         />
                       </TableHead>
-                      <TableHead className="text-white">
+                      <TableHead className="text-white whitespace-nowrap">
                         <OrderBtn
                           label="Filial"
-                          onAscClick={() => console.log("Ordem crescente")}
-                          onDescClick={() => console.log("Ordem decrescente")}
+                          onAscClick={() => handleSort("filial", "asc")}
+                          onDescClick={() => handleSort("filial", "desc")}
                         />
                       </TableHead>
-                      <TableHead className="text-white">
+                      <TableHead className="text-white whitespace-nowrap">
                         <OrderBtn
                           label="NºNF"
-                          onAscClick={() => console.log("Ordem crescente")}
-                          onDescClick={() => console.log("Ordem decrescente")}
+                          onAscClick={() => handleSort("numero_nf", "asc")}
+                          onDescClick={() => handleSort("numero_nf", "desc")}
                         />
                       </TableHead>
-                      <TableHead className="text-white">
+                      <TableHead className="text-white whitespace-nowrap">
                         <OrderBtn
                           label="Carga"
-                          onAscClick={() => console.log("Ordem crescente")}
-                          onDescClick={() => console.log("Ordem decrescente")}
+                          onAscClick={() => handleSort("carga", "asc")}
+                          onDescClick={() => handleSort("carga", "desc")}
                         />
                       </TableHead>
-                      <TableHead className="text-white max-w-8">
+                      <TableHead className="text-white whitespace-nowrap">
                         <OrderBtn
                           label="Cód. Cobrança"
-                          onAscClick={() => console.log("Ordem crescente")}
-                          onDescClick={() => console.log("Ordem decrescente")}
+                          onAscClick={() => handleSort("codigo_cobranca", "asc")}
+                          onDescClick={() => handleSort("codigo_cobranca", "desc")}
                         />
                       </TableHead>
-                      <TableHead className="text-white max-w-20">
+                      <TableHead className="text-white whitespace-nowrap">
                         <OrderBtn
                           label="Código Cliente"
-                          onAscClick={() => console.log("Ordem crescente")}
-                          onDescClick={() => console.log("Ordem decrescente")}
+                          onAscClick={() => handleSort("codigo_cliente", "asc")}
+                          onDescClick={() => handleSort("codigo_cliente", "desc")}
                         />
                       </TableHead>
-                      <TableHead className="text-white max-w-">
+                      <TableHead className="text-white whitespace-nowrap">
                         <OrderBtn
                           label="RCA"
-                          onAscClick={() => console.log("Ordem crescente")}
-                          onDescClick={() => console.log("Ordem decrescente")}
+                          onAscClick={() => handleSort("rca", "asc")}
+                          onDescClick={() => handleSort("rca", "desc")}
                         />
                       </TableHead>
-                      <TableHead className="text-white">
+                      <TableHead className="text-white whitespace-nowrap">
                         <OrderBtn
                           label="Motivo da Devolução"
-                          onAscClick={() => console.log("Ordem crescente")}
-                          onDescClick={() => console.log("Ordem decrescente")}
+                          onAscClick={() => handleSort("motivo_devolucao", "asc")}
+                          onDescClick={() => handleSort("motivo_devolucao", "desc")}
                         />
                       </TableHead>
-                      <TableHead className="text-white max-w-16">
+                      <TableHead className="text-white whitespace-nowrap">
                         <OrderBtn
                           label="Vale"
-                          onAscClick={() => console.log("Ordem crescente")}
-                          onDescClick={() => console.log("Ordem decrescente")}
+                          onAscClick={() => handleSort("vale", "asc")}
+                          onDescClick={() => handleSort("vale", "desc")}
                         />
                       </TableHead>
-                      <TableHead className="text-white text-center max-w-24">
+                      <TableHead className="text-white whitespace-nowrap">
                         <OrderBtn
                           label="Tipo de Devolução"
-                          onAscClick={() => console.log("Ordem crescente")}
-                          onDescClick={() => console.log("Ordem decrescente")}
+                          onAscClick={() => handleSort("tipo_devolucao", "asc")}
+                          onDescClick={() => handleSort("tipo_devolucao", "desc")}
                         />
                       </TableHead>
-                      <TableHead className="text-white">
+                      <TableHead className="text-white whitespace-nowrap">
                         <OrderBtn
                           label="Data de Criação"
-                          onAscClick={() => console.log("Ordem crescente")}
-                          onDescClick={() => console.log("Ordem decrescente")}
+                          onAscClick={() => handleSort("created_at", "asc")}
+                          onDescClick={() => handleSort("created_at", "desc")}
                         />
                       </TableHead>
-                      <TableHead className="text-white max-w-28">
+                      <TableHead className="text-white whitespace-nowrap">
                         <OrderBtn
                           label="Status"
-                          onAscClick={() => console.log("Ordem crescente")}
-                          onDescClick={() => console.log("Ordem decrescente")}
+                          onAscClick={() => handleSort("status", "asc")}
+                          onDescClick={() => handleSort("status", "desc")}
                         />
                       </TableHead>
-                      <TableHead className="text-white">
+                      <TableHead className="text-white whitespace-nowrap">
                         <OrderBtn
                           label="Anexo"
-                          onAscClick={() => console.log("Ordem crescente")}
-                          onDescClick={() => console.log("Ordem decrescente")}
+                          onAscClick={() => handleSort("arquivo_url", "asc")}
+                          onDescClick={() => handleSort("arquivo_url", "desc")}
                         />
                       </TableHead>
                     </TableRow>
@@ -447,9 +465,8 @@ export default function VisualizacaoSolicitacoes() {
                         <Dialog key={s.id}>
                           <DialogTrigger asChild>
                             <TableRow
-                              className={`border-slate-700 cursor-pointer transition-all hover:bg-slate-600 ${
-                                idx % 2 === 0 ? "bg-slate-700" : ""
-                              }`}
+                              className={`border-slate-700 cursor-pointer transition-all hover:bg-slate-600 ${idx % 2 === 0 ? "bg-slate-700" : ""
+                                }`}
                             >
                               <TableCell className="pl-6">{s.id}</TableCell>
                               <TableCell>{truncateText(s.nome, 15)}</TableCell>
@@ -498,115 +515,116 @@ export default function VisualizacaoSolicitacoes() {
                           <DialogTitle></DialogTitle>
                           <DialogContent className="min-w-[50%] max-h-[95%] overflow-y-auto rounded-xl scrollbar-dark">
                             <div className="grid grid-cols-3 gap-4 p-6 text-white rounded-lg relative">
-                            <DialogClose className="absolute right-0">
-                                <Button className="cursor-pointer p-0 py-2 w-8 h-auto m-0 bg-red-500 hover:bg-red-700 transition-all flex items-center justify-center shadow-transparent">
-                                  <X className="items-center p-0" style={{
-                                    width: "18px",
-                                    height: "18px",
-                                    strokeWidth: "5px"
-                                    }}/>
-                                </Button>
-                              </DialogClose>
-                              <div className="flex gap-2 items-center">
-                                <span className="font-bold bg-slate-700 p-1 rounded-md">
-                                  Nome:
-                                </span>
-                                <span>{s.nome}</span>
-                              </div>
-                              <div className="flex gap-2 items-center">
-                                <span className="font-bold bg-slate-700 p-1 rounded-md">
-                                  Filial:
-                                </span>
-                                <span>{s.filial}</span>
-                              </div>
-                              <div className="flex gap-2 items-center">
-                                <span className="font-bold bg-slate-700 p-1 rounded-md">
-                                  Nº NF:
-                                </span>
-                                <span>{s.numero_nf}</span>
-                              </div>
-                              <div className="flex gap-2 items-center">
-                                <span className="font-bold bg-slate-700 p-1 rounded-md">
-                                  Carga:
-                                </span>
-                                <span>{s.numero_nf}</span>
-                              </div>
-                              <div className="flex gap-2 items-center">
-                                <span className="font-bold bg-slate-700 p-1 rounded-md">
-                                  Cód. Cobrança:
-                                </span>
-                                <span>{s.codigo_cobranca}</span>
-                              </div>
-                              <div className="flex gap-2 items-center">
-                                <span className="font-bold bg-slate-700 p-1 rounded-md">
-                                  Cód. Cliente:
-                                </span>
-                                <span>{s.codigo_cliente}</span>
-                              </div>
-                              <div className="flex gap-2 items-center">
-                                <span className="font-bold bg-slate-700 p-1 rounded-md">
-                                  RCA:
-                                </span>
-                                <span>{s.rca}</span>
-                              </div>
-                              <div className="flex gap-2 items-center">
-                                <span className="font-bold bg-slate-700 p-1 rounded-md">
-                                  Vale:
-                                </span>
-                                <span>{s.vale}</span>
-                              </div>
-                              <Card className="flex flex-col items-center justify-center col-span-3 bg-slate-600">
-                                <CardHeader className="flex items-center justify-center text-center w-full">
-                                  <span className="font-bold bg-slate-00 w-full text-white text-center text-xl">
-                                    Motivo da Devolução:
+                              <DialogClose className="absolute right-0" />
+                                <DialogClose className="absolute right-0">
+                                  <Button className="cursor-pointer p-0 py-2 w-8 h-auto m-0 bg-red-500 hover:bg-red-700 transition-all flex items-center justify-center shadow-transparent">
+                                    <X className="items-center p-0" style={{
+                                      width: "18px",
+                                      height: "18px",
+                                      strokeWidth: "5px"
+                                    }} />
+                                  </Button>
+                                </DialogClose>
+                                <div className="flex gap-2 items-center">
+                                  <span className="font-bold bg-slate-700 p-1 rounded-md">
+                                    Nome:
                                   </span>
-                                </CardHeader>
-                                <CardContent className="w-[96%] p-6 rounded-md h-40 overflow-y-scroll scrollbar-dark">
-                                  <span className="text-white text-lg min-h-[100%] max-h-[100%]">
-                                    {s.motivo_devolucao}                                    
-                                  </span>
-                                </CardContent>
-                              </Card>
-                              
-                              <Card className="bg-slate-600 text-white col-span-3 max-h-80 flex gap-0 p-0">
-                                <span className="text-center font-bold text-xl py-2">
-                                  PRODUTOS
-                                </span>
-                                <div className="flex min-w-full bg-slate-800">
-                                  <div className="w-[25%] py-2 text-lg text-center border-r-2 border-white">
-                                    <span className="text-white font-bold">Código Produto</span>
-                                  </div>
-                                  <div className="w-[50%] py-2 text-lg text-center border-l-2 border-r-2 border-white">
-                                    <span className="text-white font-bold">Nome</span>
-                                  </div>
-                                  <div className="w-[25%] py-2 text-lg text-center border-l-2 border-white">
-                                    <span className="text-white font-bold">Quantidade</span>
-                                  </div>
+                                  <span>{s.nome}</span>
                                 </div>
-                                {/* Produtos */}
-                                <Table className="bg-slate-500 max-h-24 h-10">
-                                  <TableHeader className="mx-6">
-                                    <TableRow className="mx-6">
-                                    </TableRow>
-                                  </TableHeader>
-                                  <TableBody className="mx-6 px-32">
-                                    {productsList.map((p) => (
-                                      <TableRow
-                                        key={p.codigo_produto}
-                                        className="px-32 w-full"
-                                      >
-                                        <TableCell className="text-center w-[25%] text-lg">
-                                          {p.codigo_produto}
-                                        </TableCell>
-                                        <TableCell className="text-lg">{p.nome}</TableCell>
-                                        <TableCell className="pl-8 w-[25%] text-center text-lg">
-                                          {p.quantidade}
-                                        </TableCell>
+                                <div className="flex gap-2 items-center">
+                                  <span className="font-bold bg-slate-700 p-1 rounded-md">
+                                    Filial:
+                                  </span>
+                                  <span>{s.filial}</span>
+                                </div>
+                                <div className="flex gap-2 items-center">
+                                  <span className="font-bold bg-slate-700 p-1 rounded-md">
+                                    Nº NF:
+                                  </span>
+                                  <span>{s.numero_nf}</span>
+                                </div>
+                                <div className="flex gap-2 items-center">
+                                  <span className="font-bold bg-slate-700 p-1 rounded-md">
+                                    Carga:
+                                  </span>
+                                  <span>{s.numero_nf}</span>
+                                </div>
+                                <div className="flex gap-2 items-center">
+                                  <span className="font-bold bg-slate-700 p-1 rounded-md">
+                                    Cód. Cobrança:
+                                  </span>
+                                  <span>{s.codigo_cobranca}</span>
+                                </div>
+                                <div className="flex gap-2 items-center">
+                                  <span className="font-bold bg-slate-700 p-1 rounded-md">
+                                    Cód. Cliente:
+                                  </span>
+                                  <span>{s.codigo_cliente}</span>
+                                </div>
+                                <div className="flex gap-2 items-center">
+                                  <span className="font-bold bg-slate-700 p-1 rounded-md">
+                                    RCA:
+                                  </span>
+                                  <span>{s.rca}</span>
+                                </div>
+                                <div className="flex gap-2 items-center">
+                                  <span className="font-bold bg-slate-700 p-1 rounded-md">
+                                    Vale:
+                                  </span>
+                                  <span>{s.vale}</span>
+                                </div>
+                                <Card className="flex flex-col items-center justify-center col-span-3 bg-slate-600">
+                                  <CardHeader className="flex items-center justify-center text-center w-full">
+                                    <span className="font-bold bg-slate-00 w-full text-white text-center text-xl">
+                                      Motivo da Devolução:
+                                    </span>
+                                  </CardHeader>
+                                  <CardContent className="w-[96%] p-6 rounded-md h-40 overflow-y-scroll scrollbar-dark">
+                                    <span className="text-white text-lg min-h-[100%] max-h-[100%]">
+                                      {s.motivo_devolucao}
+                                    </span>
+                                  </CardContent>
+                                </Card>
+
+                                <Card className="bg-slate-600 text-white col-span-3 max-h-80 flex gap-0 p-0">
+                                  <span className="text-center font-bold text-xl py-2">
+                                    PRODUTOS
+                                  </span>
+                                  <div className="flex min-w-full bg-slate-800">
+                                    <div className="w-[25%] py-2 text-lg text-center border-r-2 border-white">
+                                      <span className="text-white font-bold">Código Produto</span>
+                                    </div>
+                                    <div className="w-[50%] py-2 text-lg text-center border-l-2 border-r-2 border-white">
+                                      <span className="text-white font-bold">Nome</span>
+                                    </div>
+                                    <div className="w-[25%] py-2 text-lg text-center border-l-2 border-white">
+                                      <span className="text-white font-bold">Quantidade</span>
+                                    </div>
+                                  </div>
+                                  {/* Produtos */}
+                                  <Table className="bg-slate-500 max-h-24 h-10">
+                                    <TableHeader className="mx-6">
+                                      <TableRow className="mx-6">
                                       </TableRow>
-                                    ))}
-                                  </TableBody>
-                                </Table>
-                              </Card>
+                                    </TableHeader>
+                                    <TableBody className="mx-6 px-32">
+                                      {productsList.map((p) => (
+                                        <TableRow
+                                          key={p.codigo_produto}
+                                          className="px-32 w-full"
+                                        >
+                                          <TableCell className="text-center w-[25%] text-lg">
+                                            {p.codigo_produto}
+                                          </TableCell>
+                                          <TableCell className="text-lg">{p.nome}</TableCell>
+                                          <TableCell className="pl-8 w-[25%] text-center text-lg">
+                                            {p.quantidade}
+                                          </TableCell>
+                                        </TableRow>
+                                      ))}
+                                    </TableBody>
+                                  </Table>
+                                </Card>
                             </div>
                           </DialogContent>
                         </Dialog>
@@ -626,26 +644,26 @@ export default function VisualizacaoSolicitacoes() {
 
                 {/* Paginação */}
                 <Pagination className="mt-4">
-                        <PaginationContent>
-                            <PaginationItem>
-                                <PaginationPrevious namePrevious="Primeira Página" href="#" onClick={() => setCurrentPage(1)} />
-                            </PaginationItem>
-                            <PaginationItem>
-                                <PaginationPrevious namePrevious="Anterior" href="#" onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))} />
-                            </PaginationItem>
-                            {[...Array(endPage - startPage + 1)].map((_, i) => (
-                                <PaginationItem key={i + startPage}>
-                                    <PaginationLink className={currentPage === i + startPage ? "bg-gray-200" : ""} href="#" onClick={() => setCurrentPage(i + startPage)}>{i + startPage}</PaginationLink>
-                                </PaginationItem>
-                            ))}
-                            <PaginationItem>
-                                <PaginationNext nameNext="Próxima" href="#" onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))} />
-                            </PaginationItem>
-                            <PaginationItem>
-                                <PaginationNext nameNext="Última Página" href="#" onClick={() => setCurrentPage(totalPages)} />
-                            </PaginationItem>
-                        </PaginationContent>
-                    </Pagination>
+                  <PaginationContent>
+                    <PaginationItem>
+                      <PaginationPrevious namePrevious="Primeira Página" href="#" onClick={() => setCurrentPage(1)} />
+                    </PaginationItem>
+                    <PaginationItem>
+                      <PaginationPrevious namePrevious="Anterior" href="#" onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))} />
+                    </PaginationItem>
+                    {[...Array(endPage - startPage + 1)].map((_, i) => (
+                      <PaginationItem key={i + startPage}>
+                        <PaginationLink className={currentPage === i + startPage ? "bg-gray-200" : ""} href="#" onClick={() => setCurrentPage(i + startPage)}>{i + startPage}</PaginationLink>
+                      </PaginationItem>
+                    ))}
+                    <PaginationItem>
+                      <PaginationNext nameNext="Próxima" href="#" onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))} />
+                    </PaginationItem>
+                    <PaginationItem>
+                      <PaginationNext nameNext="Última Página" href="#" onClick={() => setCurrentPage(totalPages)} />
+                    </PaginationItem>
+                  </PaginationContent>
+                </Pagination>
               </div>
             </CardContent>
           </Card>

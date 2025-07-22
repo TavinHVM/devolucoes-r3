@@ -58,7 +58,7 @@ export default function Header() {
             </Button>
             <Button
               variant="destructive"
-              className="bg-red-500 hover:bg-red-600 text-white cursor-pointer"
+              className="bg-red-custom hover:bg-red-custom-hover text-white cursor-pointer"
               onClick={() => { handleLogout(); setOpen(false); }}
               type="button"
             >
@@ -95,7 +95,7 @@ export default function Header() {
           {/* Botão de Sair */}
           <button
             onClick={() => setOpen(true)}
-            className="flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-md transition cursor-pointer"
+            className="flex items-center gap-2 bg-[#e94a4a] hover:bg-[#e94a4ae5] text-white px-3 py-2 rounded-md transition cursor-pointer"
           >
             <Power size={20} />
             <span>Sair</span>
