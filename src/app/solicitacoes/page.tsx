@@ -653,7 +653,7 @@ export default function VisualizacaoSolicitacoes() {
                     </PaginationItem>
                     {[...Array(endPage - startPage + 1)].map((_, i) => (
                       <PaginationItem key={i + startPage}>
-                        <PaginationLink className={currentPage === i + startPage ? "bg-gray-200" : ""} href="#" onClick={() => setCurrentPage(i + startPage)}>{i + startPage}</PaginationLink>
+                        <PaginationLink className={currentPage === i + startPage ? "bg-slate-600" : ""} href="#" onClick={() => setCurrentPage(i + startPage)}>{i + startPage}</PaginationLink>
                       </PaginationItem>
                     ))}
                     <PaginationItem>

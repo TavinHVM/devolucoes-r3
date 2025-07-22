@@ -18,6 +18,7 @@ model user_profiles {
   id Int @id @default(autoincrement())
   first_name            String
   last_name             String
+  password              String
   role                  String
   user_level            String
   created_at            DateTime  @default(now())
@@ -34,21 +35,21 @@ model solicitacoes {
   cod_cobranca          String
   rca                   Int
   motivo_devolucao      String
-  codigo_produto        Int
+  products_list         Json
   tipo_devolucao        String
-  arquivo_url           String
+  arquivo_url           Bytes?
   created_at            DateTime  @default(now())
   cod_cliente           Int
   status                String
   vale                  String
   pendente_at           DateTime
-  aprovada_at           DateTime
-  rejeitada_at          DateTime
-  desdobrada_at         DateTime
-  reenviada_at          DateTime
-  abatida_at            DateTime
-  finalizada_at         DateTime
-  updated_at            DateTime  @default(now())
+  aprovada_at           DateTime?
+  rejeitada_at          DateTime?
+  desdobrada_at         DateTime?
+  reenviada_at          DateTime?
+  abatida_at            DateTime?
+  finalizada_at         DateTime?
+  updated_at            DateTime?  @default(now())
 }
 
 model lista_codigos_cobranca {
