@@ -182,18 +182,21 @@ export default function VisualizacaoSolicitacoes() {
       s.codigo_cliente.toLowerCase().includes(searchTerm) ||
       s.rca.toLowerCase().includes(searchTerm) ||
       s.motivo_devolucao.toLowerCase().includes(searchTerm) ||
-      s.vale?.toLowerCase().includes(searchTerm) ||
+      (s.vale?.toLowerCase().includes(searchTerm) ?? false) ||
       s.tipo_devolucao.toLowerCase().includes(searchTerm) ||
       s.status.toLowerCase().includes(searchTerm)
     );
   });
 
-  // // Paginação dos dados filtrados
-  // const paginatedSolicitacoes = filteredSolicitacoes.slice(
-  //   (currentPage - 1) * itemsPerPage,
-  //   currentPage * itemsPerPage
-  // );
+  // Corrija aqui: use filteredSolicitacoes para paginação e exibição
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = filteredSolicitacoes.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(filteredSolicitacoes.length / itemsPerPage);
+  const startPage = Math.max(1, currentPage - 7);
+  const endPage = Math.min(totalPages, startPage + 14);
 
+  // Lista fixa de produtos (fora do Dialog)
   const productsList: {
     codigo_produto: string;
     nome: string;
@@ -209,40 +212,7 @@ export default function VisualizacaoSolicitacoes() {
       { codigo_produto: "1008", nome: "Régua 30cm", quantidade: 6 },
       { codigo_produto: "1009", nome: "Cola Branca", quantidade: 9 },
       { codigo_produto: "1010", nome: "Pasta Plástica", quantidade: 11 },
-
     ];
-
-  // Função para aprovar uma solicitação
-  async function aprovarSolicitacao(id: number) {
-    try {
-      const { error } = await supabase
-        .from("solicitacoes")
-        .update({ status: "Aprovado" })
-        .eq("id", id);
-      if (error) throw error;
-      setSolicitacoes(
-        solicitacoes.map((s) =>
-          s.id === id ? { ...s, status: "Aprovado" } : s
-        )
-      );
-    } catch (err: unknown) {
-      const msg =
-        err && typeof err === "object" && "message" in err
-          ? (err as { message: string }).message
-          : JSON.stringify(err);
-      alert("Erro ao aprovar solicitação: " + msg);
-    }
-  }
-
-  // Função para baixar o anexo de uma solicitação
-  function baixarAnexo(arquivo_url: string | undefined) {
-    if (arquivo_url) {
-      window.open(
-        `https://${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${arquivo_url}`,
-        "_blank"
-      );
-    }
-  }
 
   // Função para obter a classe do status
   function getStatusClass(status: string) {
@@ -266,12 +236,19 @@ export default function VisualizacaoSolicitacoes() {
     }
   }
 
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = sortedSolicitacoes.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(sortedSolicitacoes.length / itemsPerPage);
-  const startPage = Math.max(1, currentPage - 7); // Começa 7 páginas antes do número atual
-  const endPage = Math.min(totalPages, startPage + 14); // Termina 15 páginas após o início
+  // Função para baixar o anexo de uma solicitação
+  function baixarAnexo(arquivo_url: string | undefined) {
+    if (arquivo_url) {
+      window.open(
+        `https://${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${arquivo_url}`,
+        "_blank"
+      );
+    }
+  }
+
+  function aprovarSolicitacao(arg0: number) {
+    throw new Error("Function not implemented.");
+  }
 
   return (
     <>
