@@ -252,8 +252,8 @@ export default function VisualizacaoSolicitacoes() {
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = sortedSolicitacoes.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(sortedSolicitacoes.length / itemsPerPage);
+  const currentItems = filteredSolicitacoes.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(filteredSolicitacoes.length / itemsPerPage);
   const startPage = Math.max(1, currentPage - 7); // Começa 7 páginas antes do número atual
   const endPage = Math.min(totalPages, startPage + 14); // Termina 15 páginas após o início
 
