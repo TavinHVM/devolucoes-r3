@@ -72,11 +72,7 @@ export default function Header() {
       <header className="flex items-center justify-between px-6 py-4 bg-slate-800 text-white shadow-md w-full">
         {/* Logo e Nome */}
         <div className="flex items-center gap-3">
-<<<<<<< HEAD
-          <Image src="/favicon.ico" alt="Logo" width={50} height={50} />
-=======
           <Image src="/favicon.ico" alt="Logo" width={50} height={50} className="w-10 h-10" />
->>>>>>> main
           <span className="text-xl font-bold">Devoluções R3</span>
         </div>
 
