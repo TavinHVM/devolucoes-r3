@@ -82,10 +82,7 @@ export default function VisualizacaoSolicitacoes() {
   const [aprovacaoVale, setAprovacaoVale] = useState("");
   const [refreshing, setRefreshing] = useState(false);
   const router = useRouter();
-  const [sortColumn, setSortColumn] = useState<string | null>(null);
-  const [sortDirection, setSortDirection] = useState<"asc" | "desc" | null>(
-    null
-  );
+  const [sortColumns, setSortColumns] = useState<{ column: string; direction: "asc" | "desc" }[]>([]);
 
   // Função para buscar as solicitações
   const fetchSolicitacoes = useCallback(
@@ -122,27 +119,52 @@ export default function VisualizacaoSolicitacoes() {
     checkAuth();
   }, [router, fetchSolicitacoes]);
 
-  // Ordenação das solicitações
+  // Função para ordenar/adicionar coluna
+  function handleSort(column: string, direction: "asc" | "desc") {
+    setSortColumns(prev => {
+      const idx = prev.findIndex(s => s.column === column);
+      if (idx !== -1) {
+        // Atualiza direção
+        const updated = [...prev];
+        updated[idx] = { column, direction };
+        return updated;
+      }
+      // Adiciona nova coluna ao final
+      return [...prev, { column, direction }];
+    });
+  }
+
+  // Função para remover ordenação de uma coluna
+  function handleClearSort(column: string) {
+    setSortColumns(prev => prev.filter(s => s.column !== column));
+  }
+
+  // Ordenação multi-coluna
   const sortedSolicitacoes = [...solicitacoes];
-  if (sortColumn && sortDirection) {
+  if (sortColumns.length > 0) {
     sortedSolicitacoes.sort((a, b) => {
-      const aValue = a[sortColumn as keyof Solicitacao] ?? "";
-      const bValue = b[sortColumn as keyof Solicitacao] ?? "";
-      // Ordenação especial para datas
-      if (sortColumn === "created_at") {
-        const aDate = new Date(aValue);
-        const bDate = new Date(bValue);
-        return sortDirection === "asc"
-          ? aDate.getTime() - bDate.getTime()
-          : bDate.getTime() - aDate.getTime();
-      }
-      if (typeof aValue === "string" && typeof bValue === "string") {
-        return sortDirection === "asc"
-          ? aValue.localeCompare(bValue, "pt-BR", { sensitivity: "base" })
-          : bValue.localeCompare(aValue, "pt-BR", { sensitivity: "base" });
-      }
-      if (typeof aValue === "number" && typeof bValue === "number") {
-        return sortDirection === "asc" ? aValue - bValue : bValue - aValue;
+      for (const sort of sortColumns) {
+        const aValue = a[sort.column as keyof Solicitacao] ?? "";
+        const bValue = b[sort.column as keyof Solicitacao] ?? "";
+        if (sort.column === "created_at") {
+          const aDate = new Date(aValue);
+          const bDate = new Date(bValue);
+          if (aDate.getTime() !== bDate.getTime()) {
+            return sort.direction === "asc"
+              ? aDate.getTime() - bDate.getTime()
+              : bDate.getTime() - aDate.getTime();
+          }
+        } else if (typeof aValue === "string" && typeof bValue === "string") {
+          if (aValue.localeCompare(bValue, "pt-BR", { sensitivity: "base" }) !== 0) {
+            return sort.direction === "asc"
+              ? aValue.localeCompare(bValue, "pt-BR", { sensitivity: "base" })
+              : bValue.localeCompare(aValue, "pt-BR", { sensitivity: "base" });
+          }
+        } else if (typeof aValue === "number" && typeof bValue === "number") {
+          if (aValue !== bValue) {
+            return sort.direction === "asc" ? aValue - bValue : bValue - aValue;
+          }
+        }
       }
       return 0;
     });
@@ -242,12 +264,6 @@ export default function VisualizacaoSolicitacoes() {
       default:
         return "min-w-32 max-w-32 w-full bg-blue-900 text-white font-bold px-1 py-4 rounded flex justify-center h-full";
     }
-  }
-
-  // Função para ordenar as solicitações
-  function handleSort(column: string, direction: "asc" | "desc") {
-    setSortColumn(column);
-    setSortDirection(direction);
   }
 
   const indexOfLastItem = currentPage * itemsPerPage;
@@ -362,99 +378,128 @@ export default function VisualizacaoSolicitacoes() {
                       <TableHead className="text-white whitespace-nowrap">
                         <OrderBtn
                           label="ID"
-                          onAscClick={() => handleSort("id", "asc")}
-                          onDescClick={() => handleSort("id", "desc")}
+                          columnKey="id"
+                          activeSort={sortColumns}
+                          onSort={handleSort}
+                          onClearSort={handleClearSort}
                         />
                       </TableHead>
                       <TableHead className="text-white whitespace-nowrap">
                         <OrderBtn
                           label="Nome"
-                          onAscClick={() => handleSort("nome", "asc")}
-                          onDescClick={() => handleSort("nome", "desc")}
+                          columnKey="nome"
+                          activeSort={sortColumns}
+                          onSort={handleSort}
+                          onClearSort={handleClearSort}
                         />
+
                       </TableHead>
                       <TableHead className="text-white whitespace-nowrap">
                         <OrderBtn
                           label="Filial"
-                          onAscClick={() => handleSort("filial", "asc")}
-                          onDescClick={() => handleSort("filial", "desc")}
+                          columnKey="filial"
+                          activeSort={sortColumns}
+                          onSort={handleSort}
+                          onClearSort={handleClearSort}
                         />
                       </TableHead>
                       <TableHead className="text-white whitespace-nowrap">
                         <OrderBtn
                           label="NºNF"
-                          onAscClick={() => handleSort("numero_nf", "asc")}
-                          onDescClick={() => handleSort("numero_nf", "desc")}
+                          columnKey="numero_nf"
+                          activeSort={sortColumns}
+                          onSort={handleSort}
+                          onClearSort={handleClearSort}
                         />
                       </TableHead>
                       <TableHead className="text-white whitespace-nowrap">
                         <OrderBtn
                           label="Carga"
-                          onAscClick={() => handleSort("carga", "asc")}
-                          onDescClick={() => handleSort("carga", "desc")}
+                          columnKey="carga"
+                          activeSort={sortColumns}
+                          onSort={handleSort}
+                          onClearSort={handleClearSort}
                         />
                       </TableHead>
                       <TableHead className="text-white whitespace-nowrap">
                         <OrderBtn
                           label="Cód. Cobrança"
-                          onAscClick={() => handleSort("codigo_cobranca", "asc")}
-                          onDescClick={() => handleSort("codigo_cobranca", "desc")}
+                          columnKey="codigo_cobranca"
+                          activeSort={sortColumns}
+                          onSort={handleSort}
+                          onClearSort={handleClearSort}
                         />
                       </TableHead>
                       <TableHead className="text-white whitespace-nowrap">
                         <OrderBtn
                           label="Código Cliente"
-                          onAscClick={() => handleSort("codigo_cliente", "asc")}
-                          onDescClick={() => handleSort("codigo_cliente", "desc")}
+                          columnKey="codigo_cliente"
+                          activeSort={sortColumns}
+                          onSort={handleSort}
+                          onClearSort={handleClearSort}
                         />
                       </TableHead>
                       <TableHead className="text-white whitespace-nowrap">
                         <OrderBtn
                           label="RCA"
-                          onAscClick={() => handleSort("rca", "asc")}
-                          onDescClick={() => handleSort("rca", "desc")}
+                          columnKey="rca"
+                          activeSort={sortColumns}
+                          onSort={handleSort}
+                          onClearSort={handleClearSort}
                         />
                       </TableHead>
                       <TableHead className="text-white whitespace-nowrap">
                         <OrderBtn
                           label="Motivo da Devolução"
-                          onAscClick={() => handleSort("motivo_devolucao", "asc")}
-                          onDescClick={() => handleSort("motivo_devolucao", "desc")}
+                          columnKey="motivo_devolucao"
+                          activeSort={sortColumns}
+                          onSort={handleSort}
+                          onClearSort={handleClearSort}
                         />
                       </TableHead>
                       <TableHead className="text-white whitespace-nowrap">
                         <OrderBtn
                           label="Vale"
-                          onAscClick={() => handleSort("vale", "asc")}
-                          onDescClick={() => handleSort("vale", "desc")}
+                          columnKey="vale"
+                          activeSort={sortColumns}
+                          onSort={handleSort}
+                          onClearSort={handleClearSort}
                         />
                       </TableHead>
                       <TableHead className="text-white whitespace-nowrap">
                         <OrderBtn
                           label="Tipo de Devolução"
-                          onAscClick={() => handleSort("tipo_devolucao", "asc")}
-                          onDescClick={() => handleSort("tipo_devolucao", "desc")}
+                          columnKey="tipo_devolucao"
+                          activeSort={sortColumns}
+                          onSort={handleSort}
+                          onClearSort={handleClearSort}
                         />
                       </TableHead>
                       <TableHead className="text-white whitespace-nowrap">
                         <OrderBtn
                           label="Data de Criação"
-                          onAscClick={() => handleSort("created_at", "asc")}
-                          onDescClick={() => handleSort("created_at", "desc")}
+                          columnKey="created_at"
+                          activeSort={sortColumns}
+                          onSort={handleSort}
+                          onClearSort={handleClearSort}
                         />
                       </TableHead>
                       <TableHead className="text-white whitespace-nowrap">
                         <OrderBtn
                           label="Status"
-                          onAscClick={() => handleSort("status", "asc")}
-                          onDescClick={() => handleSort("status", "desc")}
+                          columnKey="status"
+                          activeSort={sortColumns}
+                          onSort={handleSort}
+                          onClearSort={handleClearSort}
                         />
                       </TableHead>
                       <TableHead className="text-white whitespace-nowrap">
                         <OrderBtn
                           label="Anexo"
-                          onAscClick={() => handleSort("arquivo_url", "asc")}
-                          onDescClick={() => handleSort("arquivo_url", "desc")}
+                          columnKey="arquivo_url"
+                          activeSort={sortColumns}
+                          onSort={handleSort}
+                          onClearSort={handleClearSort}
                         />
                       </TableHead>
                     </TableRow>
@@ -516,115 +561,115 @@ export default function VisualizacaoSolicitacoes() {
                           <DialogContent className="min-w-[50%] max-h-[95%] overflow-y-auto rounded-xl scrollbar-dark">
                             <div className="grid grid-cols-3 gap-4 p-6 text-white rounded-lg relative">
                               <DialogClose className="absolute right-0" />
-                                <DialogClose className="absolute right-0">
-                                  <Button className="cursor-pointer p-0 py-2 w-8 h-auto m-0 bg-red-500 hover:bg-red-700 transition-all flex items-center justify-center shadow-transparent">
-                                    <X className="items-center p-0" style={{
-                                      width: "18px",
-                                      height: "18px",
-                                      strokeWidth: "5px"
-                                    }} />
-                                  </Button>
-                                </DialogClose>
-                                <div className="flex gap-2 items-center">
-                                  <span className="font-bold bg-slate-700 p-1 rounded-md">
-                                    Nome:
+                              <DialogClose className="absolute right-0">
+                                <Button className="cursor-pointer p-0 py-2 w-8 h-auto m-0 bg-red-500 hover:bg-red-700 transition-all flex items-center justify-center shadow-transparent">
+                                  <X className="items-center p-0" style={{
+                                    width: "18px",
+                                    height: "18px",
+                                    strokeWidth: "5px"
+                                  }} />
+                                </Button>
+                              </DialogClose>
+                              <div className="flex gap-2 items-center">
+                                <span className="font-bold bg-slate-700 p-1 rounded-md">
+                                  Nome:
+                                </span>
+                                <span>{s.nome}</span>
+                              </div>
+                              <div className="flex gap-2 items-center">
+                                <span className="font-bold bg-slate-700 p-1 rounded-md">
+                                  Filial:
+                                </span>
+                                <span>{s.filial}</span>
+                              </div>
+                              <div className="flex gap-2 items-center">
+                                <span className="font-bold bg-slate-700 p-1 rounded-md">
+                                  Nº NF:
+                                </span>
+                                <span>{s.numero_nf}</span>
+                              </div>
+                              <div className="flex gap-2 items-center">
+                                <span className="font-bold bg-slate-700 p-1 rounded-md">
+                                  Carga:
+                                </span>
+                                <span>{s.numero_nf}</span>
+                              </div>
+                              <div className="flex gap-2 items-center">
+                                <span className="font-bold bg-slate-700 p-1 rounded-md">
+                                  Cód. Cobrança:
+                                </span>
+                                <span>{s.codigo_cobranca}</span>
+                              </div>
+                              <div className="flex gap-2 items-center">
+                                <span className="font-bold bg-slate-700 p-1 rounded-md">
+                                  Cód. Cliente:
+                                </span>
+                                <span>{s.codigo_cliente}</span>
+                              </div>
+                              <div className="flex gap-2 items-center">
+                                <span className="font-bold bg-slate-700 p-1 rounded-md">
+                                  RCA:
+                                </span>
+                                <span>{s.rca}</span>
+                              </div>
+                              <div className="flex gap-2 items-center">
+                                <span className="font-bold bg-slate-700 p-1 rounded-md">
+                                  Vale:
+                                </span>
+                                <span>{s.vale}</span>
+                              </div>
+                              <Card className="flex flex-col items-center justify-center col-span-3 bg-slate-600">
+                                <CardHeader className="flex items-center justify-center text-center w-full">
+                                  <span className="font-bold bg-slate-00 w-full text-white text-center text-xl">
+                                    Motivo da Devolução:
                                   </span>
-                                  <span>{s.nome}</span>
-                                </div>
-                                <div className="flex gap-2 items-center">
-                                  <span className="font-bold bg-slate-700 p-1 rounded-md">
-                                    Filial:
+                                </CardHeader>
+                                <CardContent className="w-[96%] p-6 rounded-md h-40 overflow-y-scroll scrollbar-dark">
+                                  <span className="text-white text-lg min-h-[100%] max-h-[100%]">
+                                    {s.motivo_devolucao}
                                   </span>
-                                  <span>{s.filial}</span>
-                                </div>
-                                <div className="flex gap-2 items-center">
-                                  <span className="font-bold bg-slate-700 p-1 rounded-md">
-                                    Nº NF:
-                                  </span>
-                                  <span>{s.numero_nf}</span>
-                                </div>
-                                <div className="flex gap-2 items-center">
-                                  <span className="font-bold bg-slate-700 p-1 rounded-md">
-                                    Carga:
-                                  </span>
-                                  <span>{s.numero_nf}</span>
-                                </div>
-                                <div className="flex gap-2 items-center">
-                                  <span className="font-bold bg-slate-700 p-1 rounded-md">
-                                    Cód. Cobrança:
-                                  </span>
-                                  <span>{s.codigo_cobranca}</span>
-                                </div>
-                                <div className="flex gap-2 items-center">
-                                  <span className="font-bold bg-slate-700 p-1 rounded-md">
-                                    Cód. Cliente:
-                                  </span>
-                                  <span>{s.codigo_cliente}</span>
-                                </div>
-                                <div className="flex gap-2 items-center">
-                                  <span className="font-bold bg-slate-700 p-1 rounded-md">
-                                    RCA:
-                                  </span>
-                                  <span>{s.rca}</span>
-                                </div>
-                                <div className="flex gap-2 items-center">
-                                  <span className="font-bold bg-slate-700 p-1 rounded-md">
-                                    Vale:
-                                  </span>
-                                  <span>{s.vale}</span>
-                                </div>
-                                <Card className="flex flex-col items-center justify-center col-span-3 bg-slate-600">
-                                  <CardHeader className="flex items-center justify-center text-center w-full">
-                                    <span className="font-bold bg-slate-00 w-full text-white text-center text-xl">
-                                      Motivo da Devolução:
-                                    </span>
-                                  </CardHeader>
-                                  <CardContent className="w-[96%] p-6 rounded-md h-40 overflow-y-scroll scrollbar-dark">
-                                    <span className="text-white text-lg min-h-[100%] max-h-[100%]">
-                                      {s.motivo_devolucao}
-                                    </span>
-                                  </CardContent>
-                                </Card>
+                                </CardContent>
+                              </Card>
 
-                                <Card className="bg-slate-600 text-white col-span-3 max-h-80 flex gap-0 p-0">
-                                  <span className="text-center font-bold text-xl py-2">
-                                    PRODUTOS
-                                  </span>
-                                  <div className="flex min-w-full bg-slate-800">
-                                    <div className="w-[25%] py-2 text-lg text-center border-r-2 border-white">
-                                      <span className="text-white font-bold">Código Produto</span>
-                                    </div>
-                                    <div className="w-[50%] py-2 text-lg text-center border-l-2 border-r-2 border-white">
-                                      <span className="text-white font-bold">Nome</span>
-                                    </div>
-                                    <div className="w-[25%] py-2 text-lg text-center border-l-2 border-white">
-                                      <span className="text-white font-bold">Quantidade</span>
-                                    </div>
+                              <Card className="bg-slate-600 text-white col-span-3 max-h-80 flex gap-0 p-0">
+                                <span className="text-center font-bold text-xl py-2">
+                                  PRODUTOS
+                                </span>
+                                <div className="flex min-w-full bg-slate-800">
+                                  <div className="w-[25%] py-2 text-lg text-center border-r-2 border-white">
+                                    <span className="text-white font-bold">Código Produto</span>
                                   </div>
-                                  {/* Produtos */}
-                                  <Table className="bg-slate-500 max-h-24 h-10">
-                                    <TableHeader className="mx-6">
-                                      <TableRow className="mx-6">
+                                  <div className="w-[50%] py-2 text-lg text-center border-l-2 border-r-2 border-white">
+                                    <span className="text-white font-bold">Nome</span>
+                                  </div>
+                                  <div className="w-[25%] py-2 text-lg text-center border-l-2 border-white">
+                                    <span className="text-white font-bold">Quantidade</span>
+                                  </div>
+                                </div>
+                                {/* Produtos */}
+                                <Table className="bg-slate-500 max-h-24 h-10">
+                                  <TableHeader className="mx-6">
+                                    <TableRow className="mx-6">
+                                    </TableRow>
+                                  </TableHeader>
+                                  <TableBody className="mx-6 px-32">
+                                    {productsList.map((p) => (
+                                      <TableRow
+                                        key={p.codigo_produto}
+                                        className="px-32 w-full"
+                                      >
+                                        <TableCell className="text-center w-[25%] text-lg">
+                                          {p.codigo_produto}
+                                        </TableCell>
+                                        <TableCell className="text-lg">{p.nome}</TableCell>
+                                        <TableCell className="pl-8 w-[25%] text-center text-lg">
+                                          {p.quantidade}
+                                        </TableCell>
                                       </TableRow>
-                                    </TableHeader>
-                                    <TableBody className="mx-6 px-32">
-                                      {productsList.map((p) => (
-                                        <TableRow
-                                          key={p.codigo_produto}
-                                          className="px-32 w-full"
-                                        >
-                                          <TableCell className="text-center w-[25%] text-lg">
-                                            {p.codigo_produto}
-                                          </TableCell>
-                                          <TableCell className="text-lg">{p.nome}</TableCell>
-                                          <TableCell className="pl-8 w-[25%] text-center text-lg">
-                                            {p.quantidade}
-                                          </TableCell>
-                                        </TableRow>
-                                      ))}
-                                    </TableBody>
-                                  </Table>
-                                </Card>
+                                    ))}
+                                  </TableBody>
+                                </Table>
+                              </Card>
                             </div>
                           </DialogContent>
                         </Dialog>
@@ -653,7 +698,7 @@ export default function VisualizacaoSolicitacoes() {
                     </PaginationItem>
                     {[...Array(endPage - startPage + 1)].map((_, i) => (
                       <PaginationItem key={i + startPage}>
-                        <PaginationLink className={currentPage === i + startPage ? "bg-gray-200" : ""} href="#" onClick={() => setCurrentPage(i + startPage)}>{i + startPage}</PaginationLink>
+                        <PaginationLink className={currentPage === i + startPage ? "bg-slate-600" : ""} href="#" onClick={() => setCurrentPage(i + startPage)}>{i + startPage}</PaginationLink>
                       </PaginationItem>
                     ))}
                     <PaginationItem>
