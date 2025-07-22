@@ -14,8 +14,8 @@ const navLinks = [
   { href: "/", label: "Início", icon: <Home size={20} /> },
   { href: "/solicitacoes", label: "Solicitações", icon: <FileText size={20} /> },
   { href: "/criar-solicitacao", label: "Criar Solicitação", icon: <Plus size={20} /> },
-  { href: "/usuarios", label: "Usuários", icon: <Users size={20} /> },
   { href: "/criar-codcobranca", label: "Códigos Cobrança", icon: <Receipt size={20} /> },
+  { href: "/usuarios", label: "Usuários", icon: <Users size={20} /> },
 ];
 
 export default function Header() {

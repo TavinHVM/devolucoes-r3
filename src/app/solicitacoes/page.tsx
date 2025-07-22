@@ -25,10 +25,7 @@ import { useRouter } from "next/navigation";
 import {
   Dialog,
   DialogContent,
-  DialogHeader,
   DialogTitle,
-  DialogDescription,
-  DialogFooter,
   DialogTrigger,
 } from "../../components/ui/dialog";
 import {
@@ -223,6 +220,7 @@ export default function VisualizacaoSolicitacoes() {
   }
 
   // Função para ordenar as solicitações
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   function handleSort(column: string) {
     if (sortColumn !== column) {
       setSortColumn(column);

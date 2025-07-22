@@ -1,19 +1,17 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { supabase } from "../../lib/supabaseClient";
+// import { supabase } from "../../lib/supabaseClient";
 import Header from "../../components/header";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
-import { Label } from "../../components/ui/label";
+// import { Label } from "../../components/ui/label";
 import {
   Dialog,
   DialogContent,
-  DialogHeader,
   DialogTitle,
-  DialogFooter,
 } from "../../components/ui/dialog";
-import { useRouter } from "next/navigation";
+// import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
@@ -155,6 +153,7 @@ export default function Usuarios() {
                   </DialogTrigger>
                   <DialogContent>
                     <Card className="bg-slate-600 p-6">
+                      <DialogTitle></DialogTitle>
                       <DialogTitle className="text-white font-bold">
                         Cadastrar Código de Cobrança:
                       </DialogTitle>
@@ -231,8 +230,8 @@ export default function Usuarios() {
                 </Dialog>
               </div>
             </CardTitle>
-            <CardContent>
-              <Table>
+            <CardContent className="max-h-[400px] h-[400px] overflow-y-auto scrollbar-dark">
+              <Table className="max-h-[400px] h-[400px] overflow-y-auto scrollbar-dark">
                 <TableHeader>
                   <TableRow className="text-white font-bold hover:bg-slate-700">
                     <TableHead className="text-white font-bold w-full flex items-center justify-center">
@@ -243,11 +242,11 @@ export default function Usuarios() {
                     </TableHead>
                   </TableRow>
                 </TableHeader>
-                <TableBody className="max-h-[400px] overflow-y-auto rounded-xl scrollbar-dark">
+                <TableBody className="max-h-[400px] h-[400px] overflow-y-auto scrollbar-dark">
                   {codCobrancaList.map((cod) => (
                     <TableRow
                       key={cod.codigo_cobranca}
-                      className="px-32 w-full bg-slate-600"
+                      className="w-full bg-slate-600"
                     >
                       <TableCell className="text-center w-[25%] text-md text-white">
                         {cod.codigo_cobranca}
