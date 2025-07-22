@@ -8,12 +8,13 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Button } from "@/components/ui/button";
 
 // Ícones Lucide
-import { Home, FileText, Plus, Users, Power } from 'lucide-react';
+import { Home, FileText, Plus, Users, Power, Receipt } from 'lucide-react';
 
 const navLinks = [
   { href: "/", label: "Início", icon: <Home size={20} /> },
   { href: "/solicitacoes", label: "Solicitações", icon: <FileText size={20} /> },
   { href: "/criar-solicitacao", label: "Criar Solicitação", icon: <Plus size={20} /> },
+  { href: "/criar-codcobranca", label: "Códigos Cobrança", icon: <Receipt size={20} /> },
   { href: "/usuarios", label: "Usuários", icon: <Users size={20} /> },
 ];
 
@@ -57,11 +58,7 @@ export default function Header() {
             </Button>
             <Button
               variant="destructive"
-<<<<<<< HEAD
-              className="bg-red-600 hover:bg-red-700 text-white cursor-pointer"
-=======
-              className="bg-red-500 hover:bg-red-600 text-white cursor-pointer"
->>>>>>> main
+              className="bg-red-custom hover:bg-red-custom-hover text-white cursor-pointer"
               onClick={() => { handleLogout(); setOpen(false); }}
               type="button"
             >
@@ -72,7 +69,7 @@ export default function Header() {
       </Dialog>
 
       {/* Header */}
-      <header className="flex items-center justify-between px-6 py-4 bg-slate-800 text-white shadow-md">
+      <header className="flex items-center justify-between px-6 py-4 bg-slate-800 text-white shadow-md w-full">
         {/* Logo e Nome */}
         <div className="flex items-center gap-3">
 <<<<<<< HEAD
@@ -102,11 +99,7 @@ export default function Header() {
           {/* Botão de Sair */}
           <button
             onClick={() => setOpen(true)}
-<<<<<<< HEAD
-            className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-md transition cursor-pointer"
-=======
-            className="flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-md transition cursor-pointer"
->>>>>>> main
+            className="flex items-center gap-2 bg-[#e94a4a] hover:bg-[#e94a4ae5] text-white px-3 py-2 rounded-md transition cursor-pointer"
           >
             <Power size={20} />
             <span>Sair</span>

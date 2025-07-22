@@ -37,7 +37,7 @@ export default function Home() {
             Bem-vindo ao sistema de Devoluções R3
           </h1>
           <div className="w-full flex flex-col gap-2 mt-4">
-            <span className="text-base text-white text-center text-lg">
+            <span className="text-white text-center text-lg">
               Utilize o menu para navegar entre as funcionalidades do sistema.
             </span>
           </div>

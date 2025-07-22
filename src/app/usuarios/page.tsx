@@ -412,6 +412,7 @@ export default function Usuarios() {
         <Button className="bg-green-600 hover:bg-green-700 mt-6 mb-4 cursor-pointer" onClick={() => setShowModal(true)}>
           Cadastrar novo usuário
         </Button>
+        
         {/* Modal de criação */}
         {showModal && (
           <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center">
