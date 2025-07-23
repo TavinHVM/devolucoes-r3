@@ -81,10 +81,7 @@ export default function VisualizacaoSolicitacoes() {
   const [aprovacaoVale, setAprovacaoVale] = useState("");
   const [refreshing, setRefreshing] = useState(false);
   // const router = useRouter();
-  const [sortColumn, setSortColumn] = useState<string | null>(null);
-  const [sortDirection, setSortDirection] = useState<"asc" | "desc" | null>(
-    null
-  );
+  const [sortColumns, setSortColumns] = useState<{ column: string; direction: "asc" | "desc" }[]>([]);
 
   // Função para buscar as solicitações
   useEffect(() => {
@@ -114,27 +111,47 @@ export default function VisualizacaoSolicitacoes() {
     fetchSolicitacoes();
   }, []);
 
-  // Ordenação das solicitações
+  // Função para ordenar/adicionar coluna com prioridade da esquerda para a direita
+  function handleSort(column: string, direction: "asc" | "desc") {
+    setSortColumns(prev => {
+      // Remove a coluna se já existir
+      const filtered = prev.filter(s => s.column !== column);
+      // Adiciona no início (maior prioridade)
+      return [{ column, direction }, ...filtered];
+    });
+  }
+
+  // Função para remover ordenação de uma coluna
+  function handleClearSort(column: string) {
+    setSortColumns(prev => prev.filter(s => s.column !== column));
+  }
+
+  // Ordenação multi-coluna
   const sortedSolicitacoes = [...solicitacoes];
-  if (sortColumn && sortDirection) {
+  if (sortColumns.length > 0) {
     sortedSolicitacoes.sort((a, b) => {
-      const aValue = a[sortColumn as keyof Solicitacao] ?? "";
-      const bValue = b[sortColumn as keyof Solicitacao] ?? "";
-      // Ordenação especial para datas
-      if (sortColumn === "created_at") {
-        const aDate = new Date(aValue);
-        const bDate = new Date(bValue);
-        return sortDirection === "asc"
-          ? aDate.getTime() - bDate.getTime()
-          : bDate.getTime() - aDate.getTime();
-      }
-      if (typeof aValue === "string" && typeof bValue === "string") {
-        return sortDirection === "asc"
-          ? aValue.localeCompare(bValue, "pt-BR", { sensitivity: "base" })
-          : bValue.localeCompare(aValue, "pt-BR", { sensitivity: "base" });
-      }
-      if (typeof aValue === "number" && typeof bValue === "number") {
-        return sortDirection === "asc" ? aValue - bValue : bValue - aValue;
+      for (const sort of sortColumns) {
+        const aValue = a[sort.column as keyof Solicitacao] ?? "";
+        const bValue = b[sort.column as keyof Solicitacao] ?? "";
+        if (sort.column === "created_at") {
+          const aDate = new Date(aValue);
+          const bDate = new Date(bValue);
+          if (aDate.getTime() !== bDate.getTime()) {
+            return sort.direction === "asc"
+              ? aDate.getTime() - bDate.getTime()
+              : bDate.getTime() - aDate.getTime();
+          }
+        } else if (typeof aValue === "string" && typeof bValue === "string") {
+          if (aValue.localeCompare(bValue, "pt-BR", { sensitivity: "base" }) !== 0) {
+            return sort.direction === "asc"
+              ? aValue.localeCompare(bValue, "pt-BR", { sensitivity: "base" })
+              : bValue.localeCompare(aValue, "pt-BR", { sensitivity: "base" });
+          }
+        } else if (typeof aValue === "number" && typeof bValue === "number") {
+          if (aValue !== bValue) {
+            return sort.direction === "asc" ? aValue - bValue : bValue - aValue;
+          }
+        }
       }
       return 0;
     });
@@ -152,18 +169,21 @@ export default function VisualizacaoSolicitacoes() {
       s.cod_cliente.toLowerCase().includes(searchTerm) ||
       s.rca.toLowerCase().includes(searchTerm) ||
       s.motivo_devolucao.toLowerCase().includes(searchTerm) ||
-      s.vale?.toLowerCase().includes(searchTerm) ||
+      (s.vale?.toLowerCase().includes(searchTerm) ?? false) ||
       s.tipo_devolucao.toLowerCase().includes(searchTerm) ||
       s.status.toLowerCase().includes(searchTerm)
     );
   });
 
-  // // Paginação dos dados filtrados
-  // const paginatedSolicitacoes = filteredSolicitacoes.slice(
-  //   (currentPage - 1) * itemsPerPage,
-  //   currentPage * itemsPerPage
-  // );
+  // Corrija aqui: use filteredSolicitacoes para paginação e exibição
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = filteredSolicitacoes.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(filteredSolicitacoes.length / itemsPerPage);
+  const startPage = Math.max(1, currentPage - 7);
+  const endPage = Math.min(totalPages, startPage + 14);
 
+  // Lista fixa de produtos (fora do Dialog)
   const productsList: {
     codigo_produto: string;
     nome: string;
@@ -179,13 +199,7 @@ export default function VisualizacaoSolicitacoes() {
       { codigo_produto: "1008", nome: "Régua 30cm", quantidade: 6 },
       { codigo_produto: "1009", nome: "Cola Branca", quantidade: 9 },
       { codigo_produto: "1010", nome: "Pasta Plástica", quantidade: 11 },
-
     ];
-
-  // Função para aprovar uma solicitação
-  async function aprovarSolicitacao(id: number) {
-
-  }
 
   // Função para obter a classe do status
   function getStatusClass(status: string) {
@@ -209,10 +223,14 @@ export default function VisualizacaoSolicitacoes() {
     }
   }
 
-  // Função para ordenar as solicitações
-  function handleSort(column: string, direction: "asc" | "desc") {
-    setSortColumn(column);
-    setSortDirection(direction);
+  // Função para baixar o anexo de uma solicitação
+  function baixarAnexo(arquivo_url: string | undefined) {
+    if (arquivo_url) {
+      window.open(
+        `https://${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${arquivo_url}`,
+        "_blank"
+      );
+    }
   }
 
   const indexOfLastItem = currentPage * itemsPerPage;
@@ -319,106 +337,135 @@ export default function VisualizacaoSolicitacoes() {
               </div>
             </CardHeader>
             <CardContent>
-              <div>
+              <Card className="bg-slate-800 text-white rounded-lg">
                 <Table className="bg-slate-800 text-white rounded-lg">
                   <TableHeader>
                     <TableRow className="border-slate-700 text-white hover:bg-slate-800 h-20 items-center">
                       <TableHead className="text-white whitespace-nowrap">
                         <OrderBtn
                           label="ID"
-                          onAscClick={() => handleSort("id", "asc")}
-                          onDescClick={() => handleSort("id", "desc")}
+                          columnKey="id"
+                          activeSort={sortColumns}
+                          onSort={handleSort}
+                          onClearSort={handleClearSort}
                         />
                       </TableHead>
                       <TableHead className="text-white whitespace-nowrap">
                         <OrderBtn
                           label="Nome"
-                          onAscClick={() => handleSort("nome", "asc")}
-                          onDescClick={() => handleSort("nome", "desc")}
+                          columnKey="nome"
+                          activeSort={sortColumns}
+                          onSort={handleSort}
+                          onClearSort={handleClearSort}
                         />
+
                       </TableHead>
                       <TableHead className="text-white whitespace-nowrap">
                         <OrderBtn
                           label="Filial"
-                          onAscClick={() => handleSort("filial", "asc")}
-                          onDescClick={() => handleSort("filial", "desc")}
+                          columnKey="filial"
+                          activeSort={sortColumns}
+                          onSort={handleSort}
+                          onClearSort={handleClearSort}
                         />
                       </TableHead>
                       <TableHead className="text-white whitespace-nowrap">
                         <OrderBtn
                           label="NºNF"
-                          onAscClick={() => handleSort("numero_nf", "asc")}
-                          onDescClick={() => handleSort("numero_nf", "desc")}
+                          columnKey="numero_nf"
+                          activeSort={sortColumns}
+                          onSort={handleSort}
+                          onClearSort={handleClearSort}
                         />
                       </TableHead>
                       <TableHead className="text-white whitespace-nowrap">
                         <OrderBtn
                           label="Carga"
-                          onAscClick={() => handleSort("carga", "asc")}
-                          onDescClick={() => handleSort("carga", "desc")}
+                          columnKey="carga"
+                          activeSort={sortColumns}
+                          onSort={handleSort}
+                          onClearSort={handleClearSort}
                         />
                       </TableHead>
                       <TableHead className="text-white whitespace-nowrap">
                         <OrderBtn
                           label="Cód. Cobrança"
-                          onAscClick={() => handleSort("codigo_cobranca", "asc")}
-                          onDescClick={() => handleSort("codigo_cobranca", "desc")}
+                          columnKey="codigo_cobranca"
+                          activeSort={sortColumns}
+                          onSort={handleSort}
+                          onClearSort={handleClearSort}
                         />
                       </TableHead>
                       <TableHead className="text-white whitespace-nowrap">
                         <OrderBtn
                           label="Código Cliente"
-                          onAscClick={() => handleSort("codigo_cliente", "asc")}
-                          onDescClick={() => handleSort("codigo_cliente", "desc")}
+                          columnKey="codigo_cliente"
+                          activeSort={sortColumns}
+                          onSort={handleSort}
+                          onClearSort={handleClearSort}
                         />
                       </TableHead>
                       <TableHead className="text-white whitespace-nowrap">
                         <OrderBtn
                           label="RCA"
-                          onAscClick={() => handleSort("rca", "asc")}
-                          onDescClick={() => handleSort("rca", "desc")}
+                          columnKey="rca"
+                          activeSort={sortColumns}
+                          onSort={handleSort}
+                          onClearSort={handleClearSort}
                         />
                       </TableHead>
                       <TableHead className="text-white whitespace-nowrap">
                         <OrderBtn
                           label="Motivo da Devolução"
-                          onAscClick={() => handleSort("motivo_devolucao", "asc")}
-                          onDescClick={() => handleSort("motivo_devolucao", "desc")}
+                          columnKey="motivo_devolucao"
+                          activeSort={sortColumns}
+                          onSort={handleSort}
+                          onClearSort={handleClearSort}
                         />
                       </TableHead>
                       <TableHead className="text-white whitespace-nowrap">
                         <OrderBtn
                           label="Vale"
-                          onAscClick={() => handleSort("vale", "asc")}
-                          onDescClick={() => handleSort("vale", "desc")}
+                          columnKey="vale"
+                          activeSort={sortColumns}
+                          onSort={handleSort}
+                          onClearSort={handleClearSort}
                         />
                       </TableHead>
                       <TableHead className="text-white whitespace-nowrap">
                         <OrderBtn
                           label="Tipo de Devolução"
-                          onAscClick={() => handleSort("tipo_devolucao", "asc")}
-                          onDescClick={() => handleSort("tipo_devolucao", "desc")}
+                          columnKey="tipo_devolucao"
+                          activeSort={sortColumns}
+                          onSort={handleSort}
+                          onClearSort={handleClearSort}
                         />
                       </TableHead>
                       <TableHead className="text-white whitespace-nowrap">
                         <OrderBtn
                           label="Data de Criação"
-                          onAscClick={() => handleSort("created_at", "asc")}
-                          onDescClick={() => handleSort("created_at", "desc")}
+                          columnKey="created_at"
+                          activeSort={sortColumns}
+                          onSort={handleSort}
+                          onClearSort={handleClearSort}
                         />
                       </TableHead>
                       <TableHead className="text-white whitespace-nowrap">
                         <OrderBtn
                           label="Status"
-                          onAscClick={() => handleSort("status", "asc")}
-                          onDescClick={() => handleSort("status", "desc")}
+                          columnKey="status"
+                          activeSort={sortColumns}
+                          onSort={handleSort}
+                          onClearSort={handleClearSort}
                         />
                       </TableHead>
                       <TableHead className="text-white whitespace-nowrap">
                         <OrderBtn
                           label="Anexo"
-                          onAscClick={() => handleSort("arquivo_url", "asc")}
-                          onDescClick={() => handleSort("arquivo_url", "desc")}
+                          columnKey="arquivo_url"
+                          activeSort={sortColumns}
+                          onSort={handleSort}
+                          onClearSort={handleClearSort}
                         />
                       </TableHead>
                     </TableRow>
@@ -429,8 +476,7 @@ export default function VisualizacaoSolicitacoes() {
                         <Dialog key={s.id}>
                           <DialogTrigger asChild>
                             <TableRow
-                              className={`border-slate-700 cursor-pointer transition-all hover:bg-slate-600 ${idx % 2 === 0 ? "bg-slate-700" : ""
-                                }`}
+                              className={`border-slate-700 cursor-pointer transition-all hover:bg-slate-600 ${idx % 2 === 0 ? "bg-slate-700" : ""}`}
                             >
                               <TableCell className="pl-6">{s.id}</TableCell>
                               <TableCell>{truncateText(s.nome, 15)}</TableCell>
@@ -475,9 +521,10 @@ export default function VisualizacaoSolicitacoes() {
                             </TableRow>
                           </DialogTrigger>
 
-                          {/* Dialog */}
-                          <DialogTitle></DialogTitle>
+                          {/* ⚠️ FORA da Tabela! */}
                           <DialogContent className="min-w-[50%] max-h-[95%] overflow-y-auto rounded-xl scrollbar-dark">
+                            {/* Adiciona título acessível para o Dialog */}
+                            <DialogTitle>Detalhes da Solicitação</DialogTitle>
                             <div className="grid grid-cols-3 gap-4 p-6 text-white rounded-lg relative">
                               <DialogClose className="absolute right-0" />
                                 <DialogClose className="absolute right-0">
@@ -550,25 +597,43 @@ export default function VisualizacaoSolicitacoes() {
                                   </CardContent>
                                 </Card>
 
-                                <Card className="bg-slate-600 text-white col-span-3 max-h-80 flex gap-0 p-0">
-                                  <span className="text-center font-bold text-xl py-2">
-                                    PRODUTOS
-                                  </span>
-                                  <div className="flex min-w-full bg-slate-800">
-                                    <div className="w-[25%] py-2 text-lg text-center border-r-2 border-white">
-                                      <span className="text-white font-bold">Código Produto</span>
-                                    </div>
-                                    <div className="w-[50%] py-2 text-lg text-center border-l-2 border-r-2 border-white">
-                                      <span className="text-white font-bold">Nome</span>
-                                    </div>
-                                    <div className="w-[25%] py-2 text-lg text-center border-l-2 border-white">
-                                      <span className="text-white font-bold">Quantidade</span>
-                                    </div>
-                                  </div>
-                                  {/* Produtos */}
-                                  <Table className="bg-slate-500 max-h-24 h-10">
-                                    <TableHeader className="mx-6">
-                                      <TableRow className="mx-6">
+                              {/* Informações de detalhes */}
+                              <div className="flex gap-2 items-center"><strong className="bg-slate-700 p-1 rounded-md">Nome:</strong> {s.nome}</div>
+                              <div className="flex gap-2 items-center"><strong className="bg-slate-700 p-1 rounded-md">Filial:</strong> {s.filial}</div>
+                              <div className="flex gap-2 items-center"><strong className="bg-slate-700 p-1 rounded-md">Nº NF:</strong> {s.numero_nf}</div>
+                              <div className="flex gap-2 items-center"><strong className="bg-slate-700 p-1 rounded-md">Carga:</strong> {s.carga}</div>
+                              <div className="flex gap-2 items-center"><strong className="bg-slate-700 p-1 rounded-md">Cód. Cobrança:</strong> {s.codigo_cobranca}</div>
+                              <div className="flex gap-2 items-center"><strong className="bg-slate-700 p-1 rounded-md">Cód. Cliente:</strong> {s.codigo_cliente}</div>
+                              <div className="flex gap-2 items-center"><strong className="bg-slate-700 p-1 rounded-md">RCA:</strong> {s.rca}</div>
+                              <div className="flex gap-2 items-center"><strong className="bg-slate-700 p-1 rounded-md">Vale:</strong> {s.vale}</div>
+
+                              {/* Motivo da devolução */}
+                              <Card className="col-span-3 bg-slate-600">
+                                <CardHeader>
+                                  <h2 className="text-xl font-bold text-center text-white">Motivo da Devolução:</h2>
+                                </CardHeader>
+                                <CardContent className="p-4 max-h-40 overflow-y-auto">
+                                  <p className="text-white">{s.motivo_devolucao}</p>
+                                </CardContent>
+                              </Card>
+
+                              {/* Produtos */}
+                              <Card className="col-span-3 bg-slate-600 p-4">
+                                <h3 className="text-xl font-bold text-center text-white mb-2">PRODUTOS</h3>
+                                <Table className="bg-slate-700 text-white">
+                                  <TableHeader>
+                                    <TableRow>
+                                      <TableHead>Código Produto</TableHead>
+                                      <TableHead>Nome</TableHead>
+                                      <TableHead>Quantidade</TableHead>
+                                    </TableRow>
+                                  </TableHeader>
+                                  <TableBody>
+                                    {productsList.map((p) => (
+                                      <TableRow key={p.codigo_produto}>
+                                        <TableCell>{p.codigo_produto}</TableCell>
+                                        <TableCell>{p.nome}</TableCell>
+                                        <TableCell>{p.quantidade}</TableCell>
                                       </TableRow>
                                     </TableHeader>
                                     <TableBody className="mx-6 px-32">
@@ -595,10 +660,7 @@ export default function VisualizacaoSolicitacoes() {
                       ))
                     ) : (
                       <TableRow>
-                        <TableCell
-                          colSpan={15}
-                          className="text-center py-8 text-gray-400 bg-slate-800"
-                        >
+                        <TableCell colSpan={15} className="text-center py-8 text-gray-400 bg-slate-800">
                           Nenhuma solicitação encontrada.
                         </TableCell>
                       </TableRow>
@@ -633,55 +695,30 @@ export default function VisualizacaoSolicitacoes() {
           </Card>
         </div>
       </div>
-      {/* Modal Aprovar */}
-      {modalAprovar.open && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
-          <div className="bg-white rounded-lg p-8 w-full max-w-md">
-            <h2 className="text-xl font-bold mb-4">Aprovar Solicitação</h2>
-            <div className="mb-4">
-              <label className="block mb-2">Vale?</label>
-              <select
-                value={aprovacaoVale}
-                onChange={(e) => setAprovacaoVale(e.target.value)}
-                className="w-full border rounded p-2"
-              >
-                <option value="">Escolha uma opção</option>
-                <option value="Sim">Sim</option>
-                <option value="Não">Não</option>
-              </select>
-            </div>
-            <div className="mb-4">
-              <label className="block mb-2">Recibo:</label>
-              <input type="file" className="w-full" />
-            </div>
-            <div className="mb-4">
-              <label className="block mb-2">Nota de Devolução:</label>
-              <input type="file" className="w-full" />
-            </div>
-            <div className="flex gap-2 justify-end">
-              <Button
-                className="bg-green-600"
-                onClick={async () => {
-                  await aprovarSolicitacao(modalAprovar.id!);
-                  setModalAprovar({ open: false });
-                  setAprovacaoVale("");
-                }}
-              >
-                Confirmar
-              </Button>
-              <Button
-                className="bg-gray-400"
-                onClick={() => {
-                  setModalAprovar({ open: false });
-                  setAprovacaoVale("");
-                }}
-              >
-                Cancelar
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* sim o html está todo cagado fodase dps arruma */}
+
+      {/* Paginação */}
+      <Pagination className="mt-4">
+        <PaginationContent>
+          <PaginationItem>
+            <PaginationPrevious namePrevious="Primeira Página" href="#" onClick={() => setCurrentPage(1)} />
+          </PaginationItem>
+          <PaginationItem>
+            <PaginationPrevious namePrevious="Anterior" href="#" onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))} />
+          </PaginationItem>
+          {[...Array(endPage - startPage + 1)].map((_, i) => (
+            <PaginationItem key={i + startPage}>
+              <PaginationLink className={currentPage === i + startPage ? "bg-slate-600" : ""} href="#" onClick={() => setCurrentPage(i + startPage)}>{i + startPage}</PaginationLink>
+            </PaginationItem>
+          ))}
+          <PaginationItem>
+            <PaginationNext nameNext="Próxima" href="#" onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))} />
+          </PaginationItem>
+          <PaginationItem>
+            <PaginationNext nameNext="Última Página" href="#" onClick={() => setCurrentPage(totalPages)} />
+          </PaginationItem>
+        </PaginationContent>
+      </Pagination>
     </>
   );
 }

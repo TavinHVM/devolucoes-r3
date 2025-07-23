@@ -143,12 +143,9 @@ export default function Usuarios() {
                 </span>
                 <Dialog>
                   <DialogTrigger>
-                    <Button
-                      type="submit"
-                      className="bg-green-600 hover:bg-green-700 text-white font-bold cursor-pointer"
-                    >
-                      Cadastrar Código de Cobrança
-                    </Button>
+                    <div className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-bold cursor-pointer px-4 py-2 rounded-md transition-all">
+                      <span>Cadastrar Código de Cobrança</span>
+                    </div>
                   </DialogTrigger>
                   <DialogContent>
                     <Card className="bg-slate-600 p-6">
