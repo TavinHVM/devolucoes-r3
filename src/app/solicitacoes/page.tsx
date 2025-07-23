@@ -343,7 +343,7 @@ export default function VisualizacaoSolicitacoes() {
               </div>
             </CardHeader>
             <CardContent>
-              <div>
+              <Card className="bg-slate-800 text-white rounded-lg">
                 <Table className="bg-slate-800 text-white rounded-lg">
                   <TableHeader>
                     <TableRow className="border-slate-700 text-white hover:bg-slate-800 h-20 items-center">
@@ -482,35 +482,20 @@ export default function VisualizacaoSolicitacoes() {
                         <Dialog key={s.id}>
                           <DialogTrigger asChild>
                             <TableRow
-                              className={`border-slate-700 cursor-pointer transition-all hover:bg-slate-600 ${idx % 2 === 0 ? "bg-slate-700" : ""
-                                }`}
+                              className={`border-slate-700 cursor-pointer transition-all hover:bg-slate-600 ${idx % 2 === 0 ? "bg-slate-700" : ""}`}
                             >
                               <TableCell className="pl-6">{s.id}</TableCell>
                               <TableCell>{truncateText(s.nome, 15)}</TableCell>
                               <TableCell className="pl-8">{s.filial}</TableCell>
                               <TableCell>{s.numero_nf}</TableCell>
                               <TableCell>{s.carga}</TableCell>
-                              <TableCell className="text-center max-w-[70px]">
-                                {s.codigo_cobranca}
-                              </TableCell>
-                              <TableCell className="text-center max-w-2">
-                                {s.codigo_cliente}
-                              </TableCell>
-                              <TableCell className="text-center max-w-2">
-                                {s.rca}
-                              </TableCell>
-                              <TableCell>
-                                {truncateText(s.motivo_devolucao, 10)}
-                              </TableCell>
-                              <TableCell className="text-center max-w-12">
-                                {s.vale}
-                              </TableCell>
-                              <TableCell className="text-center max-w-12">
-                                {s.tipo_devolucao}
-                              </TableCell>
-                              <TableCell className="pl-4">
-                                {new Date(s.created_at).toLocaleDateString()}
-                              </TableCell>
+                              <TableCell className="text-center max-w-[70px]">{s.codigo_cobranca}</TableCell>
+                              <TableCell className="text-center max-w-2">{s.codigo_cliente}</TableCell>
+                              <TableCell className="text-center max-w-2">{s.rca}</TableCell>
+                              <TableCell>{truncateText(s.motivo_devolucao, 10)}</TableCell>
+                              <TableCell className="text-center max-w-12">{s.vale}</TableCell>
+                              <TableCell className="text-center max-w-12">{s.tipo_devolucao}</TableCell>
+                              <TableCell className="pl-4">{new Date(s.created_at).toLocaleDateString()}</TableCell>
                               <TableCell className={getStatusClass(s.status)}>
                                 {s.status.toUpperCase()}
                               </TableCell>
@@ -528,304 +513,203 @@ export default function VisualizacaoSolicitacoes() {
                             </TableRow>
                           </DialogTrigger>
 
-                          {/* Dialog */}
-                          <DialogTitle></DialogTitle>
+                          {/* ⚠️ FORA da Tabela! */}
                           <DialogContent className="min-w-[50%] max-h-[95%] overflow-y-auto rounded-xl scrollbar-dark">
+                            {/* Adiciona título acessível para o Dialog */}
+                            <DialogTitle>Detalhes da Solicitação</DialogTitle>
                             <div className="grid grid-cols-3 gap-4 p-6 text-white rounded-lg relative">
-                              <DialogClose className="absolute right-0" />
-                              <DialogClose className="absolute right-0">
-                                <Button className="cursor-pointer p-0 py-2 w-8 h-auto m-0 bg-red-500 hover:bg-red-700 transition-all flex items-center justify-center shadow-transparent">
-                                  <X className="items-center p-0" style={{
-                                    width: "18px",
-                                    height: "18px",
-                                    strokeWidth: "5px"
-                                  }} />
+                              {/* Corrige o aninhamento de <button> usando asChild */}
+                              <DialogClose asChild>
+                                <Button className="absolute right-0 cursor-pointer p-0 py-2 w-8 h-auto m-0 bg-red-500 hover:bg-red-700 transition-all flex items-center justify-center shadow-transparent">
+                                  <X className="items-center p-0" style={{ width: "18px", height: "18px", strokeWidth: "5px" }} />
                                 </Button>
                               </DialogClose>
-                              <div className="flex gap-2 items-center">
-                                <span className="font-bold bg-slate-700 p-1 rounded-md">
-                                  Nome:
-                                </span>
-                                <span>{s.nome}</span>
-                              </div>
-                              <div className="flex gap-2 items-center">
-                                <span className="font-bold bg-slate-700 p-1 rounded-md">
-                                  Filial:
-                                </span>
-                                <span>{s.filial}</span>
-                              </div>
-                              <div className="flex gap-2 items-center">
-                                <span className="font-bold bg-slate-700 p-1 rounded-md">
-                                  Nº NF:
-                                </span>
-                                <span>{s.numero_nf}</span>
-                              </div>
-                              <div className="flex gap-2 items-center">
-                                <span className="font-bold bg-slate-700 p-1 rounded-md">
-                                  Carga:
-                                </span>
-                                <span>{s.numero_nf}</span>
-                              </div>
-                              <div className="flex gap-2 items-center">
-                                <span className="font-bold bg-slate-700 p-1 rounded-md">
-                                  Cód. Cobrança:
-                                </span>
-                                <span>{s.codigo_cobranca}</span>
-                              </div>
-                              <div className="flex gap-2 items-center">
-                                <span className="font-bold bg-slate-700 p-1 rounded-md">
-                                  Cód. Cliente:
-                                </span>
-                                <span>{s.codigo_cliente}</span>
-                              </div>
-                              <div className="flex gap-2 items-center">
-                                <span className="font-bold bg-slate-700 p-1 rounded-md">
-                                  RCA:
-                                </span>
-                                <span>{s.rca}</span>
-                              </div>
-                              <div className="flex gap-2 items-center">
-                                <span className="font-bold bg-slate-700 p-1 rounded-md">
-                                  Vale:
-                                </span>
-                                <span>{s.vale}</span>
-                              </div>
-                              <Card className="flex flex-col items-center justify-center col-span-3 bg-slate-600">
-                                <CardHeader className="flex items-center justify-center text-center w-full">
-                                  <span className="font-bold bg-slate-00 w-full text-white text-center text-xl">
-                                    Motivo da Devolução:
-                                  </span>
+
+                              {/* Informações de detalhes */}
+                              <div className="flex gap-2 items-center"><strong className="bg-slate-700 p-1 rounded-md">Nome:</strong> {s.nome}</div>
+                              <div className="flex gap-2 items-center"><strong className="bg-slate-700 p-1 rounded-md">Filial:</strong> {s.filial}</div>
+                              <div className="flex gap-2 items-center"><strong className="bg-slate-700 p-1 rounded-md">Nº NF:</strong> {s.numero_nf}</div>
+                              <div className="flex gap-2 items-center"><strong className="bg-slate-700 p-1 rounded-md">Carga:</strong> {s.carga}</div>
+                              <div className="flex gap-2 items-center"><strong className="bg-slate-700 p-1 rounded-md">Cód. Cobrança:</strong> {s.codigo_cobranca}</div>
+                              <div className="flex gap-2 items-center"><strong className="bg-slate-700 p-1 rounded-md">Cód. Cliente:</strong> {s.codigo_cliente}</div>
+                              <div className="flex gap-2 items-center"><strong className="bg-slate-700 p-1 rounded-md">RCA:</strong> {s.rca}</div>
+                              <div className="flex gap-2 items-center"><strong className="bg-slate-700 p-1 rounded-md">Vale:</strong> {s.vale}</div>
+
+                              {/* Motivo da devolução */}
+                              <Card className="col-span-3 bg-slate-600">
+                                <CardHeader>
+                                  <h2 className="text-xl font-bold text-center text-white">Motivo da Devolução:</h2>
                                 </CardHeader>
-                                <CardContent className="w-[96%] p-6 rounded-md h-40 overflow-y-scroll scrollbar-dark">
-                                  <span className="text-white text-lg min-h-[100%] max-h-[100%]">
-                                    {s.motivo_devolucao}
-                                  </span>
+                                <CardContent className="p-4 max-h-40 overflow-y-auto">
+                                  <p className="text-white">{s.motivo_devolucao}</p>
                                 </CardContent>
                               </Card>
 
-                              <Card className="bg-slate-600 text-white col-span-3 max-h-80 flex gap-0 p-0">
-                                <span className="text-center font-bold text-xl py-2">
-                                  PRODUTOS
-                                </span>
-                                <div className="flex min-w-full bg-slate-800">
-                                  <div className="w-[25%] py-2 text-lg text-center border-r-2 border-white">
-                                    <span className="text-white font-bold">Código Produto</span>
-                                  </div>
-                                  <div className="w-[50%] py-2 text-lg text-center border-l-2 border-r-2 border-white">
-                                    <span className="text-white font-bold">Nome</span>
-                                  </div>
-                                  <div className="w-[25%] py-2 text-lg text-center border-l-2 border-white">
-                                    <span className="text-white font-bold">Quantidade</span>
-                                  </div>
-                                </div>
-                                {/* Produtos */}
-                                <Table className="bg-slate-500 max-h-24 h-10">
-                                  <TableHeader className="mx-6">
-                                    <TableRow className="mx-6">
+                              {/* Produtos */}
+                              <Card className="col-span-3 bg-slate-600 p-4">
+                                <h3 className="text-xl font-bold text-center text-white mb-2">PRODUTOS</h3>
+                                <Table className="bg-slate-700 text-white">
+                                  <TableHeader>
+                                    <TableRow>
+                                      <TableHead>Código Produto</TableHead>
+                                      <TableHead>Nome</TableHead>
+                                      <TableHead>Quantidade</TableHead>
                                     </TableRow>
                                   </TableHeader>
-                                  <TableBody className="mx-6 px-32">
+                                  <TableBody>
                                     {productsList.map((p) => (
-                                      <TableRow
-                                        key={p.codigo_produto}
-                                        className="px-32 w-full"
-                                      >
-                                        <TableCell className="text-center w-[25%] text-lg">
-                                          {p.codigo_produto}
-                                        </TableCell>
-                                        <TableCell className="text-lg">{p.nome}</TableCell>
-                                        <TableCell className="pl-8 w-[25%] text-center text-lg">
-                                          {p.quantidade}
-                                        </TableCell>
+                                      <TableRow key={p.codigo_produto}>
+                                        <TableCell>{p.codigo_produto}</TableCell>
+                                        <TableCell>{p.nome}</TableCell>
+                                        <TableCell>{p.quantidade}</TableCell>
                                       </TableRow>
                                     ))}
                                   </TableBody>
                                 </Table>
-
-                                {/* Botões */}
-
-                                {/* {Botão de aprovar}  */}
-                                <Button
-                                  className="bg-green-600 hover:bg-green-700 text-white cursor-pointer m-2 transition-all"
-                                  onClick={() => {
-                                    // Implementar lógica de aprovação
-                                    alert("Aprovar solicitação ainda não implementado.");
-                                  }}
-                                >
-                                  Aprovar
-                                </Button>
-
-                                {/* {Botão de reprovar} */}
-                                <Button
-                                  className="bg-red-600 hover:bg-red-700 text-white cursor-pointer m-2 transition-all"
-                                  onClick={() => {
-                                    // Implementar lógica de reprovação
-                                    alert("Reprovar solicitação ainda não implementado.");
-                                  }}
-                                >
-                                  Reprovar
-                                </Button>
-
-                                {/* {Botão de cancelar} */}
-                                <Button
-                                  className="bg-gray-600 hover:bg-gray-700 text-white cursor-pointer m-2 transition-all"
-                                  onClick={() => {
-                                    // Implementar lógica de cancelamento
-                                    alert("Cancelar solicitação ainda não implementado.");
-                                  }}
-                                >
-                                  Cancelar
-                                </Button>
-
-                                {/* {Botão de desdobrar} */}
-                                <Button
-                                  className="bg-blue-600 hover:bg-blue-700 text-white cursor-pointer m-2 transition-all"
-                                  onClick={() => {
-                                    // Implementar lógica de desdobramento
-                                    alert("Desdobrar solicitação ainda não implementado.");
-                                  }}
-                                >
-                                  Desdobrar
-                                </Button>
-
-                                {/* {Botão de finalizar} */}
-                                <Button
-                                  className="bg-yellow-600 hover:bg-yellow-700 text-white cursor-pointer m-2 transition-all"
-                                  onClick={() => {
-                                    // Implementar lógica de finalização
-                                    alert("Finalizar solicitação ainda não implementado.");
-                                  }}
-                                >
-                                  Finalizar
-                                </Button>
-
-                                {/* {Botão de reenvio} */}
-                                <Button
-                                  className="bg-lime-600 hover:bg-lime-700 text-white cursor-pointer m-2 transition-all"
-                                  onClick={() => {
-                                    // Implementar lógica de reenvio
-                                    alert("Reenviar solicitação ainda não implementado.");
-                                  }}
-                                >
-                                  Reenviar
-                                </Button>
-
-                                {/* {Botão de abatimento} */}
-                                <Button
-                                  className="bg-stone-600 hover:bg-stone-700 text-white cursor-pointer m-2 transition-all"
-                                  onClick={() => {
-                                    // Implementar lógica de abatimento
-                                    alert("Abater solicitação ainda não implementado.");
-                                  }}
-                                >
-                                  Abater
-                                </Button>
-
-                                {/* {Botão de exclusão} */}
-                                <Button
-                                  className="bg-red-600 hover:bg-red-700 text-white cursor-pointer m-2 transition-all"
-                                  onClick={() => {
-                                    // Implementar lógica de exclusão
-                                    alert("Excluir solicitação ainda não implementado.");
-                                  }}
-                                >
-                                  Excluir
-                                </Button>
-
                               </Card>
+
+                              {/* Botões de ação */}
+                              <div className="col-span-3 flex flex-wrap justify-center gap-2 mt-4">
+                                <Button className="bg-green-600 hover:bg-green-700">Aprovar</Button>
+                                <Button className="bg-red-600 hover:bg-red-700">Reprovar</Button>
+                                <Button className="bg-gray-600 hover:bg-gray-700">Cancelar</Button>
+                                <Button className="bg-blue-600 hover:bg-blue-700">Desdobrar</Button>
+                                <Button className="bg-yellow-600 hover:bg-yellow-700">Finalizar</Button>
+                                <Button className="bg-lime-600 hover:bg-lime-700">Reenviar</Button>
+                                <Button className="bg-stone-600 hover:bg-stone-700">Abater</Button>
+                                <Button className="bg-red-700 hover:bg-red-800">Excluir</Button>
+                              </div>
                             </div>
                           </DialogContent>
                         </Dialog>
                       ))
                     ) : (
                       <TableRow>
-                        <TableCell
-                          colSpan={15}
-                          className="text-center py-8 text-gray-400 bg-slate-800"
-                        >
+                        <TableCell colSpan={15} className="text-center py-8 text-gray-400 bg-slate-800">
                           Nenhuma solicitação encontrada.
                         </TableCell>
                       </TableRow>
                     )}
                   </TableBody>
+
                 </Table>
 
-                {/* Paginação */}
-                <Pagination className="mt-4">
-                  <PaginationContent>
-                    <PaginationItem>
-                      <PaginationPrevious namePrevious="Primeira Página" href="#" onClick={() => setCurrentPage(1)} />
-                    </PaginationItem>
-                    <PaginationItem>
-                      <PaginationPrevious namePrevious="Anterior" href="#" onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))} />
-                    </PaginationItem>
-                    {[...Array(endPage - startPage + 1)].map((_, i) => (
-                      <PaginationItem key={i + startPage}>
-                        <PaginationLink className={currentPage === i + startPage ? "bg-slate-600" : ""} href="#" onClick={() => setCurrentPage(i + startPage)}>{i + startPage}</PaginationLink>
-                      </PaginationItem>
-                    ))}
-                    <PaginationItem>
-                      <PaginationNext nameNext="Próxima" href="#" onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))} />
-                    </PaginationItem>
-                    <PaginationItem>
-                      <PaginationNext nameNext="Última Página" href="#" onClick={() => setCurrentPage(totalPages)} />
-                    </PaginationItem>
-                  </PaginationContent>
-                </Pagination>
-              </div>
+                {/* Botões */}
+                {/* {Botão de aprovar}  */}
+                <Button
+                  className="bg-green-600 hover:bg-green-700 text-white cursor-pointer m-2 transition-all"
+                  onClick={() => {
+                    // Implementar lógica de aprovação
+                    alert("Aprovar solicitação ainda não implementado.");
+                  }}
+                >
+                  Aprovar
+                </Button>
+
+                {/* {Botão de reprovar} */}
+                <Button
+                  className="bg-red-600 hover:bg-red-700 text-white cursor-pointer m-2 transition-all"
+                  onClick={() => {
+                    // Implementar lógica de reprovação
+                    alert("Reprovar solicitação ainda não implementado.");
+                  }}
+                >
+                  Reprovar
+                </Button>
+
+                {/* {Botão de cancelar} */}
+                <Button
+                  className="bg-gray-600 hover:bg-gray-700 text-white cursor-pointer m-2 transition-all"
+                  onClick={() => {
+                    // Implementar lógica de cancelamento
+                    alert("Cancelar solicitação ainda não implementado.");
+                  }}
+                >
+                  Cancelar
+                </Button>
+
+                {/* {Botão de desdobrar} */}
+                <Button
+                  className="bg-blue-600 hover:bg-blue-700 text-white cursor-pointer m-2 transition-all"
+                  onClick={() => {
+                    // Implementar lógica de desdobramento
+                    alert("Desdobrar solicitação ainda não implementado.");
+                  }}
+                >
+                  Desdobrar
+                </Button>
+
+                {/* {Botão de finalizar} */}
+                <Button
+                  className="bg-yellow-600 hover:bg-yellow-700 text-white cursor-pointer m-2 transition-all"
+                  onClick={() => {
+                    // Implementar lógica de finalização
+                    alert("Finalizar solicitação ainda não implementado.");
+                  }}
+                >
+                  Finalizar
+                </Button>
+
+                {/* {Botão de reenvio} */}
+                <Button
+                  className="bg-lime-600 hover:bg-lime-700 text-white cursor-pointer m-2 transition-all"
+                  onClick={() => {
+                    // Implementar lógica de reenvio
+                    alert("Reenviar solicitação ainda não implementado.");
+                  }}
+                >
+                  Reenviar
+                </Button>
+
+                {/* {Botão de abatimento} */}
+                <Button
+                  className="bg-stone-600 hover:bg-stone-700 text-white cursor-pointer m-2 transition-all"
+                  onClick={() => {
+                    // Implementar lógica de abatimento
+                    alert("Abater solicitação ainda não implementado.");
+                  }}
+                >
+                  Abater
+                </Button>
+
+                {/* {Botão de exclusão} */}
+                <Button
+                  className="bg-red-600 hover:bg-red-700 text-white cursor-pointer m-2 transition-all"
+                  onClick={() => {
+                    // Implementar lógica de exclusão
+                    alert("Excluir solicitação ainda não implementado.");
+                  }}
+                >
+                  Excluir
+                </Button>
+
+              </Card>
             </CardContent>
           </Card>
         </div>
       </div>
-      {/* Modal Aprovar */}
-      {modalAprovar.open && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
-          <div className="bg-white rounded-lg p-8 w-full max-w-md">
-            <h2 className="text-xl font-bold mb-4">Aprovar Solicitação</h2>
-            <div className="mb-4">
-              <label className="block mb-2">Vale?</label>
-              <select
-                value={aprovacaoVale}
-                onChange={(e) => setAprovacaoVale(e.target.value)}
-                className="w-full border rounded p-2"
-              >
-                <option value="">Escolha uma opção</option>
-                <option value="Sim">Sim</option>
-                <option value="Não">Não</option>
-              </select>
-            </div>
-            <div className="mb-4">
-              <label className="block mb-2">Recibo:</label>
-              <input type="file" className="w-full" />
-            </div>
-            <div className="mb-4">
-              <label className="block mb-2">Nota de Devolução:</label>
-              <input type="file" className="w-full" />
-            </div>
-            <div className="flex gap-2 justify-end">
-              <Button
-                className="bg-green-600"
-                onClick={async () => {
-                  await aprovarSolicitacao(modalAprovar.id!);
-                  setModalAprovar({ open: false });
-                  setAprovacaoVale("");
-                }}
-              >
-                Confirmar
-              </Button>
-              <Button
-                className="bg-gray-400"
-                onClick={() => {
-                  setModalAprovar({ open: false });
-                  setAprovacaoVale("");
-                }}
-              >
-                Cancelar
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Paginação */}
+      <Pagination className="mt-4">
+        <PaginationContent>
+          <PaginationItem>
+            <PaginationPrevious namePrevious="Primeira Página" href="#" onClick={() => setCurrentPage(1)} />
+          </PaginationItem>
+          <PaginationItem>
+            <PaginationPrevious namePrevious="Anterior" href="#" onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))} />
+          </PaginationItem>
+          {[...Array(endPage - startPage + 1)].map((_, i) => (
+            <PaginationItem key={i + startPage}>
+              <PaginationLink className={currentPage === i + startPage ? "bg-slate-600" : ""} href="#" onClick={() => setCurrentPage(i + startPage)}>{i + startPage}</PaginationLink>
+            </PaginationItem>
+          ))}
+          <PaginationItem>
+            <PaginationNext nameNext="Próxima" href="#" onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))} />
+          </PaginationItem>
+          <PaginationItem>
+            <PaginationNext nameNext="Última Página" href="#" onClick={() => setCurrentPage(totalPages)} />
+          </PaginationItem>
+        </PaginationContent>
+      </Pagination>
     </>
   );
 }
