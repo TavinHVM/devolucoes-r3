@@ -74,11 +74,6 @@ export default function VisualizacaoSolicitacoes() {
   const [busca, setBusca] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 15;
-  const [modalAprovar, setModalAprovar] = useState<{
-    open: boolean;
-    id?: number;
-  }>({ open: false });
-  const [aprovacaoVale, setAprovacaoVale] = useState("");
   const [refreshing, setRefreshing] = useState(false);
   // const router = useRouter();
   const [sortColumns, setSortColumns] = useState<{ column: string; direction: "asc" | "desc" }[]>([]);
@@ -174,32 +169,6 @@ export default function VisualizacaoSolicitacoes() {
       s.status.toLowerCase().includes(searchTerm)
     );
   });
-
-  // Corrija aqui: use filteredSolicitacoes para paginação e exibição
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filteredSolicitacoes.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(filteredSolicitacoes.length / itemsPerPage);
-  const startPage = Math.max(1, currentPage - 7);
-  const endPage = Math.min(totalPages, startPage + 14);
-
-  // Lista fixa de produtos (fora do Dialog)
-  const productsList: {
-    codigo_produto: string;
-    nome: string;
-    quantidade: number;
-  }[] = [
-      { codigo_produto: "1001", nome: "Chamex - Resma", quantidade: 5 },
-      { codigo_produto: "1002", nome: "Caneta Azul", quantidade: 12 },
-      { codigo_produto: "1003", nome: "Lápis Preto", quantidade: 20 },
-      { codigo_produto: "1004", nome: "Borracha Branca", quantidade: 8 },
-      { codigo_produto: "1005", nome: "Caderno 200 folhas", quantidade: 3 },
-      { codigo_produto: "1006", nome: "Apontador", quantidade: 15 },
-      { codigo_produto: "1007", nome: "Marcador de Texto", quantidade: 7 },
-      { codigo_produto: "1008", nome: "Régua 30cm", quantidade: 6 },
-      { codigo_produto: "1009", nome: "Cola Branca", quantidade: 9 },
-      { codigo_produto: "1010", nome: "Pasta Plástica", quantidade: 11 },
-    ];
 
   // Função para obter a classe do status
   function getStatusClass(status: string) {
@@ -695,30 +664,6 @@ export default function VisualizacaoSolicitacoes() {
           </Card>
         </div>
       </div>
-      {/* sim o html está todo cagado fodase dps arruma */}
-
-      {/* Paginação */}
-      <Pagination className="mt-4">
-        <PaginationContent>
-          <PaginationItem>
-            <PaginationPrevious namePrevious="Primeira Página" href="#" onClick={() => setCurrentPage(1)} />
-          </PaginationItem>
-          <PaginationItem>
-            <PaginationPrevious namePrevious="Anterior" href="#" onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))} />
-          </PaginationItem>
-          {[...Array(endPage - startPage + 1)].map((_, i) => (
-            <PaginationItem key={i + startPage}>
-              <PaginationLink className={currentPage === i + startPage ? "bg-slate-600" : ""} href="#" onClick={() => setCurrentPage(i + startPage)}>{i + startPage}</PaginationLink>
-            </PaginationItem>
-          ))}
-          <PaginationItem>
-            <PaginationNext nameNext="Próxima" href="#" onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))} />
-          </PaginationItem>
-          <PaginationItem>
-            <PaginationNext nameNext="Última Página" href="#" onClick={() => setCurrentPage(totalPages)} />
-          </PaginationItem>
-        </PaginationContent>
-      </Pagination>
     </>
   );
 }
