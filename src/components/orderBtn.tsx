@@ -1,5 +1,4 @@
 import { ChevronUp, ChevronDown } from "lucide-react";
-import { X } from 'lucide-react';
 
 interface OrderBtnProps {
   label: string;
@@ -13,30 +12,29 @@ export default function OrderBtn({ label, columnKey, activeSort, onSort, onClear
   const sortObj = activeSort.find(s => s.column === columnKey);
   const isActive = !!sortObj;
 
+  // Função para alternar ordenação ou limpar se já estiver ativa
+  const handleToggle = (dir: "asc" | "desc") => {
+    if (isActive && sortObj?.direction === dir) {
+      onClearSort(columnKey);
+    } else {
+      onSort(columnKey, dir);
+    }
+  };
+
   return (
     <div className="flex items-center gap-2 cursor-pointer">
       <span>{label}</span>
       <div className="flex flex-col">
         <ChevronUp
           className={`transition-all ${isActive && sortObj?.direction === "asc" ? "text-blue-400" : "hover:text-blue-500"}`}
-          onClick={() => onSort(columnKey, "asc")}
+          onClick={() => handleToggle("asc")}
           style={{ width: "15px", height: "15px", strokeWidth: "4px" }}
         />
         <ChevronDown
           className={`transition-all ${isActive && sortObj?.direction === "desc" ? "text-blue-400" : "hover:text-blue-500"}`}
-          onClick={() => onSort(columnKey, "desc")}
+          onClick={() => handleToggle("desc")}
           style={{ width: "15px", height: "15px", strokeWidth: "4px" }}
         />
-        {isActive && (
-          <button
-            className="text-xs text-red-400 hover:text-red-600"
-            onClick={() => onClearSort(columnKey)}
-            style={{ fontSize: "10px", marginTop: "2px" }}
-            title="Limpar ordenação"
-          >
-            <X className="cursor-pointer"/>
-          </button>
-        )}
       </div>
     </div>
   );

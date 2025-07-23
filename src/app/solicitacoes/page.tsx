@@ -119,18 +119,13 @@ export default function VisualizacaoSolicitacoes() {
     checkAuth();
   }, [router, fetchSolicitacoes]);
 
-  // Função para ordenar/adicionar coluna
+  // Função para ordenar/adicionar coluna com prioridade da esquerda para a direita
   function handleSort(column: string, direction: "asc" | "desc") {
     setSortColumns(prev => {
-      const idx = prev.findIndex(s => s.column === column);
-      if (idx !== -1) {
-        // Atualiza direção
-        const updated = [...prev];
-        updated[idx] = { column, direction };
-        return updated;
-      }
-      // Adiciona nova coluna ao final
-      return [...prev, { column, direction }];
+      // Remove a coluna se já existir
+      const filtered = prev.filter(s => s.column !== column);
+      // Adiciona no início (maior prioridade)
+      return [{ column, direction }, ...filtered];
     });
   }
 
@@ -646,6 +641,97 @@ export default function VisualizacaoSolicitacoes() {
                                     ))}
                                   </TableBody>
                                 </Table>
+
+                                {/* Botões */}
+
+                                {/* {Botão de aprovar}  */}
+                                <Button
+                                  className="bg-green-600 hover:bg-green-700 text-white cursor-pointer m-2 transition-all"
+                                  onClick={() => {
+                                    // Implementar lógica de aprovação
+                                    alert("Aprovar solicitação ainda não implementado.");
+                                  }}
+                                >
+                                  Aprovar
+                                </Button>
+
+                                {/* {Botão de reprovar} */}
+                                <Button
+                                  className="bg-red-600 hover:bg-red-700 text-white cursor-pointer m-2 transition-all"
+                                  onClick={() => {
+                                    // Implementar lógica de reprovação
+                                    alert("Reprovar solicitação ainda não implementado.");
+                                  }}
+                                >
+                                  Reprovar
+                                </Button>
+
+                                {/* {Botão de cancelar} */}
+                                <Button
+                                  className="bg-gray-600 hover:bg-gray-700 text-white cursor-pointer m-2 transition-all"
+                                  onClick={() => {
+                                    // Implementar lógica de cancelamento
+                                    alert("Cancelar solicitação ainda não implementado.");
+                                  }}
+                                >
+                                  Cancelar
+                                </Button>
+
+                                {/* {Botão de desdobrar} */}
+                                <Button
+                                  className="bg-blue-600 hover:bg-blue-700 text-white cursor-pointer m-2 transition-all"
+                                  onClick={() => {
+                                    // Implementar lógica de desdobramento
+                                    alert("Desdobrar solicitação ainda não implementado.");
+                                  }}
+                                >
+                                  Desdobrar
+                                </Button>
+
+                                {/* {Botão de finalizar} */}
+                                <Button
+                                  className="bg-yellow-600 hover:bg-yellow-700 text-white cursor-pointer m-2 transition-all"
+                                  onClick={() => {
+                                    // Implementar lógica de finalização
+                                    alert("Finalizar solicitação ainda não implementado.");
+                                  }}
+                                >
+                                  Finalizar
+                                </Button>
+
+                                {/* {Botão de reenvio} */}
+                                <Button
+                                  className="bg-lime-600 hover:bg-lime-700 text-white cursor-pointer m-2 transition-all"
+                                  onClick={() => {
+                                    // Implementar lógica de reenvio
+                                    alert("Reenviar solicitação ainda não implementado.");
+                                  }}
+                                >
+                                  Reenviar
+                                </Button>
+
+                                {/* {Botão de abatimento} */}
+                                <Button
+                                  className="bg-stone-600 hover:bg-stone-700 text-white cursor-pointer m-2 transition-all"
+                                  onClick={() => {
+                                    // Implementar lógica de abatimento
+                                    alert("Abater solicitação ainda não implementado.");
+                                  }}
+                                >
+                                  Abater
+                                </Button>
+
+                                {/* {Botão de exclusão} */}
+                                <Button
+                                  className="bg-red-600 hover:bg-red-700 text-white cursor-pointer m-2 transition-all"
+                                  onClick={() => {
+                                    // Implementar lógica de exclusão
+                                    alert("Excluir solicitação ainda não implementado.");
+                                  }}
+                                >
+                                  Excluir
+                                </Button>
+
                               </Card>
                             </div>
                           </DialogContent>
