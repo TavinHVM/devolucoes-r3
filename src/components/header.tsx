@@ -1,9 +1,8 @@
 'use client';
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import Image from "next/image";
-import { supabase } from "../lib/supabaseClient";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 
@@ -19,25 +18,13 @@ const navLinks = [
 ];
 
 export default function Header() {
-  const router = useRouter();
+  // const router = useRouter();
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  // const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  useEffect(() => {
-    async function checkAuth() {
-      const { data: { session } } = await supabase.auth.getSession();
-      setIsLoggedIn(!!session);
-    }
-    checkAuth();
-  }, []);
 
-  async function handleLogout() {
-    await supabase.auth.signOut();
-    router.replace('/login');
-  }
-
-  if (!isLoggedIn) return null;
+  // if (!isLoggedIn) return null;
 
   return (
     <>
@@ -59,7 +46,7 @@ export default function Header() {
             <Button
               variant="destructive"
               className="bg-red-custom hover:bg-red-custom-hover text-white cursor-pointer"
-              onClick={() => { handleLogout(); setOpen(false); }}
+              // onClick={() => { handleLogout(); setOpen(false); }}
               type="button"
             >
               Sair

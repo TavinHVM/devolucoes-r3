@@ -1,6 +1,5 @@
 "use client";
-import { useEffect, useState, useCallback } from "react";
-import { supabase } from "../../lib/supabaseClient";
+import { useEffect, useState } from "react";
 import { truncateText } from "../../lib/truncateText";
 import { Card, CardContent, CardHeader } from "../../components/ui/card";
 import { Input } from "../../components/ui/input";
@@ -21,7 +20,7 @@ import {
   PaginationPrevious,
 } from "../../components/ui/pagination";
 import Header from "../../components/header";
-import { useRouter } from "next/navigation";
+// import { useRouter } from "next/navigation";
 import {
   Dialog,
   DialogContent,
@@ -47,16 +46,16 @@ type Solicitacao = {
   filial: string;
   numero_nf: string;
   carga: string;
-  codigo_cobranca: string;
-  codigo_cliente: string;
+  cod_cobranca: string;
+  cod_cliente: string;
   rca: string;
   motivo_devolucao: string;
   vale?: string;
-  codigo_produto: string;
   tipo_devolucao: string;
   status: string;
   created_at: string;
   arquivo_url?: string;
+  products_list: JSON; 
 };
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -81,46 +80,39 @@ export default function VisualizacaoSolicitacoes() {
   }>({ open: false });
   const [aprovacaoVale, setAprovacaoVale] = useState("");
   const [refreshing, setRefreshing] = useState(false);
-  const router = useRouter();
+  // const router = useRouter();
   const [sortColumn, setSortColumn] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<"asc" | "desc" | null>(
     null
   );
 
   // Função para buscar as solicitações
-  const fetchSolicitacoes = useCallback(
-    async (statusParam = status) => {
-      setRefreshing(true);
-      let query = supabase.from("solicitacoes").select("*");
-      if (statusParam !== "Todos") {
-        query = query.eq("status", statusParam);
-      }
-      const { data, error } = await query;
-      if (error) {
-        console.error("Erro ao buscar solicitações:", error);
-        setSolicitacoes([]);
-      } else {
-        setSolicitacoes(data || []);
-      }
-      setRefreshing(false);
-    },
-    [status]
-  );
-
-  // Verifica se o usuário está autenticado
   useEffect(() => {
-    async function checkAuth() {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-      if (!session) {
-        router.replace("/login");
-      } else {
-        fetchSolicitacoes();
-      }
+    const fetchSolicitacoes = async () => {
+        try {
+            setRefreshing(true);
+
+            const response = await fetch('/api/getSolicitacoes', {
+                method: 'GET',
+                headers: {
+                    'Cache-Control': 'no-cache',
+                },
+                // cache: 'no-store',
+            });
+            if (!response.ok) {
+                throw new Error('Erro ao buscar os Solicitações.');
+            }
+            const data = await response.json();
+            setSolicitacoes(data);
+        } catch (error) {
+            console.error('Erro ao buscar os Solicitações:', error);
+        }
+        // setLoading(false);
+        setRefreshing(false);
     }
-    checkAuth();
-  }, [router, fetchSolicitacoes]);
+
+    fetchSolicitacoes();
+  }, []);
 
   // Ordenação das solicitações
   const sortedSolicitacoes = [...solicitacoes];
@@ -156,8 +148,8 @@ export default function VisualizacaoSolicitacoes() {
       s.filial.toLowerCase().includes(searchTerm) ||
       s.numero_nf.toLowerCase().includes(searchTerm) ||
       s.carga.toLowerCase().includes(searchTerm) ||
-      s.codigo_cobranca.toLowerCase().includes(searchTerm) ||
-      s.codigo_cliente.toLowerCase().includes(searchTerm) ||
+      s.cod_cobranca.toLowerCase().includes(searchTerm) ||
+      s.cod_cliente.toLowerCase().includes(searchTerm) ||
       s.rca.toLowerCase().includes(searchTerm) ||
       s.motivo_devolucao.toLowerCase().includes(searchTerm) ||
       s.vale?.toLowerCase().includes(searchTerm) ||
@@ -192,34 +184,7 @@ export default function VisualizacaoSolicitacoes() {
 
   // Função para aprovar uma solicitação
   async function aprovarSolicitacao(id: number) {
-    try {
-      const { error } = await supabase
-        .from("solicitacoes")
-        .update({ status: "Aprovado" })
-        .eq("id", id);
-      if (error) throw error;
-      setSolicitacoes(
-        solicitacoes.map((s) =>
-          s.id === id ? { ...s, status: "Aprovado" } : s
-        )
-      );
-    } catch (err: unknown) {
-      const msg =
-        err && typeof err === "object" && "message" in err
-          ? (err as { message: string }).message
-          : JSON.stringify(err);
-      alert("Erro ao aprovar solicitação: " + msg);
-    }
-  }
 
-  // Função para baixar o anexo de uma solicitação
-  function baixarAnexo(arquivo_url: string | undefined) {
-    if (arquivo_url) {
-      window.open(
-        `https://${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${arquivo_url}`,
-        "_blank"
-      );
-    }
   }
 
   // Função para obter a classe do status
@@ -291,7 +256,6 @@ export default function VisualizacaoSolicitacoes() {
                     value={status}
                     onValueChange={(v) => {
                       setStatus(v || "Todos");
-                      fetchSolicitacoes(v || "Todos");
                     }}
                   >
                     <SelectTrigger className="w-40 bg-slate-700 text-white border-slate-600 cursor-pointer">
@@ -474,10 +438,10 @@ export default function VisualizacaoSolicitacoes() {
                               <TableCell>{s.numero_nf}</TableCell>
                               <TableCell>{s.carga}</TableCell>
                               <TableCell className="text-center max-w-[70px]">
-                                {s.codigo_cobranca}
+                                {s.cod_cobranca}
                               </TableCell>
                               <TableCell className="text-center max-w-2">
-                                {s.codigo_cliente}
+                                {s.cod_cliente}
                               </TableCell>
                               <TableCell className="text-center max-w-2">
                                 {s.rca}
@@ -502,7 +466,7 @@ export default function VisualizacaoSolicitacoes() {
                                   <Button
                                     className="bg-blue-600 hover:bg-blue-700 text-white cursor-pointer"
                                     variant="secondary"
-                                    onClick={() => baixarAnexo(s.arquivo_url)}
+                                    // onClick={() => baixarAnexo(s.arquivo_url)}
                                   >
                                     Baixar NF
                                   </Button>
@@ -553,13 +517,13 @@ export default function VisualizacaoSolicitacoes() {
                                   <span className="font-bold bg-slate-700 p-1 rounded-md">
                                     Cód. Cobrança:
                                   </span>
-                                  <span>{s.codigo_cobranca}</span>
+                                  <span>{s.cod_cobranca}</span>
                                 </div>
                                 <div className="flex gap-2 items-center">
                                   <span className="font-bold bg-slate-700 p-1 rounded-md">
                                     Cód. Cliente:
                                   </span>
-                                  <span>{s.codigo_cliente}</span>
+                                  <span>{s.cod_cliente}</span>
                                 </div>
                                 <div className="flex gap-2 items-center">
                                   <span className="font-bold bg-slate-700 p-1 rounded-md">
@@ -608,15 +572,15 @@ export default function VisualizacaoSolicitacoes() {
                                       </TableRow>
                                     </TableHeader>
                                     <TableBody className="mx-6 px-32">
-                                      {productsList.map((p) => (
+                                      {Array.isArray(s.products_list) && s.products_list.map((p: { codigo: number, descricao: string, quantidade: number }) => (
                                         <TableRow
-                                          key={p.codigo_produto}
+                                          key={p.codigo}
                                           className="px-32 w-full"
                                         >
                                           <TableCell className="text-center w-[25%] text-lg">
-                                            {p.codigo_produto}
+                                            {p.codigo}
                                           </TableCell>
-                                          <TableCell className="text-lg">{p.nome}</TableCell>
+                                          <TableCell className="text-lg">{p.descricao}</TableCell>
                                           <TableCell className="pl-8 w-[25%] text-center text-lg">
                                             {p.quantidade}
                                           </TableCell>

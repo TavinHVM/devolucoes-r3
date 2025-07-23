@@ -1,12 +1,11 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { supabase } from '../../lib/supabaseClient';
 import Header from '../../components/header';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../../components/ui/dialog';
-import { useRouter } from 'next/navigation';
+// import { useRouter } from 'next/navigation';
 
 // Tipo do usuário conforme a tabela user_profiles
 interface Usuario {
@@ -33,7 +32,7 @@ function Toast({ message, type, onClose }: { message: string, type: 'success' | 
 }
 
 export default function Usuarios() {
-  const router = useRouter();
+  // const router = useRouter();
   const [usuarios, setUsuarios] = useState<Usuario[]>([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
@@ -59,29 +58,6 @@ export default function Usuarios() {
   const [resetStatus, setResetStatus] = useState<string | null>(null);
   const [toast, setToast] = useState<{ message: string, type: 'success' | 'error' } | null>(null);
 
-  useEffect(() => {
-    async function checkAuth() {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        router.replace('/login');
-      } else {
-        fetchUsuarios();
-      }
-    }
-    checkAuth();
-  }, [router]);
-
-  async function fetchUsuarios() {
-    setLoading(true);
-    const { data, error } = await supabase
-      .from('user_profiles')
-      .select('*')
-      .order('created_at', { ascending: false });
-    if (!error && data) {
-      setUsuarios(data);
-    }
-    setLoading(false);
-  }
 
   async function handleCreateUser(e: React.FormEvent) {
     e.preventDefault();

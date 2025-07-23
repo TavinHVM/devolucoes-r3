@@ -1,7 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-// import { supabase } from "../../lib/supabaseClient";
 import Header from "../../components/header";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
