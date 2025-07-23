@@ -11,16 +11,29 @@ export async function POST(request: Request) {
         const solicitacao = await db.solicitacoes.findUnique({
             where: {
                 id: id,
-                status: "APROVADA"
-            } 
+            },
+            select:{
+                status: true,
+                id: true,
+            }
         });
 
         if (!solicitacao) {
         console.log('Solicitação não encontrada');
         return NextResponse.json([], { status: 404 }); // Retorne um array vazio em vez de um objeto
         }
-
         console.log('Solicitações encontradas!\n Id da Solicitação:', solicitacao.id);
+
+        await db.solicitacoes.update({
+            where: {
+                id: id,
+            },
+            data: {
+                status: "APROVADA",
+            }
+        })
+
+        console.log('Solicitação Aprovada!');
         return NextResponse.json(solicitacao); // Retorne diretamente a Solicitação
     } catch (error) {
         console.error('Erro ao buscar Solicitação:', error);

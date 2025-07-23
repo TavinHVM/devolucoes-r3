@@ -74,11 +74,6 @@ export default function VisualizacaoSolicitacoes() {
   const [busca, setBusca] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 15;
-  const [modalAprovar, setModalAprovar] = useState<{
-    open: boolean;
-    id?: number;
-  }>({ open: false });
-  const [aprovacaoVale, setAprovacaoVale] = useState("");
   const [refreshing, setRefreshing] = useState(false);
   // const router = useRouter();
   const [sortColumn, setSortColumn] = useState<string | null>(null);
@@ -157,35 +152,6 @@ export default function VisualizacaoSolicitacoes() {
       s.status.toLowerCase().includes(searchTerm)
     );
   });
-
-  // // Paginação dos dados filtrados
-  // const paginatedSolicitacoes = filteredSolicitacoes.slice(
-  //   (currentPage - 1) * itemsPerPage,
-  //   currentPage * itemsPerPage
-  // );
-
-  const productsList: {
-    codigo_produto: string;
-    nome: string;
-    quantidade: number;
-  }[] = [
-      { codigo_produto: "1001", nome: "Chamex - Resma", quantidade: 5 },
-      { codigo_produto: "1002", nome: "Caneta Azul", quantidade: 12 },
-      { codigo_produto: "1003", nome: "Lápis Preto", quantidade: 20 },
-      { codigo_produto: "1004", nome: "Borracha Branca", quantidade: 8 },
-      { codigo_produto: "1005", nome: "Caderno 200 folhas", quantidade: 3 },
-      { codigo_produto: "1006", nome: "Apontador", quantidade: 15 },
-      { codigo_produto: "1007", nome: "Marcador de Texto", quantidade: 7 },
-      { codigo_produto: "1008", nome: "Régua 30cm", quantidade: 6 },
-      { codigo_produto: "1009", nome: "Cola Branca", quantidade: 9 },
-      { codigo_produto: "1010", nome: "Pasta Plástica", quantidade: 11 },
-
-    ];
-
-  // Função para aprovar uma solicitação
-  async function aprovarSolicitacao(id: number) {
-
-  }
 
   // Função para obter a classe do status
   function getStatusClass(status: string) {
@@ -633,55 +599,6 @@ export default function VisualizacaoSolicitacoes() {
           </Card>
         </div>
       </div>
-      {/* Modal Aprovar */}
-      {modalAprovar.open && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
-          <div className="bg-white rounded-lg p-8 w-full max-w-md">
-            <h2 className="text-xl font-bold mb-4">Aprovar Solicitação</h2>
-            <div className="mb-4">
-              <label className="block mb-2">Vale?</label>
-              <select
-                value={aprovacaoVale}
-                onChange={(e) => setAprovacaoVale(e.target.value)}
-                className="w-full border rounded p-2"
-              >
-                <option value="">Escolha uma opção</option>
-                <option value="Sim">Sim</option>
-                <option value="Não">Não</option>
-              </select>
-            </div>
-            <div className="mb-4">
-              <label className="block mb-2">Recibo:</label>
-              <input type="file" className="w-full" />
-            </div>
-            <div className="mb-4">
-              <label className="block mb-2">Nota de Devolução:</label>
-              <input type="file" className="w-full" />
-            </div>
-            <div className="flex gap-2 justify-end">
-              <Button
-                className="bg-green-600"
-                onClick={async () => {
-                  await aprovarSolicitacao(modalAprovar.id!);
-                  setModalAprovar({ open: false });
-                  setAprovacaoVale("");
-                }}
-              >
-                Confirmar
-              </Button>
-              <Button
-                className="bg-gray-400"
-                onClick={() => {
-                  setModalAprovar({ open: false });
-                  setAprovacaoVale("");
-                }}
-              >
-                Cancelar
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
     </>
   );
 }
