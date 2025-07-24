@@ -41,6 +41,7 @@ import { DialogClose } from "@radix-ui/react-dialog";
 import { RefreshCw } from 'lucide-react';
 import AprovarSolicitacao from "@/utils/solicitacoes/aprovarSolicitacoes";
 import { filterTableHeader } from "@/utils/filterTableHeader";
+import { filterBySearch } from "@/utils/filterBySearch";
 
 type Solicitacao = {
   id: number;
@@ -155,23 +156,20 @@ export default function VisualizacaoSolicitacoes() {
     });
   }
 
-  // Função para filtrar solicitações com base na busca
-  const filteredSolicitacoes = sortedSolicitacoes.filter((s) => {
-    const searchTerm = busca.toLowerCase();
-    return (
-      s.nome.toLowerCase().includes(searchTerm) ||
-      s.filial.toLowerCase().includes(searchTerm) ||
-      s.numero_nf.toLowerCase().includes(searchTerm) ||
-      s.carga.toLowerCase().includes(searchTerm) ||
-      s.cod_cobranca.toLowerCase().includes(searchTerm) ||
-      s.cod_cliente.toLowerCase().includes(searchTerm) ||
-      s.rca.toLowerCase().includes(searchTerm) ||
-      s.motivo_devolucao.toLowerCase().includes(searchTerm) ||
-      (s.vale?.toLowerCase().includes(searchTerm) ?? false) ||
-      s.tipo_devolucao.toLowerCase().includes(searchTerm) ||
-      s.status.toLowerCase().includes(searchTerm)
-    );
-  });
+  const filteredSolicitacoes = filterBySearch(sortedSolicitacoes, busca, [
+    "nome",
+    "filial",
+    "numero_nf",
+    "carga",
+    "cod_cobranca",
+    "cod_cliente",
+    "rca",
+    "motivo_devolucao",
+    "vale",
+    "tipo_devolucao",
+    "status",
+  ]);
+
 
   // Função para obter a classe do status
   function getStatusClass(status: string) {
