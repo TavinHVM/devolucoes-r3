@@ -296,7 +296,7 @@ const filteredSolicitacoes = sortedSolicitacoes.filter((s) => {
               </div>
             </CardHeader>
             <CardContent>
-              <Card className="bg-slate-800 text-white rounded-lg">
+              <div>
                 <Table className="bg-slate-800 text-white rounded-lg">
                 <TableHeader>
                     <TableRow className="border-slate-700 text-white hover:bg-slate-800 h-20 items-center">
@@ -435,7 +435,8 @@ const filteredSolicitacoes = sortedSolicitacoes.filter((s) => {
                         <Dialog key={s.id}>
                           <DialogTrigger asChild>
                             <TableRow
-                              className={`border-slate-700 cursor-pointer transition-all hover:bg-slate-600 ${idx % 2 === 0 ? "bg-slate-700" : ""}`}
+                              className={`border-slate-700 cursor-pointer transition-all hover:bg-slate-600 ${idx % 2 === 0 ? "bg-slate-700" : ""
+                                }`}
                             >
                               <TableCell className="pl-6">{s.id}</TableCell>
                               <TableCell>{truncateText(s.nome, 15)}</TableCell>
@@ -480,10 +481,9 @@ const filteredSolicitacoes = sortedSolicitacoes.filter((s) => {
                             </TableRow>
                           </DialogTrigger>
 
-                          {/* ⚠️ FORA da Tabela! */}
+                          {/* Dialog */}
+                          <DialogTitle></DialogTitle>
                           <DialogContent className="min-w-[50%] max-h-[95%] overflow-y-auto rounded-xl scrollbar-dark">
-                            {/* Adiciona título acessível para o Dialog */}
-                            <DialogTitle>Detalhes da Solicitação</DialogTitle>
                             <div className="grid grid-cols-3 gap-4 p-6 text-white rounded-lg relative">
                               <DialogClose className="absolute right-0" />
                                 <DialogClose className="absolute right-0">
@@ -556,43 +556,25 @@ const filteredSolicitacoes = sortedSolicitacoes.filter((s) => {
                                   </CardContent>
                                 </Card>
 
-                              {/* Informações de detalhes */}
-                              <div className="flex gap-2 items-center"><strong className="bg-slate-700 p-1 rounded-md">Nome:</strong> {s.nome}</div>
-                              <div className="flex gap-2 items-center"><strong className="bg-slate-700 p-1 rounded-md">Filial:</strong> {s.filial}</div>
-                              <div className="flex gap-2 items-center"><strong className="bg-slate-700 p-1 rounded-md">Nº NF:</strong> {s.numero_nf}</div>
-                              <div className="flex gap-2 items-center"><strong className="bg-slate-700 p-1 rounded-md">Carga:</strong> {s.carga}</div>
-                              <div className="flex gap-2 items-center"><strong className="bg-slate-700 p-1 rounded-md">Cód. Cobrança:</strong> {s.codigo_cobranca}</div>
-                              <div className="flex gap-2 items-center"><strong className="bg-slate-700 p-1 rounded-md">Cód. Cliente:</strong> {s.codigo_cliente}</div>
-                              <div className="flex gap-2 items-center"><strong className="bg-slate-700 p-1 rounded-md">RCA:</strong> {s.rca}</div>
-                              <div className="flex gap-2 items-center"><strong className="bg-slate-700 p-1 rounded-md">Vale:</strong> {s.vale}</div>
-
-                              {/* Motivo da devolução */}
-                              <Card className="col-span-3 bg-slate-600">
-                                <CardHeader>
-                                  <h2 className="text-xl font-bold text-center text-white">Motivo da Devolução:</h2>
-                                </CardHeader>
-                                <CardContent className="p-4 max-h-40 overflow-y-auto">
-                                  <p className="text-white">{s.motivo_devolucao}</p>
-                                </CardContent>
-                              </Card>
-
-                              {/* Produtos */}
-                              <Card className="col-span-3 bg-slate-600 p-4">
-                                <h3 className="text-xl font-bold text-center text-white mb-2">PRODUTOS</h3>
-                                <Table className="bg-slate-700 text-white">
-                                  <TableHeader>
-                                    <TableRow>
-                                      <TableHead>Código Produto</TableHead>
-                                      <TableHead>Nome</TableHead>
-                                      <TableHead>Quantidade</TableHead>
-                                    </TableRow>
-                                  </TableHeader>
-                                  <TableBody>
-                                    {productsList.map((p) => (
-                                      <TableRow key={p.codigo_produto}>
-                                        <TableCell>{p.codigo_produto}</TableCell>
-                                        <TableCell>{p.nome}</TableCell>
-                                        <TableCell>{p.quantidade}</TableCell>
+                                <Card className="bg-slate-600 text-white col-span-3 max-h-80 flex gap-0 p-0">
+                                  <span className="text-center font-bold text-xl py-2">
+                                    PRODUTOS
+                                  </span>
+                                  <div className="flex min-w-full bg-slate-800">
+                                    <div className="w-[25%] py-2 text-lg text-center border-r-2 border-white">
+                                      <span className="text-white font-bold">Código Produto</span>
+                                    </div>
+                                    <div className="w-[50%] py-2 text-lg text-center border-l-2 border-r-2 border-white">
+                                      <span className="text-white font-bold">Nome</span>
+                                    </div>
+                                    <div className="w-[25%] py-2 text-lg text-center border-l-2 border-white">
+                                      <span className="text-white font-bold">Quantidade</span>
+                                    </div>
+                                  </div>
+                                  {/* Produtos */}
+                                  <Table className="bg-slate-500 max-h-24 h-10">
+                                    <TableHeader className="mx-6">
+                                      <TableRow className="mx-6">
                                       </TableRow>
                                     </TableHeader>
                                     <TableBody className="mx-6 px-32">
@@ -619,7 +601,10 @@ const filteredSolicitacoes = sortedSolicitacoes.filter((s) => {
                       ))
                     ) : (
                       <TableRow>
-                        <TableCell colSpan={15} className="text-center py-8 text-gray-400 bg-slate-800">
+                        <TableCell
+                          colSpan={15}
+                          className="text-center py-8 text-gray-400 bg-slate-800"
+                        >
                           Nenhuma solicitação encontrada.
                         </TableCell>
                       </TableRow>
