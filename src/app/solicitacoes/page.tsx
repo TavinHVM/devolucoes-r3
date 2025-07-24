@@ -75,7 +75,6 @@ export default function VisualizacaoSolicitacoes() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 15;
   const [refreshing, setRefreshing] = useState(false);
-  // const router = useRouter();
   const [sortColumns, setSortColumns] = useState<{ column: string; direction: "asc" | "desc" }[]>([]);
 
   // Função para buscar as solicitações
@@ -106,69 +105,69 @@ export default function VisualizacaoSolicitacoes() {
     fetchSolicitacoes();
   }, []);
 
-  // Função para ordenar/adicionar coluna com prioridade da esquerda para a direita
-  function handleSort(column: string, direction: "asc" | "desc") {
-    setSortColumns(prev => {
-      // Remove a coluna se já existir
-      const filtered = prev.filter(s => s.column !== column);
-      // Adiciona no início (maior prioridade)
-      return [{ column, direction }, ...filtered];
-    });
-  }
+// Função para ordenar/adicionar coluna com prioridade da esquerda para a direita
+function handleSort(column: string, direction: "asc" | "desc") {
+  setSortColumns(prev => {
+    // Remove a coluna se já existir
+    const filtered = prev.filter(s => s.column !== column);
+    // Adiciona no início (maior prioridade)
+    return [{ column, direction }, ...filtered];
+  });
+}
 
-  // Função para remover ordenação de uma coluna
-  function handleClearSort(column: string) {
-    setSortColumns(prev => prev.filter(s => s.column !== column));
-  }
+// Função para remover ordenação de uma coluna
+function handleClearSort(column: string) {
+  setSortColumns(prev => prev.filter(s => s.column !== column));
+}
 
-  // Ordenação multi-coluna
-  const sortedSolicitacoes = [...solicitacoes];
-  if (sortColumns.length > 0) {
-    sortedSolicitacoes.sort((a, b) => {
-      for (const sort of sortColumns) {
-        const aValue = a[sort.column as keyof Solicitacao] ?? "";
-        const bValue = b[sort.column as keyof Solicitacao] ?? "";
-        if (sort.column === "created_at") {
-          const aDate = new Date(aValue);
-          const bDate = new Date(bValue);
-          if (aDate.getTime() !== bDate.getTime()) {
-            return sort.direction === "asc"
-              ? aDate.getTime() - bDate.getTime()
-              : bDate.getTime() - aDate.getTime();
-          }
-        } else if (typeof aValue === "string" && typeof bValue === "string") {
-          if (aValue.localeCompare(bValue, "pt-BR", { sensitivity: "base" }) !== 0) {
-            return sort.direction === "asc"
-              ? aValue.localeCompare(bValue, "pt-BR", { sensitivity: "base" })
-              : bValue.localeCompare(aValue, "pt-BR", { sensitivity: "base" });
-          }
-        } else if (typeof aValue === "number" && typeof bValue === "number") {
-          if (aValue !== bValue) {
-            return sort.direction === "asc" ? aValue - bValue : bValue - aValue;
-          }
+// Ordenação multi-coluna
+const sortedSolicitacoes = [...solicitacoes];
+if (sortColumns.length > 0) {
+  sortedSolicitacoes.sort((a, b) => {
+    for (const sort of sortColumns) {
+      const aValue = a[sort.column as keyof Solicitacao] ?? "";
+      const bValue = b[sort.column as keyof Solicitacao] ?? "";
+      if (sort.column === "created_at") {
+        const aDate = new Date(aValue as string);
+        const bDate = new Date(bValue as string);
+        if (aDate.getTime() !== bDate.getTime()) {
+          return sort.direction === "asc"
+            ? aDate.getTime() - bDate.getTime()
+            : bDate.getTime() - aDate.getTime();
+        }
+      } else if (typeof aValue === "string" && typeof bValue === "string") {
+        if (aValue.localeCompare(bValue, "pt-BR", { sensitivity: "base" }) !== 0) {
+          return sort.direction === "asc"
+            ? aValue.localeCompare(bValue, "pt-BR", { sensitivity: "base" })
+            : bValue.localeCompare(aValue, "pt-BR", { sensitivity: "base" });
+        }
+      } else if (typeof aValue === "number" && typeof bValue === "number") {
+        if (aValue !== bValue) {
+          return sort.direction === "asc" ? aValue - bValue : bValue - aValue;
         }
       }
-      return 0;
-    });
-  }
-
-  // Função para filtrar solicitações com base na busca
-  const filteredSolicitacoes = sortedSolicitacoes.filter((s) => {
-    const searchTerm = busca.toLowerCase();
-    return (
-      s.nome.toLowerCase().includes(searchTerm) ||
-      s.filial.toLowerCase().includes(searchTerm) ||
-      s.numero_nf.toLowerCase().includes(searchTerm) ||
-      s.carga.toLowerCase().includes(searchTerm) ||
-      s.cod_cobranca.toLowerCase().includes(searchTerm) ||
-      s.cod_cliente.toLowerCase().includes(searchTerm) ||
-      s.rca.toLowerCase().includes(searchTerm) ||
-      s.motivo_devolucao.toLowerCase().includes(searchTerm) ||
-      (s.vale?.toLowerCase().includes(searchTerm) ?? false) ||
-      s.tipo_devolucao.toLowerCase().includes(searchTerm) ||
-      s.status.toLowerCase().includes(searchTerm)
-    );
+    }
+    return 0;
   });
+}
+
+// Função para filtrar solicitações com base na busca
+const filteredSolicitacoes = sortedSolicitacoes.filter((s) => {
+  const searchTerm = busca.toLowerCase();
+  return (
+    s.nome.toLowerCase().includes(searchTerm) ||
+    s.filial.toLowerCase().includes(searchTerm) ||
+    s.numero_nf.toLowerCase().includes(searchTerm) ||
+    s.carga.toLowerCase().includes(searchTerm) ||
+    s.cod_cobranca.toLowerCase().includes(searchTerm) ||
+    s.cod_cliente.toLowerCase().includes(searchTerm) ||
+    s.rca.toLowerCase().includes(searchTerm) ||
+    s.motivo_devolucao.toLowerCase().includes(searchTerm) ||
+    (s.vale?.toLowerCase().includes(searchTerm) ?? false) ||
+    s.tipo_devolucao.toLowerCase().includes(searchTerm) ||
+    s.status.toLowerCase().includes(searchTerm)
+  );
+});
 
   // Função para obter a classe do status
   function getStatusClass(status: string) {
@@ -189,16 +188,6 @@ export default function VisualizacaoSolicitacoes() {
         return "min-w-32 max-w-32 w-full bg-gray-500 text-white font-bold px-1 py-4 rounded flex justify-center h-full";
       default:
         return "min-w-32 max-w-32 w-full bg-blue-900 text-white font-bold px-1 py-4 rounded flex justify-center h-full";
-    }
-  }
-
-  // Função para baixar o anexo de uma solicitação
-  function baixarAnexo(arquivo_url: string | undefined) {
-    if (arquivo_url) {
-      window.open(
-        `https://${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${arquivo_url}`,
-        "_blank"
-      );
     }
   }
 
@@ -231,7 +220,7 @@ export default function VisualizacaoSolicitacoes() {
                 />
                 <Button
                   className="ml-2 bg-blue-500 hover:bg-blue-600 text-white cursor-pointer"
-                  onClick={() => fetchSolicitacoes()}
+                  // onClick={() => fetchSolicitacoes()}
                   disabled={refreshing}
                 >
                   <RefreshCw />
@@ -243,6 +232,7 @@ export default function VisualizacaoSolicitacoes() {
                     value={status}
                     onValueChange={(v) => {
                       setStatus(v || "Todos");
+                      
                     }}
                   >
                     <SelectTrigger className="w-40 bg-slate-700 text-white border-slate-600 cursor-pointer">
@@ -263,13 +253,13 @@ export default function VisualizacaoSolicitacoes() {
                       </SelectItem>
                       <SelectItem
                         className="bg-green-600 text-white font-bold px-1 py-2 rounded flex justify-center h-full cursor-pointer transition-all"
-                        value="APROVADO"
+                        value="APROVADA"
                       >
                         Aprovado
                       </SelectItem>
                       <SelectItem
                         className="bg-red-600 text-white font-bold px-1 py-2 rounded flex justify-center h-full cursor-pointer transition-all"
-                        value="REJEITADO"
+                        value="REJEITADA"
                       >
                         Rejeitado
                       </SelectItem>
@@ -308,7 +298,7 @@ export default function VisualizacaoSolicitacoes() {
             <CardContent>
               <Card className="bg-slate-800 text-white rounded-lg">
                 <Table className="bg-slate-800 text-white rounded-lg">
-                  <TableHeader>
+                <TableHeader>
                     <TableRow className="border-slate-700 text-white hover:bg-slate-800 h-20 items-center">
                       <TableHead className="text-white whitespace-nowrap">
                         <OrderBtn
