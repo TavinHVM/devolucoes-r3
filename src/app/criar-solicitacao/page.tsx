@@ -144,6 +144,7 @@ export default function Solicitacao() {
     //  Adicionar o log de erros de validação aqui
     const { errors } = form.formState;
     console.log("Erros do formulário:", errors);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [toast]);
 
   useEffect(() => {
@@ -157,21 +158,6 @@ export default function Solicitacao() {
     };
     fetchProduct();
   }, [codigo]);
-
-
-  // Função antiga para salvar no banco
-
-  // async function onSubmit(data: FormData) {
-  //   setToast(null);
-  //   const dadosParaSalvar = data;
-  //   const { error } = await supabase.from('solicitacoes').insert([dadosParaSalvar]);
-  //   if (error) {
-  //     setToast({ message: 'Erro ao salvar solicitação: ' + error.message, type: 'error' });
-  //   } else {
-  //     setToast({ message: 'Solicitação criada com sucesso!', type: 'success' });
-  //     form.reset();
-  //   }
-  // }
 
   // Função nova para salvar no banco, adptar ela em relação à antiga
 
