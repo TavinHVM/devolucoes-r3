@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { truncateText } from "../../lib/truncateText";
+import { truncateText } from "../../utils/truncateText";
 import { Card, CardContent, CardHeader } from "../../components/ui/card";
 import { Input } from "../../components/ui/input";
 import {
@@ -39,6 +39,7 @@ import OrderBtn from "@/components/orderBtn";
 import { X } from 'lucide-react';
 import { DialogClose } from "@radix-ui/react-dialog";
 import { RefreshCw } from 'lucide-react';
+import AprovarSolicitacao from "@/utils/solicitacoes/aprovarSolicitacoes";
 
 type Solicitacao = {
   id: number;
@@ -76,6 +77,8 @@ export default function VisualizacaoSolicitacoes() {
   const itemsPerPage = 15;
   const [refreshing, setRefreshing] = useState(false);
   const [sortColumns, setSortColumns] = useState<{ column: string; direction: "asc" | "desc" }[]>([]);
+
+
 
   // Função para buscar as solicitações
   useEffect(() => {
@@ -594,6 +597,10 @@ const filteredSolicitacoes = sortedSolicitacoes.filter((s) => {
                                       ))}
                                     </TableBody>
                                   </Table>
+                                  <Button className="bg-green-600 cursor-pointer transition-all"
+                                    onClick={() => AprovarSolicitacao(s.id)}>
+                                    Aprovar
+                                  </Button>
                                 </Card>
                             </div>
                           </DialogContent>
