@@ -40,6 +40,7 @@ import { X } from 'lucide-react';
 import { DialogClose } from "@radix-ui/react-dialog";
 import { RefreshCw } from 'lucide-react';
 import AprovarSolicitacao from "@/utils/solicitacoes/aprovarSolicitacoes";
+import { filterTableHeader } from "@/utils/filterTableHeader";
 
 type Solicitacao = {
   id: number;
@@ -124,7 +125,7 @@ export default function VisualizacaoSolicitacoes() {
   }
 
   // Ordenação multi-coluna
-  const sortedSolicitacoes = [...solicitacoes];
+  const sortedSolicitacoes = filterTableHeader(solicitacoes, sortColumns);
   if (sortColumns.length > 0) {
     sortedSolicitacoes.sort((a, b) => {
       for (const sort of sortColumns) {
@@ -559,49 +560,49 @@ export default function VisualizacaoSolicitacoes() {
                                 </CardContent>
                               </Card>
 
-                                <Card className="bg-slate-600 text-white col-span-3 max-h-80 flex gap-0 p-0">
-                                  <span className="text-center font-bold text-xl py-2">
-                                    PRODUTOS
-                                  </span>
-                                  <div className="flex min-w-full bg-slate-800">
-                                    <div className="w-[25%] py-2 text-lg text-center border-r-2 border-white">
-                                      <span className="text-white font-bold">Código Produto</span>
-                                    </div>
-                                    <div className="w-[50%] py-2 text-lg text-center border-l-2 border-r-2 border-white">
-                                      <span className="text-white font-bold">Nome</span>
-                                    </div>
-                                    <div className="w-[25%] py-2 text-lg text-center border-l-2 border-white">
-                                      <span className="text-white font-bold">Quantidade</span>
-                                    </div>
+                              <Card className="bg-slate-600 text-white col-span-3 max-h-80 flex gap-0 p-0">
+                                <span className="text-center font-bold text-xl py-2">
+                                  PRODUTOS
+                                </span>
+                                <div className="flex min-w-full bg-slate-800">
+                                  <div className="w-[25%] py-2 text-lg text-center border-r-2 border-white">
+                                    <span className="text-white font-bold">Código Produto</span>
                                   </div>
-                                  {/* Produtos */}
-                                  <Table className="bg-slate-500 max-h-24 h-10">
-                                    <TableHeader className="mx-6">
-                                      <TableRow className="mx-6">
+                                  <div className="w-[50%] py-2 text-lg text-center border-l-2 border-r-2 border-white">
+                                    <span className="text-white font-bold">Nome</span>
+                                  </div>
+                                  <div className="w-[25%] py-2 text-lg text-center border-l-2 border-white">
+                                    <span className="text-white font-bold">Quantidade</span>
+                                  </div>
+                                </div>
+                                {/* Produtos */}
+                                <Table className="bg-slate-500 max-h-24 h-10">
+                                  <TableHeader className="mx-6">
+                                    <TableRow className="mx-6">
+                                    </TableRow>
+                                  </TableHeader>
+                                  <TableBody className="mx-6 px-32">
+                                    {Array.isArray(s.products_list) && s.products_list.map((p: { codigo: number, descricao: string, quantidade: number }) => (
+                                      <TableRow
+                                        key={p.codigo}
+                                        className="px-32 w-full"
+                                      >
+                                        <TableCell className="text-center w-[25%] text-lg">
+                                          {p.codigo}
+                                        </TableCell>
+                                        <TableCell className="text-lg">{p.descricao}</TableCell>
+                                        <TableCell className="pl-8 w-[25%] text-center text-lg">
+                                          {p.quantidade}
+                                        </TableCell>
                                       </TableRow>
-                                    </TableHeader>
-                                    <TableBody className="mx-6 px-32">
-                                      {Array.isArray(s.products_list) && s.products_list.map((p: { codigo: number, descricao: string, quantidade: number }) => (
-                                        <TableRow
-                                          key={p.codigo}
-                                          className="px-32 w-full"
-                                        >
-                                          <TableCell className="text-center w-[25%] text-lg">
-                                            {p.codigo}
-                                          </TableCell>
-                                          <TableCell className="text-lg">{p.descricao}</TableCell>
-                                          <TableCell className="pl-8 w-[25%] text-center text-lg">
-                                            {p.quantidade}
-                                          </TableCell>
-                                        </TableRow>
-                                      ))}
-                                    </TableBody>
-                                  </Table>
-                                  <Button className="bg-green-600 cursor-pointer transition-all"
-                                    onClick={() => AprovarSolicitacao(s.id)}>
-                                    Aprovar
-                                  </Button>
-                                </Card>
+                                    ))}
+                                  </TableBody>
+                                </Table>
+                                <Button className="bg-green-600 cursor-pointer transition-all"
+                                  onClick={() => AprovarSolicitacao(s.id)}>
+                                  Aprovar
+                                </Button>
+                              </Card>
                             </div>
                           </DialogContent>
                         </Dialog>
