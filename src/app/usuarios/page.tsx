@@ -34,7 +34,6 @@ function Toast({ message, type, onClose }: { message: string, type: 'success' | 
 export default function Usuarios() {
   // const router = useRouter();
   const [usuarios, setUsuarios] = useState<Usuario[]>([]);
-  const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [form, setForm] = useState<Omit<Usuario, 'id' | 'created_at'> & { password: string }>({
     first_name: '',
@@ -59,100 +58,6 @@ export default function Usuarios() {
   const [toast, setToast] = useState<{ message: string, type: 'success' | 'error' } | null>(null);
 
 
-  async function handleCreateUser(e: React.FormEvent) {
-    e.preventDefault();
-    setError(null);
-    setToast(null);
-    // Validação simples
-    if (!form.first_name || !form.last_name || !form.role || !form.user_level || !form.email || !form.password) {
-      setError('Preencha todos os campos.');
-      setToast({ message: 'Preencha todos os campos.', type: 'error' });
-      return;
-    }
-    // 1. Cria o usuário no Auth
-    const { data, error: authError } = await supabase.auth.signUp({
-      email: form.email,
-      password: form.password,
-    });
-    if (authError) {
-      setError(authError.message);
-      setToast({ message: 'Erro ao criar usuário: ' + authError.message, type: 'error' });
-      return;
-    }
-    if (!data?.user) {
-      setError('Erro ao criar usuário no Auth.');
-      setToast({ message: 'Erro ao criar usuário no Auth.', type: 'error' });
-      return;
-    }
-    // 2. Cria o perfil com o mesmo id do Auth
-    const { error: profileError } = await supabase.from('user_profiles').insert([{
-      id: data.user.id,
-      first_name: form.first_name,
-      last_name: form.last_name,
-      role: form.role,
-      user_level: form.user_level,
-      email: form.email,
-    }]);
-    if (profileError) {
-      setError(profileError.message);
-      setToast({ message: 'Erro ao criar perfil: ' + profileError.message, type: 'error' });
-      return;
-    }
-    setShowModal(false);
-    setForm({ first_name: '', last_name: '', role: '', user_level: '', email: '', password: '' });
-    setToast({ message: 'Usuário criado com sucesso!', type: 'success' });
-    fetchUsuarios();
-  }
-
-  function openEditModal(usuario: Usuario) {
-    setEditUser(usuario);
-    setEditForm({
-      first_name: usuario.first_name,
-      last_name: usuario.last_name,
-      role: usuario.role,
-      user_level: usuario.user_level,
-      email: usuario.email,
-    });
-  }
-
-  async function handleEditUser(e: React.FormEvent) {
-    e.preventDefault();
-    if (!editUser) return;
-    const { error } = await supabase
-      .from('user_profiles')
-      .update({ ...editForm })
-      .eq('id', editUser.id);
-    if (!error) {
-      setEditUser(null);
-      setToast({ message: 'Usuário editado com sucesso!', type: 'success' });
-      fetchUsuarios();
-    } else {
-      setError(error.message);
-      setToast({ message: 'Erro ao editar usuário: ' + error.message, type: 'error' });
-    }
-  }
-
-  async function excluirUsuario(id: string) {
-    const { error } = await supabase.from('user_profiles').delete().eq('id', id);
-    setConfirmDeleteId(null);
-    if (!error) {
-      setToast({ message: 'Usuário excluído com sucesso!', type: 'success' });
-      fetchUsuarios();
-    } else {
-      setToast({ message: 'Erro ao excluir usuário: ' + error.message, type: 'error' });
-    }
-  }
-
-  async function handleResetPassword(email: string) {
-    setResetStatus(null);
-    const { error } = await supabase.auth.resetPasswordForEmail(email);
-    if (error) {
-      setResetStatus('Erro ao enviar e-mail de redefinição: ' + error.message);
-    } else {
-      setResetStatus('E-mail de redefinição enviado com sucesso!');
-    }
-  }
-
   // Toast auto-hide
   useEffect(() => {
     if (toast) {
@@ -160,10 +65,6 @@ export default function Usuarios() {
       return () => clearTimeout(timer);
     }
   }, [toast]);
-
-  if (loading) {
-    return <div className="flex h-screen items-center justify-center bg-gray-900 text-white">Carregando...</div>;
-  }
 
   return (
     <>
