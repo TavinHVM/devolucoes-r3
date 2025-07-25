@@ -42,6 +42,7 @@ import { RefreshCw } from 'lucide-react';
 import AprovarSolicitacao from "@/utils/solicitacoes/aprovarSolicitacoes";
 import { filterTableHeader } from "@/utils/filterTableHeader";
 import { filterBySearch } from "@/utils/filterBySearch";
+import { filterByStatus } from "@/utils/filterByStatus";
 
 type Solicitacao = {
   id: number;
@@ -79,8 +80,6 @@ export default function VisualizacaoSolicitacoes() {
   const itemsPerPage = 15;
   const [refreshing, setRefreshing] = useState(false);
   const [sortColumns, setSortColumns] = useState<{ column: string; direction: "asc" | "desc" }[]>([]);
-
-
 
   // Função para buscar as solicitações
   useEffect(() => {
@@ -170,6 +169,7 @@ export default function VisualizacaoSolicitacoes() {
     "status",
   ]);
 
+  const finalSolicitacoes = filterByStatus(filteredSolicitacoes, status);
 
   // Função para obter a classe do status
   function getStatusClass(status: string) {
@@ -195,8 +195,8 @@ export default function VisualizacaoSolicitacoes() {
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filteredSolicitacoes.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(filteredSolicitacoes.length / itemsPerPage);
+  const currentItems = finalSolicitacoes.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(finalSolicitacoes.length / itemsPerPage);
   const startPage = Math.max(1, currentPage - 7); // Começa 7 páginas antes do número atual
   const endPage = Math.min(totalPages, startPage + 14); // Termina 15 páginas após o início
 
@@ -257,13 +257,13 @@ export default function VisualizacaoSolicitacoes() {
                         className="bg-green-600 text-white font-bold px-1 py-2 rounded flex justify-center h-full cursor-pointer transition-all"
                         value="APROVADA"
                       >
-                        Aprovado
+                        Aprovada
                       </SelectItem>
                       <SelectItem
                         className="bg-red-600 text-white font-bold px-1 py-2 rounded flex justify-center h-full cursor-pointer transition-all"
                         value="REJEITADA"
                       >
-                        Rejeitado
+                        Rejeitada
                       </SelectItem>
                       <SelectItem
                         className="bg-blue-700 text-white font-bold px-1 py-2 rounded flex justify-center h-full cursor-pointer transition-all"
@@ -273,7 +273,7 @@ export default function VisualizacaoSolicitacoes() {
                       </SelectItem>
                       <SelectItem
                         className="bg-yellow-400 text-white font-bold px-1 py-2 rounded flex justify-center h-full cursor-pointer transition-all"
-                        value="FINALIZADA"
+                        value="REENVIADA"
                       >
                         Reenviada
                       </SelectItem>
