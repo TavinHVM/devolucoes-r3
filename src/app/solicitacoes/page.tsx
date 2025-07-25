@@ -40,9 +40,9 @@ import { X } from 'lucide-react';
 import { DialogClose } from "@radix-ui/react-dialog";
 import { RefreshCw } from 'lucide-react';
 import AprovarSolicitacao from "@/utils/solicitacoes/aprovarSolicitacoes";
-import { filterTableHeader } from "@/utils/filterTableHeader";
-import { filterBySearch } from "@/utils/filterBySearch";
-import { filterByStatus } from "@/utils/filterByStatus";
+import { filterTableHeader } from "@/utils/filters/filterTableHeader";
+import { filterBySearch } from "@/utils/filters/filterBySearch";
+import { filterByStatus } from "@/utils/filters/filterByStatus";
 
 type Solicitacao = {
   id: number;
