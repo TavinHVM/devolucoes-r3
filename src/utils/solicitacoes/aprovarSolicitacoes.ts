@@ -1,6 +1,6 @@
 export default async function AprovarSolicitacao(id: number) {
     try {
-        const response = await fetch(`/api/aprovarSolicitacao/${id}`, {
+        const response = await fetch(`/api/btnsSolicitacoes/aprovarSolicitacao/${id}`, {
         method: "POST",
         headers: {
             "Cache-Control": "no-cache",
