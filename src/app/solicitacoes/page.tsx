@@ -176,10 +176,10 @@ export default function VisualizacaoSolicitacoes() {
     switch (status?.toUpperCase()) {
       case "APROVADA":
         return "min-w-32 max-w-32 w-full bg-green-600 text-white font-bold px-1 py-4 rounded flex justify-center h-full";
-      case "REJEITADA":
+      case "RECUSADA":
         return "min-w-32 max-w-32 w-full bg-red-600 text-white font-bold px-1 py-4 rounded flex justify-center h-full";
       case "PENDENTE":
-        return "min-w-32 max-w-32 w-full bg-yellow-600 text-white font-bold px-1 py-4 rounded flex justify-center h-full";
+        return "min-w-32 max-w-32 w-full bg-slate-400 text-white font-bold px-1 py-4 rounded flex justify-center h-full";
       case "REENVIADA":
         return "min-w-32 max-w-32 w-full bg-yellow-400 text-white font-bold px-1 py-4 rounded flex justify-center h-full";
       case "DESDOBRADA":
@@ -261,9 +261,9 @@ export default function VisualizacaoSolicitacoes() {
                       </SelectItem>
                       <SelectItem
                         className="bg-red-600 text-white font-bold px-1 py-2 rounded flex justify-center h-full cursor-pointer transition-all"
-                        value="REJEITADA"
+                        value="RECUSADA"
                       >
-                        Rejeitada
+                        Recusada
                       </SelectItem>
                       <SelectItem
                         className="bg-blue-700 text-white font-bold px-1 py-2 rounded flex justify-center h-full cursor-pointer transition-all"
