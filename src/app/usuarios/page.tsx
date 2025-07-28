@@ -4,7 +4,12 @@ import Header from '../../components/header';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
+import { utils } from 'xlsx';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../../components/ui/dialog';
+import { handleCreateUser } from '../../utils/usuarios/handleCreateUser';
+import { handleEditUser } from '../../utils/usuarios/handleEditUSer';
+import { handleDeleteUser } from '../../utils/usuarios/handleDeleteUser';
+// import { handleResetPassword } from '../../utils/usuarios/handleResetPassword';
 // import { useRouter } from 'next/navigation';
 
 // Tipo do usuário conforme a tabela user_profiles
@@ -76,7 +81,7 @@ export default function Usuarios() {
         <Button className="bg-green-600 hover:bg-green-700 mt-6 mb-4 cursor-pointer" onClick={() => setShowModal(true)}>
           Cadastrar novo usuário
         </Button>
-        
+
         {/* Modal de criação */}
         {showModal && (
           <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center">
@@ -152,7 +157,7 @@ export default function Usuarios() {
               <div className="mb-6 text-center">Tem certeza que deseja excluir este usuário?</div>
               <div className="flex flex-row gap-2 justify-end">
                 <Button className="bg-gray-500 hover:bg-gray-600 cursor-pointer" onClick={() => setConfirmDeleteId(null)} type="button">Cancelar</Button>
-                <Button className="bg-red-500 hover:bg-red-600 cursor-pointer" onClick={() => excluirUsuario(confirmDeleteId)} type="button">Excluir</Button>
+                <Button className="bg-red-500 hover:bg-red-600 cursor-pointer" onClick={() => handleDeleteUser(confirmDeleteId)} type="button">Excluir</Button>
               </div>
             </div>
           </div>
