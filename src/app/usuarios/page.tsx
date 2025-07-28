@@ -4,12 +4,10 @@ import Header from '../../components/header';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
-import { utils } from 'xlsx';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../../components/ui/dialog';
 import { handleCreateUser } from '../../utils/usuarios/handleCreateUser';
 import { handleEditUser } from '../../utils/usuarios/handleEditUSer';
 import { handleDeleteUser } from '../../utils/usuarios/handleDeleteUser';
-// import { handleResetPassword } from '../../utils/usuarios/handleResetPassword';
 // import { useRouter } from 'next/navigation';
 
 // Tipo do usuário conforme a tabela user_profiles
@@ -61,6 +59,29 @@ export default function Usuarios() {
   const [resetEmail, setResetEmail] = useState<string | null>(null);
   const [resetStatus, setResetStatus] = useState<string | null>(null);
   const [toast, setToast] = useState<{ message: string, type: 'success' | 'error' } | null>(null);
+
+  useEffect(() => {
+    const fetchUsuarios = async () => {
+      try {
+        const response = await fetch('/api/getUsuarios', {
+          method: 'GET',
+          headers: {
+            'Cache-Control': 'no-cache',
+          },
+          // cache: 'no-store',
+        });
+        if (!response.ok) {
+          throw new Error('Erro ao buscar os Solicitações.');
+        }
+        const data = await response.json();
+        setUsuarios(data);
+      } catch (error) {
+        console.error('Erro ao buscar os Usuários:', error);
+      }
+    }
+
+    fetchUsuarios();
+  }, []);
 
 
   // Toast auto-hide
@@ -205,28 +226,22 @@ export default function Usuarios() {
                 </tr>
               </thead>
               <tbody>
-                {loading ? (
-                  <tr><td colSpan={7} className="text-center py-8 text-gray-400 bg-gray-900">Carregando...</td></tr>
-                ) : usuarios.length === 0 ? (
-                  <tr><td colSpan={7} className="text-center py-8 text-gray-400 bg-slate-800">Nenhum usuário encontrado.</td></tr>
-                ) : (
-                  usuarios.map(usuario => (
-                    <tr key={usuario.id} className="even:bg-slate-700 odd:bg-slate-800 border-b border-slate-700">
-                      <td className="px-4 py-2 break-all">{usuario.id}</td>
-                      <td className="px-4 py-2">{usuario.first_name}</td>
-                      <td className="px-4 py-2">{usuario.last_name}</td>
-                      <td className="px-4 py-2">{usuario.email}</td>
-                      <td className="px-4 py-2">{usuario.role}</td>
-                      <td className="px-4 py-2">{usuario.user_level}</td>
-                      <td className="px-4 py-2">
-                        <div className="flex gap-2">
-                          <Button className="bg-blue-500 hover:bg-blue-600 cursor-pointer" onClick={() => openEditModal(usuario)} size="sm">Editar</Button>
-                          <Button className="bg-red-500 hover:bg-red-600 cursor-pointer" onClick={() => setConfirmDeleteId(usuario.id)} size="sm">Excluir</Button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))
-                )}
+                {usuarios.map(usuario => (
+                  <tr key={usuario.id} className="even:bg-slate-700 odd:bg-slate-800 border-b border-slate-700">
+                    <td className="px-4 py-2 break-all">{usuario.id}</td>
+                    <td className="px-4 py-2">{usuario.first_name}</td>
+                    <td className="px-4 py-2">{usuario.last_name}</td>
+                    <td className="px-4 py-2">{usuario.email}</td>
+                    <td className="px-4 py-2">{usuario.role}</td>
+                    <td className="px-4 py-2">{usuario.user_level}</td>
+                    <td className="px-4 py-2">
+                      <div className="flex gap-2">
+                        <Button className="bg-blue-500 hover:bg-blue-600 cursor-pointer" onClick={() => openEditModal(usuario)} size="sm">Editar</Button>
+                        <Button className="bg-red-500 hover:bg-red-600 cursor-pointer" onClick={() => setConfirmDeleteId(usuario.id)} size="sm">Excluir</Button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>
