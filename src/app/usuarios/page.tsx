@@ -8,10 +8,10 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '
 import { handleCreateUser } from '../../utils/usuarios/handleCreateUser';
 import { handleEditUser } from '../../utils/usuarios/handleEditUSer';
 import { handleDeleteUser } from '../../utils/usuarios/handleDeleteUser';
-// import { useRouter } from 'next/navigation';
+import { fetchUsuarios } from '../../utils/usuarios/fetchUsuarios';
 
 // Tipo do usuário conforme a tabela user_profiles
-interface Usuario {
+export interface Usuario {
   id: string;
   first_name: string;
   last_name: string;
@@ -61,26 +61,7 @@ export default function Usuarios() {
   const [toast, setToast] = useState<{ message: string, type: 'success' | 'error' } | null>(null);
 
   useEffect(() => {
-    const fetchUsuarios = async () => {
-      try {
-        const response = await fetch('/api/getUsuarios', {
-          method: 'GET',
-          headers: {
-            'Cache-Control': 'no-cache',
-          },
-          // cache: 'no-store',
-        });
-        if (!response.ok) {
-          throw new Error('Erro ao buscar os Solicitações.');
-        }
-        const data = await response.json();
-        setUsuarios(data);
-      } catch (error) {
-        console.error('Erro ao buscar os Usuários:', error);
-      }
-    }
-
-    fetchUsuarios();
+    fetchUsuariosList();
   }, []);
 
 
@@ -91,6 +72,73 @@ export default function Usuarios() {
       return () => clearTimeout(timer);
     }
   }, [toast]);
+
+  const handleCreateUserSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      await handleCreateUser(form);
+      setToast({ message: 'Usuário criado com sucesso!', type: 'success' });
+      setShowModal(false);
+      setForm({
+        first_name: '',
+        last_name: '',
+        role: '',
+        user_level: '',
+        email: '',
+        password: '',
+      });
+      fetchUsuariosList(); // Refresh the user list
+    } catch (error) {
+      console.error('Erro ao criar usuário:', error);
+      setToast({ message: 'Erro ao criar usuário.', type: 'error' });
+    }
+  };
+
+  const handleEditUserSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editUser) return;
+    try {
+      await handleEditUser(Number(editUser.id), editForm);
+      setToast({ message: 'Usuário editado com sucesso!', type: 'success' });
+      setEditUser(null);
+      fetchUsuariosList(); // Refresh the user list
+    } catch (error) {
+      console.error('Erro ao editar usuário:', error);
+      setToast({ message: 'Erro ao editar usuário.', type: 'error' });
+    }
+  };
+
+  const handleDeleteUserConfirm = async (id: string) => {
+    try {
+      await handleDeleteUser(Number(id));
+      setToast({ message: 'Usuário excluído com sucesso!', type: 'success' });
+      setConfirmDeleteId(null);
+      fetchUsuariosList(); // Refresh the user list
+    } catch (error) {
+      console.error('Erro ao excluir usuário:', error);
+      setToast({ message: 'Erro ao excluir usuário.', type: 'error' });
+    }
+  };
+
+  const fetchUsuariosList = async () => {
+    try {
+      const data = await fetchUsuarios();
+      setUsuarios(data);
+    } catch (error) {
+      console.error('Erro ao buscar os usuários:', error);
+    }
+  };
+
+  const openEditModal = (usuario: Usuario) => {
+    setEditUser(usuario);
+    setEditForm({
+      first_name: usuario.first_name,
+      last_name: usuario.last_name,
+      role: usuario.role,
+      user_level: usuario.user_level,
+      email: usuario.email,
+    });
+  };
 
   return (
     <>
@@ -109,7 +157,7 @@ export default function Usuarios() {
             <div className="bg-slate-800 rounded-lg shadow-lg p-8 w-full max-w-md relative text-white">
               <button className="absolute top-2 right-3 text-xl" onClick={() => setShowModal(false)} type="button">×</button>
               <h2 className="text-xl font-bold mb-4">Cadastrar novo usuário</h2>
-              <form onSubmit={handleCreateUser} className="flex flex-col gap-3">
+              <form onSubmit={handleCreateUserSubmit} className="flex flex-col gap-3">
                 <div><Label htmlFor="email">E-mail</Label><Input id="email" name="email" value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} required /></div>
                 <div><Label htmlFor="first_name">Nome</Label><Input id="first_name" name="first_name" value={form.first_name} onChange={e => setForm(f => ({ ...f, first_name: e.target.value }))} required /></div>
                 <div><Label htmlFor="last_name">Sobrenome</Label><Input id="last_name" name="last_name" value={form.last_name} onChange={e => setForm(f => ({ ...f, last_name: e.target.value }))} required /></div>
@@ -143,7 +191,7 @@ export default function Usuarios() {
             <div className="bg-slate-800 rounded-lg shadow-lg p-8 w-full max-w-md relative text-white">
               <button className="absolute top-2 right-3 text-xl" onClick={() => setEditUser(null)} type="button">×</button>
               <h2 className="text-xl font-bold mb-4">Editar usuário</h2>
-              <form onSubmit={handleEditUser} className="flex flex-col gap-3">
+              <form onSubmit={handleEditUserSubmit} className="flex flex-col gap-3">
                 <div><Label htmlFor="edit_email">E-mail</Label><Input id="edit_email" name="email" value={editForm.email} onChange={e => setEditForm(f => ({ ...f, email: e.target.value }))} required /></div>
                 <div><Label htmlFor="edit_first_name">Nome</Label><Input id="edit_first_name" name="first_name" value={editForm.first_name} onChange={e => setEditForm(f => ({ ...f, first_name: e.target.value }))} required /></div>
                 <div><Label htmlFor="edit_last_name">Sobrenome</Label><Input id="edit_last_name" name="last_name" value={editForm.last_name} onChange={e => setEditForm(f => ({ ...f, last_name: e.target.value }))} required /></div>
@@ -178,38 +226,12 @@ export default function Usuarios() {
               <div className="mb-6 text-center">Tem certeza que deseja excluir este usuário?</div>
               <div className="flex flex-row gap-2 justify-end">
                 <Button className="bg-gray-500 hover:bg-gray-600 cursor-pointer" onClick={() => setConfirmDeleteId(null)} type="button">Cancelar</Button>
-                <Button className="bg-red-500 hover:bg-red-600 cursor-pointer" onClick={() => handleDeleteUser(confirmDeleteId)} type="button">Excluir</Button>
+                <Button className="bg-red-500 hover:bg-red-600 cursor-pointer" onClick={() => handleDeleteUserConfirm(confirmDeleteId)} type="button">Excluir</Button>
               </div>
             </div>
           </div>
         )}
-        {/* Dialog de redefinir senha */}
-        <Dialog open={!!resetEmail} onOpenChange={open => { if (!open) { setResetEmail(null); setResetStatus(null); } }}>
-          <DialogContent className="bg-slate-800 border-none">
-            <DialogHeader>
-              <DialogTitle className="text-white">Redefinir senha</DialogTitle>
-            </DialogHeader>
-            <div className="mb-6 text-center text-white">Tem certeza que quer redefinir a senha?</div>
-            {resetStatus && <div className="mb-4 text-center text-sm text-green-400">{resetStatus}</div>}
-            <DialogFooter className="flex flex-row gap-2 justify-end">
-              <Button
-                className="bg-gray-500 hover:bg-gray-600 text-white border-none cursor-pointer"
-                variant="secondary"
-                onClick={() => { setResetEmail(null); setResetStatus(null); }}
-                type="button"
-              >
-                Cancelar
-              </Button>
-              <Button
-                className="bg-yellow-600 hover:bg-yellow-700 cursor-pointer text-white"
-                onClick={async () => { if (resetEmail) await handleResetPassword(resetEmail); }}
-                type="button"
-              >
-                Sim
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+
         {/* Tabela de usuários */}
         <div className="w-full max-w-4xl mt-6">
           <div className="overflow-x-auto">
