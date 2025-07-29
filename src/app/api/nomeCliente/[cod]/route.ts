@@ -2,11 +2,17 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
     const url = new URL(req.url);
-    const codClient = url.pathname.split("/").pop();
+    const codProd = url.pathname.split("/").pop();
     let connection;
 
     console.log("Importando oracledb...");
     const oracledb = (await import("oracledb")).default;
+
+    // // Liberação do Instant Client no Windows
+    // oracledb.initOracleClient({ libDir: "C:\\instantclient\\instantclient_23_5" });
+
+    // // PARA UBUNTU
+    // oracledb.initOracleClient({ libDir: '/bot/instantclient' });
 
     try {
         console.log('Connecting to Oracle database...');
@@ -16,10 +22,10 @@ export async function GET(req: NextRequest) {
             connectString: process.env.DB_HOST
         });
 
-        console.log('Executando consulta para o Cliente:', codClient);
+        console.log('Executando consulta para o Produto:', codProd);
         const result = await connection.execute(
-            `SELECT DESCRICAO FROM PCPRODUT WHERE CODPROD = :cod`,
-        [codClient]
+            `SELECT CLIENTE FROM PCCLIENT WHERE CODCLI = :cod`,
+        [codProd]
         );
 
         if (!result.rows || result.rows.length === 0) {
@@ -27,13 +33,13 @@ export async function GET(req: NextRequest) {
         }
 
         const row = result.rows[0] as unknown[];
-        const nameClient = row[0] as string;
-        console.log("Nome do Cliente:", nameClient);
+        const nameProd = row[0] as string;
+        console.log("Nome do Produto:", nameProd);
 
-        return NextResponse.json({ nameClient });
+        return NextResponse.json({ nameProd });
     } catch (err) {
         console.error("Erro Oracle:", err);
-        return NextResponse.json({ error: "Erro ao buscar cliente" }, { status: 500 });
+        return NextResponse.json({ error: "Erro ao buscar produto" }, { status: 500 });
     } finally {
         if (connection) await connection.close();
     }

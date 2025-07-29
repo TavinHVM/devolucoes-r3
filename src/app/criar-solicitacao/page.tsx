@@ -96,6 +96,12 @@ export async function fetchNameProd(cod: string): Promise<string> {
   return data.nameProd || "";
 }
 
+export async function fetchNameClient(cod: string): Promise<string> {
+  const res = await fetch(`/api/nomeCliente/${cod}`);
+  const data = await res.json();
+  return data.nameClient || "";
+}
+
 export default function Solicitacao() {
   const [toast, setToast] = useState<{
     message: string;
@@ -105,17 +111,11 @@ export default function Solicitacao() {
   const [codigoRca, setCodigoRca] = useState<string>("");
   const [numeroNota, setNumeroNota] = useState<string>("");
   const [nomeProd, setNomeProd] = useState<string>("");
+  const [nomeClient, setNomeClient] = useState<string>("");
   const [numeroQuantidade, setNumeroQuantidade] = useState<string>("");
   const [numeroCarga, setNumeroCarga] = useState<string>("");
   const [numeroCodigoCobranca, setNumeroCodigoCobranca] = useState<string>("");
   const [numeroCodigoCliente, setNumeroCodigoCliente] = useState<string>("");
-  // const [produtcsLists[], setProductsList[]] = useState<string[]>("");
-
-// interface productsList {
-//   name: string;
-//   codprod: string;
-//   quantidade: string; 
-// }
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -150,14 +150,26 @@ export default function Solicitacao() {
   useEffect(() => {
     const fetchProduct = async () => {
       if (codigo.length === 4) {
-        const nome = await fetchNameProd(codigo);
-        setNomeProd(nome);
+        const nome_produto = await fetchNameProd(codigo);
+        setNomeProd(nome_produto);
       } else {
         setNomeProd("");
       }
     };
     fetchProduct();
   }, [codigo]);
+
+  useEffect(() => {
+    const fetchClient = async () => {
+      if (numeroCodigoCliente.length >= 4 && numeroCodigoCliente.length <= 5) {
+        const nome_cliente = await fetchNameClient(numeroCodigoCliente);
+        setNomeClient(nome_cliente);
+      } else {
+        setNomeClient("");
+      }
+    };
+    fetchClient();
+  }, [numeroCodigoCliente]);
 
   // Função nova para salvar no banco, adptar ela em relação à antiga
 
@@ -225,23 +237,40 @@ export default function Solicitacao() {
               >
                 <div className="grid grid-cols-1 gap-2 lg:grid-cols-2">
                   <FormField
-                    control={form.control}
-                    name="nome"
-                    render={({ field }) => (
-                      <FormItem className="w-full col-span-2">
-                        <FormLabel className="text-white">Nome:</FormLabel>
-                        <FormControl className="bg-slate-700 text-white border-slate-600 placeholder:text-white/40 w-full">
-                          <Input
-                            type="text"
-                            {...field}
-                            className="w-full"
-                            placeholder="Nome na nota"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                      control={form.control}
+                      name="codigo_cliente"
+                      render={({ field }) => (
+                        <FormItem className="w-full">
+                          <FormLabel className="text-white">
+                            Código do Cliente:
+                          </FormLabel>
+                          <FormControl className="bg-slate-700 text-white border-slate-600 placeholder:text-white/40 w-full">
+                            <Input
+                              type="text"
+                              {...field}
+                              className="w-full"
+                              placeholder="Código do Cliente"
+                              value={numeroCodigoCliente}
+                              maxLength={5}
+                              onChange={(e) => {
+                                const val = e.target.value;
+                                if (/^\d*$/.test(val)) {
+                                  setNumeroCodigoCliente(val);
+                                  field.onChange(val); // sincroniza com react-hook-form
+                                }
+                              }}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  <div className="flex flex-col w-full text-white text-sm">
+                    <span className="font-bold">Nome do Cliente:</span>
+                    <span className="w-full border-1 border-slate-600 bg-slate-700 p-2 rounded-md text-white/60">
+                      {nomeClient ? nomeClient : "CLIENTE NÃO ENCONTRADO"}
+                    </span>
+                  </div>
                   <FormField
                     control={form.control}
                     name="numero_nf"
@@ -341,32 +370,7 @@ export default function Solicitacao() {
                         </FormItem>
                       )}
                     />
-                    <FormField
-                      control={form.control}
-                      name="codigo_cliente"
-                      render={({ field }) => (
-                        <FormItem className="w-full">
-                          <FormLabel className="text-white">
-                            Código do Cliente:
-                          </FormLabel>
-                          <FormControl className="bg-slate-700 text-white border-slate-600 placeholder:text-white/40 w-full">
-                            <Input
-                              type="text"
-                              {...field}
-                              className="w-full"
-                              placeholder="Código do Cliente"
-                              value={numeroCodigoCliente}
-                              maxLength={5}
-                              onChange={(e) => {
-                                const val = e.target.value;
-                                if (/^\d*$/.test(val)) setNumeroCodigoCliente(val); // permite apenas números
-                              }}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                    
                   </div>
                 </div>
                 <FormField

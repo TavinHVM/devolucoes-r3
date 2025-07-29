@@ -9,43 +9,43 @@ export async function POST(request: Request) {
         const id: number = parseInt(url.pathname.split("/").pop() || "0", 10);
 
         const solicitacao = await db.solicitacoes.findUnique({
-            where: {
-                id: id,
-            },
-            select: {
-                status: true,
-                id: true,
-            },
+        where: {
+            id: id,
+        },
+        select: {
+            status: true,
+            id: true,
+        },
         });
 
         if (!solicitacao) {
-            console.log("Solicitação não encontrada");
-            return NextResponse.json([], { status: 404 });
+        console.log("Solicitação não encontrada");
+        return NextResponse.json([], { status: 404 });
         }
 
         const statusOnData = (solicitacao.status).toUpperCase();
-            if (statusOnData !== "PENDENTE") {
+        if (statusOnData !== "APROVADA") {
             return NextResponse.json(
-                { error: `Solicitação está ${statusOnData} e não pode ser APROVADA.` },
+                { error: "Solicitação não está APROVADA e não pode ser DESDOBRADA." },
                 { status: 400 }
             );
         }
 
         console.log(
-        "Solicitações encontradas!\n Id da Solicitação:",
+        "Solicitação encontrada!\n Id da Solicitação:",
         solicitacao.id
         );
 
         await db.solicitacoes.update({
-            where: {
-                id: id,
-            },
-            data: {
-                status: "APROVADA",
-            },
+        where: {
+            id: id,
+        },
+        data: {
+            status: "DESDOBRADA",
+        },
         });
 
-        console.log("Solicitação Aprovada!");
+        console.log("Solicitação DESDOBRADA!");
         return NextResponse.json(solicitacao);
     } catch (error) {
         console.error("Erro ao buscar Solicitação:", error);

@@ -1,24 +1,12 @@
 'use client';
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-// import { supabase } from '../lib/supabaseClient';
+// import { useEffect, useState } from 'react';
+// import { useRouter } from 'next/navigation';
 import Header from '../components/header';
 
 export default function Home() {
-  const router = useRouter();
+  // const router = useRouter();
   // const [loading, setLoading] = useState(true);
 
-  // useEffect(() => {
-  //   async function checkAuth() {
-  //     const { data: { session } } = await supabase.auth.getSession();
-  //     if (!session) {
-  //       router.replace('/login');
-  //     } else {
-  //       setLoading(false);
-  //     }
-  //   }
-  //   checkAuth();
-  // }, [router]);
 
   // if (loading) {
   //   return <div className="flex h-screen items-center justify-center bg-gray-900 text-white">Carregando...</div>;

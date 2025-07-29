@@ -36,13 +36,20 @@ import {
   TableRow,
 } from "../../components/ui/table";
 import OrderBtn from "@/components/orderBtn";
-import { X } from 'lucide-react';
+import { X } from "lucide-react";
 import { DialogClose } from "@radix-ui/react-dialog";
-import { RefreshCw } from 'lucide-react';
-import AprovarSolicitacao from "@/utils/solicitacoes/aprovarSolicitacoes";
+import { RefreshCw } from "lucide-react";
 import { filterTableHeader } from "@/utils/filters/filterTableHeader";
 import { filterBySearch } from "@/utils/filters/filterBySearch";
 import { filterByStatus } from "@/utils/filters/filterByStatus";
+import {
+  AprovarSolicitacao,
+  RecusarSolicitacao,
+  ReenviarSolicitacao,
+  DesdobrarSolicitacao,
+  AbaterSolicitacao,
+  FinalizarSolicitacao,
+} from "@/utils/solicitacoes/botoesSolicitacoes";
 
 type Solicitacao = {
   id: number;
@@ -79,7 +86,9 @@ export default function VisualizacaoSolicitacoes() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 15;
   const [refreshing, setRefreshing] = useState(false);
-  const [sortColumns, setSortColumns] = useState<{ column: string; direction: "asc" | "desc" }[]>([]);
+  const [sortColumns, setSortColumns] = useState<
+    { column: string; direction: "asc" | "desc" }[]
+  >([]);
 
   // Função para buscar as solicitações
   useEffect(() => {
@@ -87,33 +96,33 @@ export default function VisualizacaoSolicitacoes() {
       try {
         setRefreshing(true);
 
-        const response = await fetch('/api/getSolicitacoes', {
-          method: 'GET',
+        const response = await fetch("/api/getSolicitacoes", {
+          method: "GET",
           headers: {
-            'Cache-Control': 'no-cache',
+            "Cache-Control": "no-cache",
           },
           // cache: 'no-store',
         });
         if (!response.ok) {
-          throw new Error('Erro ao buscar os Solicitações.');
+          throw new Error("Erro ao buscar os Solicitações.");
         }
         const data = await response.json();
         setSolicitacoes(data);
       } catch (error) {
-        console.error('Erro ao buscar os Solicitações:', error);
+        console.error("Erro ao buscar os Solicitações:", error);
       }
       // setLoading(false);
       setRefreshing(false);
-    }
+    };
 
     fetchSolicitacoes();
   }, []);
 
   // Função para ordenar/adicionar coluna com prioridade da esquerda para a direita
   function handleSort(column: string, direction: "asc" | "desc") {
-    setSortColumns(prev => {
+    setSortColumns((prev) => {
       // Remove a coluna se já existir
-      const filtered = prev.filter(s => s.column !== column);
+      const filtered = prev.filter((s) => s.column !== column);
       // Adiciona no início (maior prioridade)
       return [{ column, direction }, ...filtered];
     });
@@ -121,7 +130,7 @@ export default function VisualizacaoSolicitacoes() {
 
   // Função para remover ordenação de uma coluna
   function handleClearSort(column: string) {
-    setSortColumns(prev => prev.filter(s => s.column !== column));
+    setSortColumns((prev) => prev.filter((s) => s.column !== column));
   }
 
   // Ordenação multi-coluna
@@ -140,7 +149,9 @@ export default function VisualizacaoSolicitacoes() {
               : bDate.getTime() - aDate.getTime();
           }
         } else if (typeof aValue === "string" && typeof bValue === "string") {
-          if (aValue.localeCompare(bValue, "pt-BR", { sensitivity: "base" }) !== 0) {
+          if (
+            aValue.localeCompare(bValue, "pt-BR", { sensitivity: "base" }) !== 0
+          ) {
             return sort.direction === "asc"
               ? aValue.localeCompare(bValue, "pt-BR", { sensitivity: "base" })
               : bValue.localeCompare(aValue, "pt-BR", { sensitivity: "base" });
@@ -185,9 +196,9 @@ export default function VisualizacaoSolicitacoes() {
       case "DESDOBRADA":
         return "min-w-32 max-w-32 w-full bg-blue-500 text-white font-bold px-1 py-4 rounded flex justify-center h-full";
       case "ABATIDA":
-        return "min-w-32 max-w-32 w-full bg-stone-600 text-white font-bold px-1 py-4 rounded flex justify-center h-full";
+        return "min-w-32 max-w-32 w-full bg-yellow-600 text-white font-bold px-1 py-4 rounded flex justify-center h-full";
       case "FINALIZADA":
-        return "min-w-32 max-w-32 w-full bg-gray-500 text-white font-bold px-1 py-4 rounded flex justify-center h-full";
+        return "min-w-32 max-w-32 w-full bg-lime-500 text-white font-bold px-1 py-4 rounded flex justify-center h-full";
       default:
         return "min-w-32 max-w-32 w-full bg-blue-900 text-white font-bold px-1 py-4 rounded flex justify-center h-full";
     }
@@ -195,7 +206,10 @@ export default function VisualizacaoSolicitacoes() {
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = finalSolicitacoes.slice(indexOfFirstItem, indexOfLastItem);
+  const currentItems = finalSolicitacoes.slice(
+    indexOfFirstItem,
+    indexOfLastItem
+  );
   const totalPages = Math.ceil(finalSolicitacoes.length / itemsPerPage);
   const startPage = Math.max(1, currentPage - 7); // Começa 7 páginas antes do número atual
   const endPage = Math.min(totalPages, startPage + 14); // Termina 15 páginas após o início
@@ -234,7 +248,6 @@ export default function VisualizacaoSolicitacoes() {
                     value={status}
                     onValueChange={(v) => {
                       setStatus(v || "Todos");
-
                     }}
                   >
                     <SelectTrigger className="w-40 bg-slate-700 text-white border-slate-600 cursor-pointer">
@@ -319,7 +332,6 @@ export default function VisualizacaoSolicitacoes() {
                           onSort={handleSort}
                           onClearSort={handleClearSort}
                         />
-
                       </TableHead>
                       <TableHead className="text-white whitespace-nowrap">
                         <OrderBtn
@@ -437,8 +449,9 @@ export default function VisualizacaoSolicitacoes() {
                         <Dialog key={s.id}>
                           <DialogTrigger asChild>
                             <TableRow
-                              className={`border-slate-700 cursor-pointer transition-all hover:bg-slate-600 ${idx % 2 === 0 ? "bg-slate-700" : ""
-                                }`}
+                              className={`border-slate-700 cursor-pointer transition-all hover:bg-slate-600 ${
+                                idx % 2 === 0 ? "bg-slate-700" : ""
+                              }`}
                             >
                               <TableCell className="pl-6">{s.id}</TableCell>
                               <TableCell>{truncateText(s.nome, 15)}</TableCell>
@@ -474,7 +487,7 @@ export default function VisualizacaoSolicitacoes() {
                                   <Button
                                     className="bg-blue-600 hover:bg-blue-700 text-white cursor-pointer"
                                     variant="secondary"
-                                  // onClick={() => baixarAnexo(s.arquivo_url)}
+                                    // onClick={() => baixarAnexo(s.arquivo_url)}
                                   >
                                     Baixar NF
                                   </Button>
@@ -484,123 +497,122 @@ export default function VisualizacaoSolicitacoes() {
                           </DialogTrigger>
 
                           {/* Dialog */}
-                          <DialogTitle></DialogTitle>
                           <DialogContent className="min-w-[50%] max-h-[95%] overflow-y-auto rounded-xl scrollbar-dark">
+                            <DialogTitle></DialogTitle>
                             <div className="grid grid-cols-3 gap-4 p-6 text-white rounded-lg relative">
-                              <DialogClose className="absolute right-0" />
                               <DialogClose className="absolute right-0">
-                                <Button className="cursor-pointer p-0 py-2 w-8 h-auto m-0 bg-red-500 hover:bg-red-700 transition-all flex items-center justify-center shadow-transparent">
-                                  <X className="items-center p-0" style={{
-                                    width: "18px",
-                                    height: "18px",
-                                    strokeWidth: "5px"
-                                  }} />
-                                </Button>
+                                <span className="rounded-md cursor-pointer p-0 py-2 w-8 h-auto m-0 bg-red-500 hover:bg-red-700 transition-all flex items-center justify-center shadow-transparent">
+                                  <X
+                                    className="items-center p-0"
+                                    style={{
+                                      width: "18px",
+                                      height: "18px",
+                                      strokeWidth: "5px",
+                                    }}
+                                  />
+                                </span>
                               </DialogClose>
+
                               <div className="flex gap-2 items-center">
                                 <span className="font-bold bg-slate-700 p-1 rounded-md">
                                   Nome:
                                 </span>
-                                <span>{s.nome}</span>
-                              </div>
-                              <div className="flex gap-2 items-center">
-                                <span className="font-bold bg-slate-700 p-1 rounded-md">
-                                  Filial:
+                                <span className="text-white text-lg">
+                                  {s.nome}
                                 </span>
-                                <span>{s.filial}</span>
                               </div>
-                              <div className="flex gap-2 items-center">
-                                <span className="font-bold bg-slate-700 p-1 rounded-md">
-                                  Nº NF:
-                                </span>
-                                <span>{s.numero_nf}</span>
-                              </div>
-                              <div className="flex gap-2 items-center">
-                                <span className="font-bold bg-slate-700 p-1 rounded-md">
-                                  Carga:
-                                </span>
-                                <span>{s.numero_nf}</span>
-                              </div>
-                              <div className="flex gap-2 items-center">
-                                <span className="font-bold bg-slate-700 p-1 rounded-md">
-                                  Cód. Cobrança:
-                                </span>
-                                <span>{s.cod_cobranca}</span>
-                              </div>
-                              <div className="flex gap-2 items-center">
-                                <span className="font-bold bg-slate-700 p-1 rounded-md">
-                                  Cód. Cliente:
-                                </span>
-                                <span>{s.cod_cliente}</span>
-                              </div>
-                              <div className="flex gap-2 items-center">
-                                <span className="font-bold bg-slate-700 p-1 rounded-md">
-                                  RCA:
-                                </span>
-                                <span>{s.rca}</span>
-                              </div>
-                              <div className="flex gap-2 items-center">
-                                <span className="font-bold bg-slate-700 p-1 rounded-md">
-                                  Vale:
-                                </span>
-                                <span>{s.vale}</span>
-                              </div>
-                              <Card className="flex flex-col items-center justify-center col-span-3 bg-slate-600">
-                                <CardHeader className="flex items-center justify-center text-center w-full">
-                                  <span className="font-bold bg-slate-00 w-full text-white text-center text-xl">
-                                    Motivo da Devolução:
-                                  </span>
+
+                              <Card className="bg-slate-600 text-white col-span-3 max-h-80 flex flex-col gap-0 p-0">
+                                <CardHeader className="text-center font-bold text-xl py-2">
+                                  PRODUTOS
                                 </CardHeader>
-                                <CardContent className="w-[96%] p-6 rounded-md h-40 overflow-y-scroll scrollbar-dark">
-                                  <span className="text-white text-lg min-h-[100%] max-h-[100%]">
-                                    {s.motivo_devolucao}
-                                  </span>
+                                <CardContent className="w-full p-0">
+                                  <div className="flex min-w-full bg-slate-800">
+                                    <div className="w-[25%] py-2 text-lg text-center border-r-2 border-white">
+                                      <span className="text-white font-bold">
+                                        Código Produto
+                                      </span>
+                                    </div>
+                                    <div className="w-[50%] py-2 text-lg text-center border-l-2 border-r-2 border-white">
+                                      <span className="text-white font-bold">
+                                        Nome
+                                      </span>
+                                    </div>
+                                    <div className="w-[25%] py-2 text-lg text-center border-l-2 border-white">
+                                      <span className="text-white font-bold">
+                                        Quantidade
+                                      </span>
+                                    </div>
+                                  </div>
+                                  {/* Produtos */}
+                                  <Table className="bg-slate-500 max-h-24 h-10">
+                                    <TableBody className="mx-6 px-32">
+                                      {Array.isArray(s.products_list) &&
+                                        s.products_list.map(
+                                          (p: {
+                                            codigo: number;
+                                            descricao: string;
+                                            quantidade: number;
+                                          }) => (
+                                            <TableRow
+                                              key={p.codigo}
+                                              className="px-32 w-full"
+                                            >
+                                              <TableCell className="text-center w-[25%] text-lg">
+                                                {p.codigo}
+                                              </TableCell>
+                                              <TableCell className="text-lg">
+                                                {p.descricao}
+                                              </TableCell>
+                                              <TableCell className="pl-8 w-[25%] text-center text-lg">
+                                                {p.quantidade}
+                                              </TableCell>
+                                            </TableRow>
+                                          )
+                                        )}
+                                    </TableBody>
+                                  </Table>
                                 </CardContent>
                               </Card>
 
-                              <Card className="bg-slate-600 text-white col-span-3 max-h-80 flex gap-0 p-0">
-                                <span className="text-center font-bold text-xl py-2">
-                                  PRODUTOS
-                                </span>
-                                <div className="flex min-w-full bg-slate-800">
-                                  <div className="w-[25%] py-2 text-lg text-center border-r-2 border-white">
-                                    <span className="text-white font-bold">Código Produto</span>
-                                  </div>
-                                  <div className="w-[50%] py-2 text-lg text-center border-l-2 border-r-2 border-white">
-                                    <span className="text-white font-bold">Nome</span>
-                                  </div>
-                                  <div className="w-[25%] py-2 text-lg text-center border-l-2 border-white">
-                                    <span className="text-white font-bold">Quantidade</span>
-                                  </div>
-                                </div>
-                                {/* Produtos */}
-                                <Table className="bg-slate-500 max-h-24 h-10">
-                                  <TableHeader className="mx-6">
-                                    <TableRow className="mx-6">
-                                    </TableRow>
-                                  </TableHeader>
-                                  <TableBody className="mx-6 px-32">
-                                    {Array.isArray(s.products_list) && s.products_list.map((p: { codigo: number, descricao: string, quantidade: number }) => (
-                                      <TableRow
-                                        key={p.codigo}
-                                        className="px-32 w-full"
-                                      >
-                                        <TableCell className="text-center w-[25%] text-lg">
-                                          {p.codigo}
-                                        </TableCell>
-                                        <TableCell className="text-lg">{p.descricao}</TableCell>
-                                        <TableCell className="pl-8 w-[25%] text-center text-lg">
-                                          {p.quantidade}
-                                        </TableCell>
-                                      </TableRow>
-                                    ))}
-                                  </TableBody>
-                                </Table>
-                                <Button className="bg-green-600 cursor-pointer transition-all"
-                                  onClick={() => AprovarSolicitacao(s.id)}>
+                              <div className="grid grid-cols-3 gap-2 col-span-3 w-full justify-between px-8">
+                                <Button
+                                  className="bg-green-600 cursor-pointer transition-all"
+                                  onClick={() => AprovarSolicitacao(s.id)}
+                                >
                                   Aprovar
                                 </Button>
-                              </Card>
+                                <Button
+                                  className="bg-blue-700 cursor-pointer transition-all"
+                                  onClick={() => DesdobrarSolicitacao(s.id)}
+                                >
+                                  Desdobrar
+                                </Button>
+                                <Button
+                                  className="bg-yellow-600 cursor-pointer transition-all"
+                                  onClick={() => AbaterSolicitacao(s.id)}
+                                >
+                                  Abater
+                                </Button>
+                                <Button
+                                  className="bg-lime-500 cursor-pointer transition-all"
+                                  onClick={() => FinalizarSolicitacao(s.id)}
+                                >
+                                  Finalizar
+                                </Button>
+                                <Button
+                                  className="bg-red-600 cursor-pointer transition-all"
+                                  onClick={() => RecusarSolicitacao(s.id)}
+                                >
+                                  Recusar
+                                </Button>
+                                <Button
+                                  className="bg-yellow-400 cursor-pointer transition-all"
+                                  onClick={() => ReenviarSolicitacao(s.id)}
+                                >
+                                  Reenviar
+                                </Button>
+                              </div>
                             </div>
                           </DialogContent>
                         </Dialog>
@@ -622,21 +634,51 @@ export default function VisualizacaoSolicitacoes() {
                 <Pagination className="mt-4">
                   <PaginationContent>
                     <PaginationItem>
-                      <PaginationPrevious namePrevious="Primeira Página" href="#" onClick={() => setCurrentPage(1)} />
+                      <PaginationPrevious
+                        namePrevious="Primeira Página"
+                        href="#"
+                        onClick={() => setCurrentPage(1)}
+                      />
                     </PaginationItem>
                     <PaginationItem>
-                      <PaginationPrevious namePrevious="Anterior" href="#" onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))} />
+                      <PaginationPrevious
+                        namePrevious="Anterior"
+                        href="#"
+                        onClick={() =>
+                          setCurrentPage((prev) => Math.max(prev - 1, 1))
+                        }
+                      />
                     </PaginationItem>
                     {[...Array(endPage - startPage + 1)].map((_, i) => (
                       <PaginationItem key={i + startPage}>
-                        <PaginationLink className={currentPage === i + startPage ? "bg-slate-600" : ""} href="#" onClick={() => setCurrentPage(i + startPage)}>{i + startPage}</PaginationLink>
+                        <PaginationLink
+                          className={
+                            currentPage === i + startPage ? "bg-slate-600" : ""
+                          }
+                          href="#"
+                          onClick={() => setCurrentPage(i + startPage)}
+                        >
+                          {i + startPage}
+                        </PaginationLink>
                       </PaginationItem>
                     ))}
                     <PaginationItem>
-                      <PaginationNext nameNext="Próxima" href="#" onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))} />
+                      <PaginationNext
+                        nameNext="Próxima"
+                        href="#"
+                        onClick={() =>
+                          setCurrentPage((prev) =>
+                            Math.min(prev + 1, totalPages)
+                          )
+                        }
+                      />
                     </PaginationItem>
                     <PaginationItem>
-                      <PaginationNext nameNext="Última Página" href="#" onClick={() => setCurrentPage(totalPages)} />
+                      <PaginationNext
+                        nameNext="Última Página"
+                        href="#"
+                        onClick={() => setCurrentPage(totalPages)}
+                      />
                     </PaginationItem>
                   </PaginationContent>
                 </Pagination>
