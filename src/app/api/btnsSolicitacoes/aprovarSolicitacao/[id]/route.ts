@@ -26,7 +26,7 @@ export async function POST(request: Request) {
         const statusOnData = (solicitacao.status).toUpperCase();
             if (statusOnData !== "PENDENTE") {
             return NextResponse.json(
-                { error: "Solicitação não está pendente e não pode ser aprovada." },
+                { error: `Solicitação está ${statusOnData} e não pode ser APROVADA.` },
                 { status: 400 }
             );
         }

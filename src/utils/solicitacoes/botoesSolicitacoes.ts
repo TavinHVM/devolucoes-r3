@@ -1,17 +1,29 @@
 export async function AprovarSolicitacao(id: number) {
     try {
         const response = await fetch(`/api/btnsSolicitacoes/aprovarSolicitacao/${id}`, {
-        method: "POST",
-        headers: {
-            "Cache-Control": "no-cache",
-        },
-        // cache: 'no-store',
+            method: "POST",
+            headers: {
+                "Cache-Control": "no-cache",
+            },
         });
+
         if (!response.ok) {
-        throw new Error("Erro ao mudar Status da solicitação para Aprovada.");
+            const data = await response.json().catch(() => null);
+
+            const errorMessage =
+                (data && typeof data.error === "string" && data.error) ||
+                "Erro ao mudar Status da solicitação para Aprovada.";
+
+            throw new Error(errorMessage);
         }
+
+        return await response.json();
     } catch (error) {
-        console.error("Erro ao mudar Status da solicitação para Aprovada:", error);
+        if (error instanceof Error) {
+            console.error(error.message); // Aqui você pode exibir com toast.error(error.message)
+        } else {
+            console.error("Erro inesperado ao mudar Status da solicitação para Aprovada.");
+        }
     }
 }
 

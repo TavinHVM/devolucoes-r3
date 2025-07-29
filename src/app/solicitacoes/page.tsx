@@ -186,9 +186,9 @@ const filteredSolicitacoes = sortedSolicitacoes.filter((s) => {
       case "DESDOBRADA":
         return "min-w-32 max-w-32 w-full bg-blue-500 text-white font-bold px-1 py-4 rounded flex justify-center h-full";
       case "ABATIDA":
-        return "min-w-32 max-w-32 w-full bg-stone-600 text-white font-bold px-1 py-4 rounded flex justify-center h-full";
+        return "min-w-32 max-w-32 w-full bg-yellow-600 text-white font-bold px-1 py-4 rounded flex justify-center h-full";
       case "FINALIZADA":
-        return "min-w-32 max-w-32 w-full bg-gray-500 text-white font-bold px-1 py-4 rounded flex justify-center h-full";
+        return "min-w-32 max-w-32 w-full bg-lime-500 text-white font-bold px-1 py-4 rounded flex justify-center h-full";
       default:
         return "min-w-32 max-w-32 w-full bg-blue-900 text-white font-bold px-1 py-4 rounded flex justify-center h-full";
     }
@@ -485,18 +485,17 @@ const filteredSolicitacoes = sortedSolicitacoes.filter((s) => {
                           </DialogTrigger>
 
                           {/* Dialog */}
-                          <DialogTitle></DialogTitle>
                           <DialogContent className="min-w-[50%] max-h-[95%] overflow-y-auto rounded-xl scrollbar-dark">
+                          <DialogTitle></DialogTitle>
                             <div className="grid grid-cols-3 gap-4 p-6 text-white rounded-lg relative">
-                              <DialogClose className="absolute right-0" />
                                 <DialogClose className="absolute right-0">
-                                  <Button className="cursor-pointer p-0 py-2 w-8 h-auto m-0 bg-red-500 hover:bg-red-700 transition-all flex items-center justify-center shadow-transparent">
+                                  <span className="rounded-md cursor-pointer p-0 py-2 w-8 h-auto m-0 bg-red-500 hover:bg-red-700 transition-all flex items-center justify-center shadow-transparent">
                                     <X className="items-center p-0" style={{
                                       width: "18px",
                                       height: "18px",
                                       strokeWidth: "5px"
                                     }} />
-                                  </Button>
+                                  </span>
                                 </DialogClose>
                                 <div className="flex gap-2 items-center">
                                   <span className="font-bold bg-slate-700 p-1 rounded-md">
