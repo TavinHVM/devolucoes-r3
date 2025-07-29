@@ -460,7 +460,7 @@ export default function CodCobranca() {
               </DialogTitle>
               <div className="py-4">
                 <p className="text-white">
-                  Tem certeza que deseja excluir o código de cobrança "{selectedCodigo?.codigo}" - "{selectedCodigo?.nome}"?
+                  Tem certeza que deseja excluir o código de cobrança {selectedCodigo?.codigo} - {selectedCodigo?.nome}?
                 </p>
                 <p className="text-red-400 text-sm mt-2">
                   Esta ação não pode ser desfeita.
