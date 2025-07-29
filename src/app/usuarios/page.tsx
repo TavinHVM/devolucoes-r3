@@ -5,10 +5,8 @@ import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../../components/ui/dialog';
-import { handleCreateUser } from '../../utils/usuarios/handleCreateUser';
-import { handleEditUser } from '../../utils/usuarios/handleEditUSer';
-import { handleDeleteUser } from '../../utils/usuarios/handleDeleteUser';
 import { fetchUsuarios } from '../../utils/usuarios/fetchUsuarios';
+import { createUser, editUser as editUserAPI, deleteUser } from '../../utils/usuarios/apiUtils';
 
 // Tipo do usuário conforme a tabela user_profiles
 export interface Usuario {
@@ -76,7 +74,7 @@ export default function Usuarios() {
   const handleCreateUserSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await handleCreateUser(form);
+      await createUser(form);
       setToast({ message: 'Usuário criado com sucesso!', type: 'success' });
       setShowModal(false);
       setForm({
@@ -87,7 +85,7 @@ export default function Usuarios() {
         email: '',
         password: '',
       });
-      fetchUsuariosList(); // Refresh the user list
+      fetchUsuariosList();
     } catch (error) {
       console.error('Erro ao criar usuário:', error);
       setToast({ message: 'Erro ao criar usuário.', type: 'error' });
@@ -98,10 +96,10 @@ export default function Usuarios() {
     e.preventDefault();
     if (!editUser) return;
     try {
-      await handleEditUser(Number(editUser.id), editForm);
+      await editUserAPI(Number(editUser.id), editForm);
       setToast({ message: 'Usuário editado com sucesso!', type: 'success' });
       setEditUser(null);
-      fetchUsuariosList(); // Refresh the user list
+      fetchUsuariosList();
     } catch (error) {
       console.error('Erro ao editar usuário:', error);
       setToast({ message: 'Erro ao editar usuário.', type: 'error' });
@@ -110,7 +108,7 @@ export default function Usuarios() {
 
   const handleDeleteUserConfirm = async (id: string) => {
     try {
-      await handleDeleteUser(Number(id));
+      await deleteUser(id);
       setToast({ message: 'Usuário excluído com sucesso!', type: 'success' });
       setConfirmDeleteId(null);
       fetchUsuariosList(); // Refresh the user list
