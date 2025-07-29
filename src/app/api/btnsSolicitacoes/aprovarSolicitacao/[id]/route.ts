@@ -5,8 +5,10 @@ import { NextResponse } from 'next/server';
 import db from '@/lib/db';
 
 export async function POST(request: Request) {
+    const url = new URL(request.url);
     try {
-        const { id } = await request.json();
+        const id: number = parseInt(url.pathname.split("/").pop() || '0', 10);
+        // const { id } = await request.json();
 
         const solicitacao = await db.solicitacoes.findUnique({
             where: {

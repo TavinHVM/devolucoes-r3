@@ -34,33 +34,33 @@ import { useState, useEffect } from "react";
 const formSchema = z.object({
   nome: z
     .string()
-    .min(1, { message: "CPF obrigatório" })
-    .max(14, { message: "CPF inválido" }),
-  filial: z.string().min(1, { message: "Filial obrigatória" }),
-  numero_nf: z.string().min(1, { message: "Número da NF obrigatório" }),
-  carga: z.string().min(1, { message: "Número da Carga obrigatório" }),
+    .min(1, { message: "" })
+    .max(14, { message: "" }),
+  filial: z.string().min(1, { message: "" }),
+  numero_nf: z.string().min(1, { message: "" }),
+  carga: z.string().min(1, { message: "" }),
   codigo_cobranca: z
     .string()
-    .min(1, { message: "Código Cobrança obrigatório" }),
-  rca: z.string().min(1, { message: "Número do RCA obrigatório" }),
+    .min(1, { message: "" }),
+  rca: z.string().min(1, { message: "" }),
   motivo_devolucao: z
     .string()
-    .min(1, { message: "Motivo da Devolução obrigatório" }),
+    .min(1, { message: "" }),
   codigo_produto: z
     .string()
-    .min(1, { message: "Código do Produto obrigatório" }),
+    .min(1, { message: "" }),
   codigo_cliente: z
     .string()
-    .min(1, { message: "Código do Cliente obrigatório" }),
+    .min(1, { message: "" }),
   tipo_devolucao: z
     .string()
-    .min(1, { message: "Tipo de Devolução obrigatório" }),
+    .min(1, { message: "" }),
   lista_produtos: z
     .string()
-    .min(1, { message: "Tipo de Devolução obrigatório" }),
+    .min(1, { message: "" }),
   quantidade: z
     .string()
-    .min(1, { message: "Tipo de Devolução obrigatório" }),
+    .min(1, { message: "" }),
 });
 
 // Toast Component
