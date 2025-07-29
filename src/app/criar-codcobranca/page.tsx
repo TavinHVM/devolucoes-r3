@@ -39,13 +39,44 @@ const formSchema = z.object({
     .min(1, { message: "Código Cobrança obrigatório" }),
 });
 
-export default function Usuarios() {
+type CodigoCobranca = {
+  id: number;
+  codigo: string;
+  nome: string;
+};
+
+export default function CodCobranca() {
+  const [codCobrancaList, setCodCobrancaList] = useState<CodigoCobranca[]>([]);
   const [toast, setToast] = useState<{
     message: string;
     type: "success" | "error";
   } | null>(null);
   const [codigoCobranca, setCodigoCobranca] = useState<string>("");
   const [nomeCobranca, setNomeCobranca] = useState<string>("");
+
+  useEffect(() => {
+    const fetchCodCobranca = async () => {
+      try {
+
+        const response = await fetch('/api/getCodCobranca', {
+          method: 'GET',
+          headers: {
+            'Cache-Control': 'no-cache',
+          },
+          // cache: 'no-store',
+        });
+        if (!response.ok) {
+          throw new Error('Erro ao buscar os Códigos de cobrança.');
+        }
+        const data = await response.json();
+        setCodCobrancaList(data);
+      } catch (error) {
+        console.error('Erro ao buscar os Códigos de cobrança:', error);
+      }
+    }
+
+    fetchCodCobranca();
+  }, []);
 
   // Toast auto-hide
   useEffect(() => {
@@ -70,36 +101,6 @@ export default function Usuarios() {
   useEffect(() => {
     form.setValue("nome", nomeCobranca);
   }, [nomeCobranca, form]);
-
-  const codCobrancaList: {
-    nome: string;
-    codigo_cobranca: string;
-  }[] = [
-    { codigo_cobranca: "1001", nome: "AMAZON" },
-    { codigo_cobranca: "1002", nome: "SHOPEE" },
-    { codigo_cobranca: "1003", nome: "BOLETO" },
-    { codigo_cobranca: "1004", nome: "AMAZON" },
-    { codigo_cobranca: "1005", nome: "SHOPEE" },
-    { codigo_cobranca: "1006", nome: "BOLETO" },
-    { codigo_cobranca: "1007", nome: "AMAZON" },
-    { codigo_cobranca: "1008", nome: "SHOPEE" },
-    { codigo_cobranca: "1009", nome: "BOLETO" },
-    { codigo_cobranca: "1010", nome: "AMAZON" },
-    { codigo_cobranca: "1011", nome: "SHOPEE" },
-    { codigo_cobranca: "1012", nome: "BOLETO" },
-    { codigo_cobranca: "1013", nome: "AMAZON" },
-    { codigo_cobranca: "1014", nome: "SHOPEE" },
-    { codigo_cobranca: "1015", nome: "BOLETO" },
-    { codigo_cobranca: "1016", nome: "AMAZON" },
-    { codigo_cobranca: "1017", nome: "SHOPEE" },
-    { codigo_cobranca: "1018", nome: "BOLETO" },
-    { codigo_cobranca: "1019", nome: "AMAZON" },
-    { codigo_cobranca: "1020", nome: "SHOPEE" },
-    { codigo_cobranca: "1021", nome: "BOLETO" },
-    { codigo_cobranca: "1022", nome: "AMAZON" },
-    { codigo_cobranca: "1023", nome: "SHOPEE" },
-    { codigo_cobranca: "1024", nome: "BOLETO" },
-  ];
 
   async function onSubmit(data: z.infer<typeof formSchema>) {
     console.log("onSubmit chamado com os dados:", data); // Debug
@@ -241,11 +242,11 @@ export default function Usuarios() {
                 <TableBody className="max-h-[400px] h-[400px] overflow-y-auto scrollbar-dark">
                   {codCobrancaList.map((cod) => (
                     <TableRow
-                      key={cod.codigo_cobranca}
+                      key={cod.codigo}
                       className="w-full bg-slate-600"
                     >
                       <TableCell className="text-center w-[25%] text-md text-white">
-                        {cod.codigo_cobranca}
+                        {cod.codigo}
                       </TableCell>
                       <TableCell className="text-md text-white">{cod.nome}</TableCell>
                     </TableRow>
