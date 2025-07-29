@@ -24,6 +24,15 @@ export async function POST(request: Request) {
         console.log('Solicitação não encontrada');
         return NextResponse.json([], { status: 404 }); // Retorne um array vazio em vez de um objeto
         }
+
+        const statusOnData = (solicitacao.status).toUpperCase();
+        if (statusOnData !== "RECUSADA") {
+            return NextResponse.json(
+                { error: "Solicitação não está RECUSADA e não pode ser REENVIADA." },
+                { status: 400 }
+            );
+        }
+
         console.log('Solicitações encontradas!\n Id da Solicitação:', solicitacao.id);
 
         await db.solicitacoes.update({

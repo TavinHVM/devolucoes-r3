@@ -39,7 +39,7 @@ import OrderBtn from "@/components/orderBtn";
 import { X } from 'lucide-react';
 import { DialogClose } from "@radix-ui/react-dialog";
 import { RefreshCw } from 'lucide-react';
-import AprovarSolicitacao from "@/utils/solicitacoes/aprovarSolicitacoes";
+import { AprovarSolicitacao, RecusarSolicitacao, ReenviarSolicitacao, DesdobrarSolicitacao, AbaterSolicitacao, FinalizarSolicitacao } from "@/utils/solicitacoes/botoesSolicitacoes";
 
 type Solicitacao = {
   id: number;
@@ -177,7 +177,7 @@ const filteredSolicitacoes = sortedSolicitacoes.filter((s) => {
     switch (status?.toUpperCase()) {
       case "APROVADA":
         return "min-w-32 max-w-32 w-full bg-green-600 text-white font-bold px-1 py-4 rounded flex justify-center h-full";
-      case "REJEITADA":
+      case "RECUSADA":
         return "min-w-32 max-w-32 w-full bg-red-600 text-white font-bold px-1 py-4 rounded flex justify-center h-full";
       case "PENDENTE":
         return "min-w-32 max-w-32 w-full bg-yellow-600 text-white font-bold px-1 py-4 rounded flex justify-center h-full";
@@ -262,7 +262,7 @@ const filteredSolicitacoes = sortedSolicitacoes.filter((s) => {
                       </SelectItem>
                       <SelectItem
                         className="bg-red-600 text-white font-bold px-1 py-2 rounded flex justify-center h-full cursor-pointer transition-all"
-                        value="REJEITADA"
+                        value="RECUSADA"
                       >
                         Rejeitado
                       </SelectItem>
@@ -274,7 +274,7 @@ const filteredSolicitacoes = sortedSolicitacoes.filter((s) => {
                       </SelectItem>
                       <SelectItem
                         className="bg-yellow-400 text-white font-bold px-1 py-2 rounded flex justify-center h-full cursor-pointer transition-all"
-                        value="FINALIZADA"
+                        value="REENVIADA"
                       >
                         Reenviada
                       </SelectItem>
@@ -597,11 +597,33 @@ const filteredSolicitacoes = sortedSolicitacoes.filter((s) => {
                                       ))}
                                     </TableBody>
                                   </Table>
+                                </Card>
+                                <div className="grid grid-cols-3 gap-2 col-span-3 w-full justify-between px-8">
                                   <Button className="bg-green-600 cursor-pointer transition-all"
                                     onClick={() => AprovarSolicitacao(s.id)}>
                                     Aprovar
                                   </Button>
-                                </Card>
+                                  <Button className="bg-blue-700 cursor-pointer transition-all"
+                                    onClick={() => DesdobrarSolicitacao(s.id)}>
+                                    Desdobrar
+                                  </Button>
+                                  <Button className="bg-yellow-600 cursor-pointer transition-all"
+                                    onClick={() => AbaterSolicitacao(s.id)}>
+                                    Abater
+                                  </Button>
+                                  <Button className="bg-lime-500 cursor-pointer transition-all"
+                                    onClick={() => FinalizarSolicitacao(s.id)}>
+                                    Finalizar
+                                  </Button>
+                                  <Button className="bg-red-600 cursor-pointer transition-all"
+                                    onClick={() => RecusarSolicitacao(s.id)}>
+                                    Recusar
+                                  </Button>
+                                  <Button className="bg-yellow-400 cursor-pointer transition-all"
+                                    onClick={() => ReenviarSolicitacao(s.id)}>
+                                    Reenviar
+                                  </Button>
+                                </div>
                             </div>
                           </DialogContent>
                         </Dialog>
