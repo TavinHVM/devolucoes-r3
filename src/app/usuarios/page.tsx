@@ -4,7 +4,7 @@ import Header from '../../components/header';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../../components/ui/dialog';
+// import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../../components/ui/dialog';
 import { fetchUsuarios } from '../../utils/usuarios/fetchUsuarios';
 import { createUser, editUser as editUserAPI, deleteUser } from '../../utils/usuarios/apiUtils';
 
@@ -44,7 +44,7 @@ export default function Usuarios() {
     email: '',
     password: '',
   });
-  const [error, setError] = useState<string | null>(null);
+  const [error] = useState<string | null>(null);
   const [editUser, setEditUser] = useState<Usuario | null>(null);
   const [editForm, setEditForm] = useState<Omit<Usuario, 'id' | 'created_at'>>({
     first_name: '',
@@ -54,8 +54,8 @@ export default function Usuarios() {
     email: '',
   });
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
-  const [resetEmail, setResetEmail] = useState<string | null>(null);
-  const [resetStatus, setResetStatus] = useState<string | null>(null);
+  // const [resetEmail, setResetEmail] = useState<string | null>(null);
+  // const [resetStatus, setResetStatus] = useState<string | null>(null);
   const [toast, setToast] = useState<{ message: string, type: 'success' | 'error' } | null>(null);
 
   useEffect(() => {
@@ -210,7 +210,6 @@ export default function Usuarios() {
                     <option value="logistica">Logística</option>
                   </select>
                 </div>
-                <Button className="bg-slate-500 hover:bg-slate-600 cursor-pointer" onClick={() => setResetEmail(editUser.email)} size="sm">Redefinir senha</Button>
                 <Button type="submit" className="w-full mt-2 cursor-pointer bg-blue-500 hover:bg-blue-600">Salvar</Button>
               </form>
             </div>

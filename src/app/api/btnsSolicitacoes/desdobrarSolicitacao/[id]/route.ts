@@ -42,6 +42,7 @@ export async function POST(request: Request) {
         },
         data: {
             status: "DESDOBRADA",
+            desdobrada_at: new Date()
         },
         });
 

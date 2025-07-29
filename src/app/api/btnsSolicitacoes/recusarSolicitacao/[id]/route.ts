@@ -44,6 +44,7 @@ export async function POST(request: Request) {
         },
         data: {
             status: "RECUSADA",
+            rejeitada_at: new Date()
         },
         });
 

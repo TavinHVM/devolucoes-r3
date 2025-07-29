@@ -32,35 +32,18 @@ import {
 import { useState, useEffect } from "react";
 
 const formSchema = z.object({
-  nome: z
-    .string()
-    .min(1, { message: "" })
-    .max(14, { message: "" }),
+  nome: z.string().min(1, { message: "" }).max(14, { message: "" }),
   filial: z.string().min(1, { message: "" }),
   numero_nf: z.string().min(1, { message: "" }),
   carga: z.string().min(1, { message: "" }),
-  codigo_cobranca: z
-    .string()
-    .min(1, { message: "" }),
+  codigo_cobranca: z.string().min(1, { message: "" }),
   rca: z.string().min(1, { message: "" }),
-  motivo_devolucao: z
-    .string()
-    .min(1, { message: "" }),
-  codigo_produto: z
-    .string()
-    .min(1, { message: "" }),
-  codigo_cliente: z
-    .string()
-    .min(1, { message: "" }),
-  tipo_devolucao: z
-    .string()
-    .min(1, { message: "" }),
-  lista_produtos: z
-    .string()
-    .min(1, { message: "" }),
-  quantidade: z
-    .string()
-    .min(1, { message: "" }),
+  motivo_devolucao: z.string().min(1, { message: "" }),
+  codigo_produto: z.string().min(1, { message: "" }),
+  codigo_cliente: z.string().min(1, { message: "" }),
+  tipo_devolucao: z.string().min(1, { message: "" }),
+  lista_produtos: z.string().min(1, { message: "" }),
+  quantidade: z.string().min(1, { message: "" }),
 });
 
 // Toast Component
@@ -144,7 +127,7 @@ export default function Solicitacao() {
     //  Adicionar o log de erros de validação aqui
     const { errors } = form.formState;
     console.log("Erros do formulário:", errors);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [toast]);
 
   useEffect(() => {
@@ -237,34 +220,34 @@ export default function Solicitacao() {
               >
                 <div className="grid grid-cols-1 gap-2 lg:grid-cols-2">
                   <FormField
-                      control={form.control}
-                      name="codigo_cliente"
-                      render={({ field }) => (
-                        <FormItem className="w-full">
-                          <FormLabel className="text-white">
-                            Código do Cliente:
-                          </FormLabel>
-                          <FormControl className="bg-slate-700 text-white border-slate-600 placeholder:text-white/40 w-full">
-                            <Input
-                              type="text"
-                              {...field}
-                              className="w-full"
-                              placeholder="Código do Cliente"
-                              value={numeroCodigoCliente}
-                              maxLength={5}
-                              onChange={(e) => {
-                                const val = e.target.value;
-                                if (/^\d*$/.test(val)) {
-                                  setNumeroCodigoCliente(val);
-                                  field.onChange(val); // sincroniza com react-hook-form
-                                }
-                              }}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                    control={form.control}
+                    name="codigo_cliente"
+                    render={({ field }) => (
+                      <FormItem className="w-full">
+                        <FormLabel className="text-white">
+                          Código do Cliente:
+                        </FormLabel>
+                        <FormControl className="bg-slate-700 text-white border-slate-600 placeholder:text-white/40 w-full">
+                          <Input
+                            type="text"
+                            {...field}
+                            className="w-full"
+                            placeholder="Código do Cliente"
+                            value={numeroCodigoCliente}
+                            maxLength={5}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              if (/^\d*$/.test(val)) {
+                                setNumeroCodigoCliente(val);
+                                field.onChange(val); // sincroniza com react-hook-form
+                              }
+                            }}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                   <div className="flex flex-col w-full text-white text-sm">
                     <span className="font-bold">Nome do Cliente:</span>
                     <span className="w-full border-1 border-slate-600 bg-slate-700 p-2 rounded-md text-white/60">
@@ -287,7 +270,10 @@ export default function Solicitacao() {
                             maxLength={6}
                             onChange={(e) => {
                               const val = e.target.value;
-                              if (/^\d*$/.test(val)) setNumeroNota(val); // permite apenas números
+                              if (/^\d*$/.test(val)) {
+                                setNumeroNota(val); // atualiza o estado local
+                                field.onChange(val); // atualiza o valor do formulário
+                              }
                             }}
                           />
                         </FormControl>
@@ -311,7 +297,10 @@ export default function Solicitacao() {
                             maxLength={6}
                             onChange={(e) => {
                               const val = e.target.value;
-                              if (/^\d*$/.test(val)) setNumeroCarga(val); // permite apenas números
+                              if (/^\d*$/.test(val)) {
+                                setNumeroCarga(val); // atualiza o estado local
+                                field.onChange(val); // atualiza o valor do formulário
+                              }
                             }}
                           />
                         </FormControl>
@@ -338,7 +327,10 @@ export default function Solicitacao() {
                               maxLength={4}
                               onChange={(e) => {
                                 const val = e.target.value;
-                                if (/^\d*$/.test(val)) setNumeroCodigoCobranca(val); // permite apenas números
+                                if (/^\d*$/.test(val)) {
+                                  setNumeroCodigoCobranca(val); // atualiza o estado local
+                                  field.onChange(val); // atualiza o valor do formulário
+                                }
                               }}
                             />
                           </FormControl>
@@ -362,7 +354,10 @@ export default function Solicitacao() {
                               maxLength={3}
                               onChange={(e) => {
                                 const val = e.target.value;
-                                if (/^\d*$/.test(val)) setCodigoRca(val); // permite apenas números
+                                if (/^\d*$/.test(val)) {
+                                  setCodigoRca(val); // atualiza o estado local
+                                  field.onChange(val); // atualiza o valor do formulário
+                                }
                               }}
                             />
                           </FormControl>
@@ -370,7 +365,6 @@ export default function Solicitacao() {
                         </FormItem>
                       )}
                     />
-                    
                   </div>
                 </div>
                 <FormField
@@ -497,7 +491,10 @@ export default function Solicitacao() {
                             maxLength={4}
                             onChange={(e) => {
                               const val = e.target.value;
-                              if (/^\d*$/.test(val)) setCodigo(val); // permite apenas números
+                              if (/^\d*$/.test(val)) {
+                                setCodigo(val); // atualiza o estado local
+                                field.onChange(val); // atualiza o valor do formulário
+                              }
                             }}
                           />
                         </FormControl>
@@ -523,7 +520,10 @@ export default function Solicitacao() {
                             maxLength={6}
                             onChange={(e) => {
                               const val = e.target.value;
-                              if (/^\d*$/.test(val)) setNumeroQuantidade(val); // permite apenas números
+                              if (/^\d*$/.test(val)) {
+                                setNumeroQuantidade(val); // atualiza o estado local
+                                field.onChange(val); // atualiza o valor do formulário
+                              }
                             }}
                           />
                         </FormControl>

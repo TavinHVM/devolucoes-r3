@@ -574,44 +574,62 @@ export default function VisualizacaoSolicitacoes() {
                                   </Table>
                                 </CardContent>
                               </Card>
+                              <div className="flex gap-2 w-full justify-center px-8 col-span-3">
+                                {s.status.toUpperCase() === "PENDENTE" && (
+                                  <>
+                                    <Button
+                                      className="bg-green-600 cursor-pointer transition-all px-20"
+                                      onClick={() => AprovarSolicitacao(s.id)}
+                                    >
+                                      Aprovar
+                                    </Button>
+                                    <Button
+                                      className="bg-red-600 cursor-pointer transition-all px-20"
+                                      onClick={() => RecusarSolicitacao(s.id)}
+                                    >
+                                      Recusar
+                                    </Button>
+                                  </>
+                                )}
 
-                              <div className="grid grid-cols-3 gap-2 col-span-3 w-full justify-between px-8">
-                                <Button
-                                  className="bg-green-600 cursor-pointer transition-all"
-                                  onClick={() => AprovarSolicitacao(s.id)}
-                                >
-                                  Aprovar
-                                </Button>
-                                <Button
-                                  className="bg-blue-700 cursor-pointer transition-all"
-                                  onClick={() => DesdobrarSolicitacao(s.id)}
-                                >
-                                  Desdobrar
-                                </Button>
-                                <Button
-                                  className="bg-yellow-600 cursor-pointer transition-all"
-                                  onClick={() => AbaterSolicitacao(s.id)}
-                                >
-                                  Abater
-                                </Button>
-                                <Button
-                                  className="bg-lime-500 cursor-pointer transition-all"
-                                  onClick={() => FinalizarSolicitacao(s.id)}
-                                >
-                                  Finalizar
-                                </Button>
-                                <Button
-                                  className="bg-red-600 cursor-pointer transition-all"
-                                  onClick={() => RecusarSolicitacao(s.id)}
-                                >
-                                  Recusar
-                                </Button>
-                                <Button
-                                  className="bg-yellow-400 cursor-pointer transition-all"
-                                  onClick={() => ReenviarSolicitacao(s.id)}
-                                >
-                                  Reenviar
-                                </Button>
+                                {s.status.toUpperCase() === "APROVADA" && (
+                                  <>
+                                    <Button
+                                      className="bg-blue-700 cursor-pointer transition-all px-20"
+                                      onClick={() => DesdobrarSolicitacao(s.id)}
+                                    >
+                                      Desdobrar
+                                    </Button>
+                                  </>
+                                )}
+                                {s.status.toUpperCase() === "DESDOBRADA" && (
+                                  <>
+                                    <Button
+                                      className="bg-yellow-600 cursor-pointer transition-all px-20"
+                                      onClick={() => AbaterSolicitacao(s.id)}
+                                    >
+                                      Abater
+                                    </Button>
+                                  </>
+                                )}
+                                {s.status.toUpperCase() === "ABATIDA" && (
+                                  <>
+                                    <Button
+                                      className="bg-lime-500 cursor-pointer transition-all px-20"
+                                      onClick={() => FinalizarSolicitacao(s.id)}
+                                    >
+                                      Finalizar
+                                    </Button>
+                                  </>
+                                )}
+                                {s.status.toUpperCase() === "RECUSADA" && (
+                                  <Button
+                                    className="bg-yellow-400 cursor-pointer transition-all px-20"
+                                    onClick={() => ReenviarSolicitacao(s.id)}
+                                  >
+                                    Reenviar
+                                  </Button>
+                                )}
                               </div>
                             </div>
                           </DialogContent>

@@ -42,6 +42,7 @@ export async function POST(request: Request) {
             },
             data: {
                 status: "APROVADA",
+                aprovada_at: new Date()
             },
         });
 

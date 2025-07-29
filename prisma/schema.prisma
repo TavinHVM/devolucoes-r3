@@ -35,7 +35,7 @@ model solicitacoes {
   rca                       Int
   motivo_devolucao          String
   products_list             Json
-  products_list_returned    Json
+  products_list_returned    Json?
   tipo_devolucao            String
   arquivo_url               Bytes?
   created_at                DateTime  @default(now())

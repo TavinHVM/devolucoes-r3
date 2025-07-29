@@ -39,8 +39,9 @@ export async function POST(request: Request) {
             },
             data: {
                 status: "ABATIDA",
+                abatida_at: new Date()
             }
-        })
+        });
 
         console.log('Solicitação Abatida!');
         return NextResponse.json(solicitacao); // Retorne diretamente a Solicitação
