@@ -74,107 +74,168 @@ export default function Login() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-900">
-      <Card className="w-full max-w-sm shadow-2xl bg-slate-800 border-none">
-        <CardHeader>
-          <CardTitle className="text-center text-white text-2xl font-bold">Devoluções R3 - Login</CardTitle>
-        </CardHeader>
-        <CardContent>
+    <div className="flex min-h-screen items-center justify-center bg-gray-900 p-4">
+      <div className="w-full max-w-md">
+        <Card className="shadow-2xl bg-slate-800 border border-slate-700/50 backdrop-blur-sm">
+          <CardHeader className="space-y-1 pb-6 px-8 pt-8">
+            <div className="flex justify-center mb-4">
+              <div className="w-20 h-20 bg-slate-900 rounded-full flex items-center justify-center shadow-lg p-2">
+                <img 
+                  src="/r3logo.png" 
+                  alt="R3 Logo" 
+                  className="w-full h-full object-contain"
+                />
+              </div>
+            </div>
+            <CardTitle className="text-center text-white text-2xl font-bold tracking-tight">
+              Devoluções R3
+            </CardTitle>
+            <p className="text-center text-slate-400 text-sm">
+              Faça login para acessar o sistema
+            </p>
+          </CardHeader>
+          <CardContent className="space-y-6 px-8 pb-8">
           {!showForgot ? (
-            <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-6">
+            <div>
               {loginError && (
-                <div className="text-center text-sm text-red-400 bg-red-900/20 p-2 rounded">
+                <div className="mb-4 p-3 text-center text-sm text-red-400 bg-red-900/20 border border-red-700/30 rounded-lg">
                   {loginError}
                 </div>
               )}
-              <div className="grid gap-2">
-                <Label htmlFor="email" className="text-white">Email:</Label>
-                <Controller
-                  name="email"
-                  control={form.control}
-                  render={({ field }) => (
-                    <Input
-                      id="email"
-                      type="email"
-                      {...field}
-                      required
-                      className="bg-slate-700 text-white border-slate-600 placeholder:text-slate-400"
-                      autoComplete="username"
-                    />
-                  )}
-                />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="password" className="text-white">Senha:</Label>
-                <Controller
-                  name="password"
-                  control={form.control}
-                  render={({ field }) => (
-                    <Input
-                      id="password"
-                      type="password"
-                      {...field}
-                      required
-                      className="bg-slate-700 text-white border-slate-600 placeholder:text-slate-400"
-                      autoComplete="current-password"
-                    />
-                  )}
-                />
-              </div>
-              <div className="flex justify-between items-center">
-                <button
-                  type="button"
-                  className="text-blue-400 hover:underline text-sm bg-transparent border-none p-0 cursor-pointer"
-                  onClick={() => {
-                    setShowForgot(true);
-                    setForgotEmail('');
-                    setForgotStatus(null);
-                  }}
+              
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                <div className="space-y-2">
+                  <Label htmlFor="email" className="text-white text-sm font-medium">
+                    Email
+                  </Label>
+                  <Controller
+                    name="email"
+                    control={form.control}
+                    render={({ field }) => (
+                      <Input
+                        id="email"
+                        type="email"
+                        placeholder="seu@email.com"
+                        {...field}
+                        required
+                        className="h-11 bg-slate-700/50 text-white border-slate-600 placeholder:text-slate-400 focus:border-green-500 focus:ring-green-500/20 transition-all duration-200"
+                        autoComplete="username"
+                      />
+                    )}
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="password" className="text-white text-sm font-medium">
+                    Senha
+                  </Label>
+                  <Controller
+                    name="password"
+                    control={form.control}
+                    render={({ field }) => (
+                      <Input
+                        id="password"
+                        type="password"
+                        placeholder="••••••••"
+                        {...field}
+                        required
+                        className="h-11 bg-slate-700/50 text-white border-slate-600 placeholder:text-slate-400 focus:border-green-500 focus:ring-green-500/20 transition-all duration-200"
+                        autoComplete="current-password"
+                      />
+                    )}
+                  />
+                </div>
+
+                <div className="flex justify-end">
+                  <button
+                    type="button"
+                    className="text-blue-400 hover:text-blue-300 text-sm font-medium transition-colors duration-200"
+                    onClick={() => {
+                      setShowForgot(true);
+                      setForgotEmail('');
+                      setForgotStatus(null);
+                    }}
+                  >
+                    Esqueceu a senha?
+                  </button>
+                </div>
+
+                <Button 
+                  type="submit" 
+                  disabled={isLoading}
+                  className="w-full h-11 bg-green-600 hover:bg-green-700 text-white font-semibold transition-all duration-200 disabled:bg-slate-600 disabled:cursor-not-allowed shadow-lg"
                 >
-                  Esqueceu a senha?
-                </button>
-              </div>
-              <Button 
-                type="submit" 
-                disabled={isLoading}
-                className="w-full mt-2 bg-green-600 hover:bg-green-700 text-white font-bold cursor-pointer disabled:bg-gray-600 disabled:cursor-not-allowed"
-              >
-                {isLoading ? 'Entrando...' : 'Entrar'}
-              </Button>
-            </form>
+                  {isLoading ? (
+                    <div className="flex items-center gap-2">
+                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                      Entrando...
+                    </div>
+                  ) : (
+                    'Entrar'
+                  )}
+                </Button>
+              </form>
+            </div>
           ) : (
-            <form onSubmit={handleForgotPassword} className="grid gap-6">
-              <div className="grid gap-2">
-                <Label htmlFor="forgot_email" className="text-white">E-mail para redefinir senha:</Label>
-                <Input
-                  id="forgot_email"
-                  type="email"
-                  value={forgotEmail ?? ''}
-                  onChange={e => {
-                    setForgotEmail(e.target.value);
-                  }}
-                  required
-                  className="bg-slate-700 text-white border-slate-600 placeholder:text-slate-400"
-                  autoComplete="username"
-                />
+            <div>
+              <div className="mb-6 text-center">
+                <h3 className="text-lg font-semibold text-white mb-2">Redefinir Senha</h3>
+                <p className="text-sm text-slate-400">
+                  Digite seu email para receber as instruções
+                </p>
               </div>
-              {forgotStatus && <div className="text-center text-sm text-green-400">{forgotStatus}</div>}
-              <div className="flex gap-2">
-                <Button type="button" className="bg-gray-500 hover:bg-gray-600 text-white cursor-pointer" onClick={() => {
-                  setShowForgot(false);
-                  setForgotEmail('');
-                  setForgotStatus(null);
-                }}>
-                  Voltar
-                </Button>
-                <Button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white cursor-pointer">
-                  Enviar e-mail
-                </Button>
-              </div>
-            </form>
+              
+              <form onSubmit={handleForgotPassword} className="space-y-6">
+                <div className="space-y-2">
+                  <Label htmlFor="forgot_email" className="text-white text-sm font-medium">
+                    E-mail
+                  </Label>
+                  <Input
+                    id="forgot_email"
+                    type="email"
+                    placeholder="seu@email.com"
+                    value={forgotEmail ?? ''}
+                    onChange={e => {
+                      setForgotEmail(e.target.value);
+                    }}
+                    required
+                    className="h-11 bg-slate-700/50 text-white border-slate-600 placeholder:text-slate-400 focus:border-blue-500 focus:ring-blue-500/20 transition-all duration-200"
+                    autoComplete="username"
+                  />
+                </div>
+                
+                {forgotStatus && (
+                  <div className="p-3 text-center text-sm text-green-400 bg-green-900/20 border border-green-700/30 rounded-lg">
+                    {forgotStatus}
+                  </div>
+                )}
+                
+                <div className="flex gap-3">
+                  <Button 
+                    type="button" 
+                    variant="outline"
+                    className="flex-1 h-11 bg-slate-700/50 hover:bg-slate-600 text-white border-slate-600 transition-all duration-200"
+                    onClick={() => {
+                      setShowForgot(false);
+                      setForgotEmail('');
+                      setForgotStatus(null);
+                    }}
+                  >
+                    Voltar
+                  </Button>
+                  <Button 
+                    type="submit" 
+                    className="flex-1 h-11 bg-blue-600 hover:bg-blue-700 text-white font-semibold transition-all duration-200 shadow-lg"
+                  >
+                    Enviar
+                  </Button>
+                </div>
+              </form>
+            </div>
           )}
         </CardContent>
       </Card>
+      </div>
     </div>
   );
 }
