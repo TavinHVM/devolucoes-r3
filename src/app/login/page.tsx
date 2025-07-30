@@ -5,7 +5,6 @@ import { Input } from '../../components/ui/input';
 import { Button } from '../../components/ui/button';
 import { Label } from '../../components/ui/label';
 import { useForm, SubmitHandler, Controller } from 'react-hook-form';
-import { supabase } from '../../lib/supabaseClient';
 import { useEffect, useState } from 'react';
 
 interface LoginForm {
@@ -24,43 +23,55 @@ export default function Login() {
   const [showForgot, setShowForgot] = useState(false);
   const [forgotEmail, setForgotEmail] = useState('');
   const [forgotStatus, setForgotStatus] = useState<string | null>(null);
-
-  useEffect(() => {
-    async function checkAuth() {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        router.replace('/');
-      }
-    }
-    checkAuth();
-  }, [router, showForgot, forgotEmail]);
+  const [loginError, setLoginError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const onSubmit: SubmitHandler<LoginForm> = async (data) => {
-    const { error } = await supabase.auth.signInWithPassword({
-      email: data.email,
-      password: data.password,
-    });
+    setIsLoading(true);
+    setLoginError(null);
 
-    if (error) {
-      alert('Usuário ou senha inválidos');
-    } else {
-      router.push('/');
+    try {
+      const response = await fetch('/api/usuarios/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        // Login bem-sucedido
+        localStorage.setItem('user', JSON.stringify(result.user));
+        localStorage.setItem('token', result.token);
+        
+        console.log('Login bem-sucedido, dados salvos no localStorage');
+        console.log('Usuário:', result.user);
+        console.log('Token:', result.token);
+        
+        // Aguardar um momento para garantir que o localStorage foi salvo
+        setTimeout(() => {
+          console.log('Redirecionando para home...');
+          router.push('/');
+        }, 100);
+      } else {
+        // Erro no login
+        setLoginError(result.error || 'Erro ao fazer login');
+      }
+    } catch (error) {
+      console.error('Erro na requisição de login:', error);
+      setLoginError('Erro de conexão. Tente novamente.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  async function handleForgotPassword(e: React.FormEvent) {
+  const handleForgotPassword = async (e: React.FormEvent) => {
     e.preventDefault();
-    setForgotStatus(null);
-    const redirectTo = window.location.origin + '/reset-password';
-    const { error } = await supabase.auth.resetPasswordForEmail(forgotEmail, {
-      redirectTo
-    });
-    if (error) {
-      setForgotStatus('Erro ao enviar e-mail de redefinição: ' + error.message);
-    } else {
-      setForgotStatus('E-mail de redefinição enviado com sucesso!');
-    }
-  }
+    setForgotStatus('Funcionalidade de redefinição de senha será implementada em breve.');
+    // Aqui você pode implementar a funcionalidade de redefinição de senha no futuro
+  };
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-900">
@@ -71,6 +82,11 @@ export default function Login() {
         <CardContent>
           {!showForgot ? (
             <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-6">
+              {loginError && (
+                <div className="text-center text-sm text-red-400 bg-red-900/20 p-2 rounded">
+                  {loginError}
+                </div>
+              )}
               <div className="grid gap-2">
                 <Label htmlFor="email" className="text-white">Email:</Label>
                 <Controller
@@ -118,8 +134,12 @@ export default function Login() {
                   Esqueceu a senha?
                 </button>
               </div>
-              <Button type="submit" className="w-full mt-2 bg-green-600 hover:bg-green-700 text-white font-bold cursor-pointer">
-                Entrar
+              <Button 
+                type="submit" 
+                disabled={isLoading}
+                className="w-full mt-2 bg-green-600 hover:bg-green-700 text-white font-bold cursor-pointer disabled:bg-gray-600 disabled:cursor-not-allowed"
+              >
+                {isLoading ? 'Entrando...' : 'Entrar'}
               </Button>
             </form>
           ) : (

@@ -1,10 +1,11 @@
 'use client';
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { getStoredUser, getUserDisplayName, logout, User } from "@/lib/auth";
 
 // Ícones Lucide
 import { Home, FileText, Plus, Users, Power, Receipt } from 'lucide-react';
@@ -18,13 +19,28 @@ const navLinks = [
 ];
 
 export default function Header() {
-  // const router = useRouter();
+  const router = useRouter();
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
-  // const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
 
+  useEffect(() => {
+    setUser(getStoredUser());
+  }, []);
 
-  // if (!isLoggedIn) return null;
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/usuarios/logout', {
+        method: 'POST'
+      });
+      logout();
+      router.push('/login');
+    } catch (error) {
+      console.error('Erro ao fazer logout:', error);
+      logout(); // Faz logout local mesmo se houver erro no servidor
+      router.push('/login');
+    }
+  };
 
   return (
     <>
@@ -46,7 +62,7 @@ export default function Header() {
             <Button
               variant="destructive"
               className="bg-red-custom hover:bg-red-custom-hover text-white cursor-pointer"
-              // onClick={() => { handleLogout(); setOpen(false); }}
+              onClick={() => { handleLogout(); setOpen(false); }}
               type="button"
             >
               Sair
@@ -60,7 +76,14 @@ export default function Header() {
         {/* Logo e Nome */}
         <div className="flex items-center gap-3">
           <Image src="/favicon.ico" alt="Logo" width={50} height={50} className="w-10 h-10" />
-          <span className="text-xl font-bold">Devoluções R3</span>
+          <div className="flex flex-col">
+            <span className="text-xl font-bold">Devoluções R3</span>
+            {user && (
+              <span className="text-sm text-gray-300">
+                Olá, {getUserDisplayName(user)}
+              </span>
+            )}
+          </div>
         </div>
 
         {/* Navegação */}

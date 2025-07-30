@@ -1,28 +1,26 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-// import { supabase } from '../lib/supabaseClient';
+import { useAuth } from '../lib/useAuth';
 import Header from '../components/header';
 
 export default function Home() {
   const router = useRouter();
-  // const [loading, setLoading] = useState(true);
+  const { user, isAuthenticated, isLoading } = useAuth();
 
-  // useEffect(() => {
-  //   async function checkAuth() {
-  //     const { data: { session } } = await supabase.auth.getSession();
-  //     if (!session) {
-  //       router.replace('/login');
-  //     } else {
-  //       setLoading(false);
-  //     }
-  //   }
-  //   checkAuth();
-  // }, [router]);
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      router.replace('/login');
+    }
+  }, [isLoading, isAuthenticated, router]);
 
-  // if (loading) {
-  //   return <div className="flex h-screen items-center justify-center bg-gray-900 text-white">Carregando...</div>;
-  // }
+  if (isLoading) {
+    return <div className="flex h-screen items-center justify-center bg-gray-900 text-white">Carregando...</div>;
+  }
+
+  if (!isAuthenticated) {
+    return null; // Vai redirecionar para login
+  }
 
   return (
     <>
@@ -32,6 +30,11 @@ export default function Home() {
           <h1 className="text-4xl font-extrabold mb-4 text-white drop-shadow text-center">
             Bem-vindo ao sistema de Devoluções R3
           </h1>
+          {user && (
+            <p className="text-xl text-green-400 mb-4 text-center">
+              Olá, {user.first_name} {user.last_name}!
+            </p>
+          )}
           <div className="w-full flex flex-col gap-2 mt-4">
             <span className="text-white text-center text-lg">
               Utilize o menu para navegar entre as funcionalidades do sistema.
