@@ -207,6 +207,16 @@ export default function Solicitacao() {
           />
         )}
         <Card className="w-full max-w-[90%] lg:max-w-[30%] shadow-2xl bg-slate-800 rounded-lg p-0 gap-0 max-h-full">
+          <CardHeader>
+            <CardTitle>
+              Continuar Solicitação
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            
+          </CardContent>
+        </Card>
+        <Card className="w-full max-w-[90%] lg:max-w-[30%] shadow-2xl bg-slate-800 rounded-lg p-0 gap-0 max-h-full hidden">
           <CardHeader className="px-8 py-4 m-0 flex items-center justify-center">
             <CardTitle className="text-center text-2xl font-bold text-white">
               Criar Solicitação
@@ -547,7 +557,7 @@ export default function Solicitacao() {
                   type="submit"
                   className="w-full mt-4 bg-green-600 hover:bg-green-700 text-white font-bold cursor-pointer"
                 >
-                  Criar Solicitação
+                  Avançar
                 </Button>
               </form>
             </Form>
