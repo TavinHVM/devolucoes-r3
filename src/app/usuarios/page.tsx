@@ -5,8 +5,16 @@ import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
 // import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../../components/ui/dialog';
+import {
+  Select as CustomSelect,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem
+} from '../../components/ui/select';
 import { fetchUsuarios } from '../../utils/usuarios/fetchUsuarios';
 import { createUser, editUser as editUserAPI, deleteUser } from '../../utils/usuarios/apiUtils';
+import { Select } from '@radix-ui/react-select';
 
 // Tipo do usuário conforme a tabela user_profiles
 export interface Usuario {
@@ -195,20 +203,17 @@ export default function Usuarios() {
                 <div><Label htmlFor="edit_last_name">Sobrenome</Label><Input id="edit_last_name" name="last_name" value={editForm.last_name} onChange={e => setEditForm(f => ({ ...f, last_name: e.target.value }))} required /></div>
                 <div><Label htmlFor="edit_role">Cargo</Label><Input id="edit_role" name="role" value={editForm.role} onChange={e => setEditForm(f => ({ ...f, role: e.target.value }))} required /></div>
                 <div><Label htmlFor="edit_user_level">Nível</Label>
-                  <select
-                    id="edit_user_level"
-                    name="user_level"
-                    className="w-full rounded border px-2 py-2 text-white"
-                    value={editForm.user_level}
-                    onChange={e => setEditForm(f => ({ ...f, user_level: e.target.value }))}
-                    required
-                  >
-                    <option value="">Selecione o nível</option>
-                    <option value="adm">Adm</option>
-                    <option value="vendas">Vendas</option>
-                    <option value="financeiro">Financeiro</option>
-                    <option value="logistica">Logística</option>
-                  </select>
+                  <CustomSelect value={editForm.user_level} onValueChange={value => setEditForm(f => ({ ...f, user_level: value }))} required>
+                    <SelectTrigger className="w-full bg-slate-700 text-white">
+                      <SelectValue placeholder="Selecione o nível" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-slate-700 text-white">
+                      <SelectItem value="adm">Adm</SelectItem>
+                      <SelectItem value="vendas">Vendas</SelectItem>
+                      <SelectItem value="financeiro">Financeiro</SelectItem>
+                      <SelectItem value="logistica">Logística</SelectItem>
+                    </SelectContent>
+                  </CustomSelect>
                 </div>
                 <Button type="submit" className="w-full mt-2 cursor-pointer bg-blue-500 hover:bg-blue-600">Salvar</Button>
               </form>
