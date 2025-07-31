@@ -198,11 +198,11 @@ export default function Usuarios() {
               <button className="absolute top-2 right-3 text-xl" onClick={() => setEditUser(null)} type="button">×</button>
               <h2 className="text-xl font-bold mb-4">Editar usuário</h2>
               <form onSubmit={handleEditUserSubmit} className="flex flex-col gap-3">
-                <div><Label htmlFor="edit_email">E-mail</Label><Input id="edit_email" name="email" value={editForm.email} onChange={e => setEditForm(f => ({ ...f, email: e.target.value }))} required /></div>
-                <div><Label htmlFor="edit_first_name">Nome</Label><Input id="edit_first_name" name="first_name" value={editForm.first_name} onChange={e => setEditForm(f => ({ ...f, first_name: e.target.value }))} required /></div>
-                <div><Label htmlFor="edit_last_name">Sobrenome</Label><Input id="edit_last_name" name="last_name" value={editForm.last_name} onChange={e => setEditForm(f => ({ ...f, last_name: e.target.value }))} required /></div>
-                <div><Label htmlFor="edit_role">Cargo</Label><Input id="edit_role" name="role" value={editForm.role} onChange={e => setEditForm(f => ({ ...f, role: e.target.value }))} required /></div>
-                <div><Label htmlFor="edit_user_level">Nível</Label>
+                <div><Label className='mb-2' htmlFor="edit_email">E-mail</Label><Input id="edit_email" name="email" value={editForm.email} onChange={e => setEditForm(f => ({ ...f, email: e.target.value }))} required /></div>
+                <div><Label className='mb-2' htmlFor="edit_first_name">Nome</Label><Input id="edit_first_name" name="first_name" value={editForm.first_name} onChange={e => setEditForm(f => ({ ...f, first_name: e.target.value }))} required /></div>
+                <div><Label className='mb-2' htmlFor="edit_last_name">Sobrenome</Label><Input id="edit_last_name" name="last_name" value={editForm.last_name} onChange={e => setEditForm(f => ({ ...f, last_name: e.target.value }))} required /></div>
+                <div><Label className='mb-2' htmlFor="edit_role">Cargo</Label><Input id="edit_role" name="role" value={editForm.role} onChange={e => setEditForm(f => ({ ...f, role: e.target.value }))} required /></div>
+                <div><Label className='mb-2' htmlFor="edit_user_level">Nível</Label>
                   <CustomSelect value={editForm.user_level} onValueChange={value => setEditForm(f => ({ ...f, user_level: value }))} required>
                     <SelectTrigger className="w-full bg-slate-700 text-white">
                       <SelectValue placeholder="Selecione o nível" />
