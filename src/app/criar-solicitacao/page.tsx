@@ -18,7 +18,6 @@ import {
 import { Textarea } from "../../components/ui/textarea";
 import { useForm } from "react-hook-form";
 import Header from "../../components/header";
-// import { supabase } from "../../lib/supabaseClient";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -29,6 +28,13 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHeader,
+  TableRow,
+} from "../../components/ui/table";
 import { useState, useEffect } from "react";
 
 const formSchema = z.object({
@@ -99,6 +105,9 @@ export default function Solicitacao() {
   const [numeroCarga, setNumeroCarga] = useState<string>("");
   const [numeroCodigoCobranca, setNumeroCodigoCobranca] = useState<string>("");
   const [numeroCodigoCliente, setNumeroCodigoCliente] = useState<string>("");
+  const [produtos, setProdutos] = useState<
+    Array<{ codigo: string; descricao: string; quantidade: string }>
+  >([]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -134,7 +143,12 @@ export default function Solicitacao() {
     const fetchProduct = async () => {
       if (codigo.length === 4) {
         const nome_produto = await fetchNameProd(codigo);
-        setNomeProd(nome_produto);
+        console.log("Nome do produto retornado da API:", nome_produto); // Debug
+        if (nome_produto && nome_produto.trim() !== "") {
+          setNomeProd(nome_produto);
+        } else {
+          setNomeProd("");
+        }
       } else {
         setNomeProd("");
       }
@@ -194,6 +208,19 @@ export default function Solicitacao() {
     }
   }
 
+  // Função para adicionar produto à lista
+  function adicionarProduto() {
+    if (codigo && nomeProd && numeroQuantidade) {
+      setProdutos((prev) => [
+        ...prev,
+        { codigo, descricao: nomeProd, quantidade: numeroQuantidade },
+      ]);
+      setCodigo("");
+      setNomeProd("");
+      setNumeroQuantidade("");
+    }
+  }
+
   return (
     <>
       <Header />
@@ -206,17 +233,60 @@ export default function Solicitacao() {
             onClose={() => setToast(null)}
           />
         )}
-        <Card className="w-full max-w-[90%] lg:max-w-[30%] shadow-2xl bg-slate-800 rounded-lg p-0 gap-0 max-h-full">
+        <Card className="w-full max-w-[90%] lg:max-w-[30%] shadow-2xl bg-slate-800 rounded-lg p-0 gap-0 max-h-full hidden">
           <CardHeader>
-            <CardTitle>
-              Continuar Solicitação
-            </CardTitle>
+            <CardTitle>Continuar Solicitação</CardTitle>
           </CardHeader>
           <CardContent>
-            
+            <Card className="bg-slate-600 text-white col-span-3 max-h-80 flex flex-col gap-0 p-0">
+              <CardHeader className="text-center font-bold text-xl py-2">
+                PRODUTOS
+              </CardHeader>
+              <CardContent className="w-full p-0">
+                <div className="flex min-w-full bg-slate-800">
+                  <div className="w-[25%] py-2 text-lg text-center border-r-2 border-white">
+                    <span className="text-white font-bold">Código Produto</span>
+                  </div>
+                  <div className="w-[50%] py-2 text-lg text-center border-l-2 border-r-2 border-white">
+                    <span className="text-white font-bold">Nome</span>
+                  </div>
+                  <div className="w-[25%] py-2 text-lg text-center border-l-2 border-white">
+                    <span className="text-white font-bold">Quantidade</span>
+                  </div>
+                </div>
+                {/* Produtos */}
+                <Table className="bg-slate-500 max-h-24 h-10">
+                    <TableHeader>
+                      Continuar Solicitação
+                    </TableHeader>
+                  <TableBody className="mx-6 px-32">
+                    {Array.isArray(produtos) &&
+                      produtos.map(
+                        (p: {
+                          codigo: string;
+                          descricao: string;
+                          quantidade: string;
+                        }) => (
+                          <TableRow key={p.codigo} className="px-32 w-full">
+                            <TableCell className="text-center w-[25%] text-lg">
+                              {p.codigo}
+                            </TableCell>
+                            <TableCell className="text-lg">
+                              {p.descricao}
+                            </TableCell>
+                            <TableCell className="pl-8 w-[25%] text-center text-lg">
+                              {p.quantidade}
+                            </TableCell>
+                          </TableRow>
+                        )
+                      )}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
           </CardContent>
         </Card>
-        <Card className="w-full max-w-[90%] lg:max-w-[30%] shadow-2xl bg-slate-800 rounded-lg p-0 gap-0 max-h-full hidden">
+        <Card className="w-full max-w-[90%] lg:max-w-[30%] shadow-2xl bg-slate-800 rounded-lg p-0 gap-0 max-h-full">
           <CardHeader className="px-8 py-4 m-0 flex items-center justify-center">
             <CardTitle className="text-center text-2xl font-bold text-white">
               Criar Solicitação
@@ -542,11 +612,48 @@ export default function Solicitacao() {
                     )}
                   />
                   <div className="flex items-end h-full mt-auto">
-                    <Button className="justify-center bg-slate-500 hover:bg-slate-600 text-white font-bold cursor-pointer">
+                    <Button
+                      type="button"
+                      onClick={adicionarProduto}
+                      className="justify-center bg-slate-500 hover:bg-slate-600 text-white font-bold cursor-pointer"
+                    >
                       +
                     </Button>
                   </div>
                 </div>
+                {/* Lista de produtos adicionados */}
+                {produtos.length > 0 && (
+                  <div className="w-full mt-4">
+                    <Table className="bg-slate-700">
+                      <TableBody>
+                        <TableRow>
+                          <TableCell className="font-bold text-white">
+                            Código
+                          </TableCell>
+                          <TableCell className="font-bold text-white">
+                            Nome
+                          </TableCell>
+                          <TableCell className="font-bold text-white">
+                            Quantidade
+                          </TableCell>
+                        </TableRow>
+                        {produtos.map((p, idx) => (
+                          <TableRow key={idx}>
+                            <TableCell className="text-white">
+                              {p.codigo}
+                            </TableCell>
+                            <TableCell className="text-white">
+                              {p.descricao}
+                            </TableCell>
+                            <TableCell className="text-white">
+                              {p.quantidade}
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                )}
                 <div className="flex flex-col w-full text-white text-sm">
                   <span className="font-bold">Nome do Produto:</span>
                   <span className="w-full border-1 border-slate-600 bg-slate-700 p-2 rounded-md text-white/60">
