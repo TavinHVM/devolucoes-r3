@@ -5,10 +5,12 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
+  CardDescription,
 } from "../../components/ui/card";
 import { Input } from "../../components/ui/input";
 import { Button } from "../../components/ui/button";
 import { Textarea } from "../../components/ui/textarea";
+import { Badge } from "../../components/ui/badge";
 import { useForm } from "react-hook-form";
 import Header from "../../components/header";
 import { z } from "zod";
@@ -31,7 +33,21 @@ import {
   TableRow,
 } from "../../components/ui/table";
 import { useState, useEffect } from "react";
-import { Undo2 } from "lucide-react";
+import { 
+  ArrowLeft, 
+  ArrowRight, 
+  FileText, 
+  Package, 
+  User, 
+  CreditCard, 
+  MapPin, 
+  Search,
+  CheckCircle2,
+  XCircle,
+  AlertCircle,
+  ShoppingCart,
+  Calculator
+} from "lucide-react";
 import { formatPrice } from "../../utils/formatPrice";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -303,201 +319,384 @@ export default function Solicitacao() {
   }
 
   return (
-    <>
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
       <Header />
-      <div className="flex items-center justify-center h-[90%] w-full bg-slate-900 0-0">
-        {/* Toast Overlay */}
-        {toast && (
-          <Toast
-            message={toast.message}
-            type={toast.type}
-            onClose={() => setToast(null)}
-          />
-        )}
-        <Card
-          className={`w-full max-w-[90%] lg:max-w-[50%] shadow-2xl bg-slate-800 rounded-lg p-8 gap-0 max-h-full ${statusCobranca2} relative`}
-        >
-          <Button
-            type="button"
-            className="mt-4 bg-slate-600 hover:bg-slate-700 text-white font-bold cursor-pointer absolute left-4 top-[0]"
-            onClick={() => {
-              voltarPagina();
-            }}
-          >
-            <Undo2 />
-            Voltar
-          </Button>
-          <div className="w-full flex py-2">
+      
+      {/* Toast Overlay */}
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
+
+      <div className="container mx-auto px-4 py-8">
+        {/* Header Section */}
+        <div className="mb-8">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="p-2 bg-blue-500/20 rounded-lg">
+              <FileText className="h-8 w-8 text-blue-400" />
+            </div>
             <div>
-              <label className="text-white mb-2">Tipo de Devolução:</label>
-              <Select
-                value={tipoDevolucao}
-                onValueChange={(value) => setTipoDevolucao(value)}
-              >
-                <SelectTrigger
-                  className="text-white border-slate-600 bg-slate-700
-                          border rounded-md placeholder:text-white/40"
-                >
-                  <SelectValue placeholder="Selecione o tipo de Devolução" />
-                </SelectTrigger>
-                <SelectContent className="bg-slate-700 border-slate-600 text-white">
-                  <SelectItem
-                    value="total"
-                    className="bg-slate-700 text-white data-[state=checked]:bg-slate-600 hover:!bg-slate-600 hover:!text-white focus:bg-slate-600 focus:text-white"
-                  >
-                    Total
-                  </SelectItem>
-                  <SelectItem
-                    value="parcial"
-                    className="bg-slate-700 text-white data-[state=checked]:bg-slate-600 hover:!bg-slate-600 hover:!text-white focus:bg-slate-600 focus:text-white"
-                  >
-                    Parcial
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-              </div>
+              <h1 className="text-3xl font-bold text-white">Nova Solicitação de Devolução</h1>
+              <p className="text-slate-400">Crie uma nova solicitação de devolução de produtos</p>
+            </div>
           </div>
-          <CardHeader className="">
-            <CardTitle className="text-center text-2xl font-bold text-white p-12">
-              Continuar Solicitação
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Card className="bg-slate-600 text-white col-span-3 max-h-80 flex flex-col gap-0 p-0 relative">
-            <div className="mb-4 absolute left-2 top-2">
+        </div>
+
+        {/* Progress Indicator */}
+        <div className="mb-8">
+          <div className="flex items-center justify-center gap-4">
+            <div className={`flex items-center gap-2 px-4 py-2 rounded-lg ${
+              statusCobranca1 === "display" ? "bg-blue-500/20 text-blue-400" : "bg-slate-700 text-slate-400"
+            }`}>
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                statusCobranca1 === "display" ? "bg-blue-500 text-white" : "bg-slate-600 text-slate-400"
+              }`}>1</div>
+              <span className="font-medium">Informações da NF</span>
+            </div>
+            <ArrowRight className="h-5 w-5 text-slate-400" />
+            <div className={`flex items-center gap-2 px-4 py-2 rounded-lg ${
+              statusCobranca2 === "display" ? "bg-blue-500/20 text-blue-400" : "bg-slate-700 text-slate-400"
+            }`}>
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                statusCobranca2 === "display" ? "bg-blue-500 text-white" : "bg-slate-600 text-slate-400"
+              }`}>2</div>
+              <span className="font-medium">Seleção de Produtos</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Etapa 1: Informações da NF */}
+        {statusCobranca1 === "display" && (
+          <div className="max-w-4xl mx-auto">
+            <Card className="bg-slate-800/50 border-slate-700">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center gap-2">
+                  <Search className="h-5 w-5" />
+                  Buscar Nota Fiscal
+                </CardTitle>
+                <CardDescription className="text-slate-400">
+                  Digite o número da nota fiscal para buscar as informações
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Form {...form}>
+                  <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="md:col-span-2">
+                        <FormField
+                          control={form.control}
+                          name="numero_nf"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="text-slate-300">Número da Nota Fiscal</FormLabel>
+                              <FormControl>
+                                <Input
+                                  type="text"
+                                  {...field}
+                                  placeholder="Digite o número da NF (6 dígitos)"
+                                  value={numeroNF}
+                                  maxLength={6}
+                                  onChange={(e) => {
+                                    const val = e.target.value;
+                                    if (/^\d*$/.test(val)) {
+                                      setNumeroNF(val);
+                                      field.onChange(val);
+                                    }
+                                  }}
+                                  className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-400"
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+
+                      {/* Informações do Cliente */}
+                      <Card className="md:col-span-2 bg-slate-700/50 border-slate-600">
+                        <CardHeader>
+                          <CardTitle className="text-white text-lg flex items-center gap-2">
+                            <User className="h-5 w-5" />
+                            Informações do Cliente
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <label className="text-sm font-medium text-slate-300">Nome do Cliente</label>
+                            <div className="mt-1 p-3 bg-slate-600 rounded-lg border border-slate-500">
+                              <span className="text-white">
+                                {nomeClient || "CLIENTE NÃO ENCONTRADO"}
+                              </span>
+                            </div>
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium text-slate-300">Código do Cliente</label>
+                            <div className="mt-1 p-3 bg-slate-600 rounded-lg border border-slate-500">
+                              <span className="text-white">
+                                {numeroCodigoCliente || "CÓDIGO NÃO ENCONTRADO"}
+                              </span>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+
+                      {/* Informações da Carga e Cobrança */}
+                      <Card className="bg-slate-700/50 border-slate-600">
+                        <CardHeader>
+                          <CardTitle className="text-white text-lg flex items-center gap-2">
+                            <Package className="h-5 w-5" />
+                            Informações da Carga
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                          <div>
+                            <label className="text-sm font-medium text-slate-300">Número da Carga</label>
+                            <div className="mt-1 p-3 bg-slate-600 rounded-lg border border-slate-500">
+                              <span className="text-white">
+                                {numeroCarga || "CARGA NÃO ENCONTRADA"}
+                              </span>
+                            </div>
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium text-slate-300">Código RCA</label>
+                            <div className="mt-1 p-3 bg-slate-600 rounded-lg border border-slate-500">
+                              <span className="text-white">
+                                {codigoRca || "RCA NÃO ENCONTRADO"}
+                              </span>
+                            </div>
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium text-slate-300">Código Filial</label>
+                            <div className="mt-1 p-3 bg-slate-600 rounded-lg border border-slate-500">
+                              <span className="text-white">
+                                {codigoFilial || "FILIAL NÃO ENCONTRADA"}
+                              </span>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+
+                      <Card className="bg-slate-700/50 border-slate-600">
+                        <CardHeader>
+                          <CardTitle className="text-white text-lg flex items-center gap-2">
+                            <CreditCard className="h-5 w-5" />
+                            Informações de Cobrança
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                          <div>
+                            <label className="text-sm font-medium text-slate-300">Código da Cobrança</label>
+                            <div className="mt-1 p-3 bg-slate-600 rounded-lg border border-slate-500">
+                              <span className="text-white">
+                                {numeroCodigoCobranca || "CÓDIGO NÃO ENCONTRADO"}
+                              </span>
+                            </div>
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium text-slate-300">Nome da Cobrança</label>
+                            <div className="mt-1 p-3 bg-slate-600 rounded-lg border border-slate-500">
+                              <span className="text-white">
+                                {nomeCodigoCobranca || "COBRANÇA NÃO ENCONTRADA"}
+                              </span>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+
+                      <div className="md:col-span-2">
+                        <FormField
+                          control={form.control}
+                          name="motivo_devolucao"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="text-slate-300">Motivo da Devolução</FormLabel>
+                              <FormControl>
+                                <Textarea
+                                  {...field}
+                                  placeholder="Descreva o motivo da devolução..."
+                                  className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-400 resize-none min-h-[100px]"
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="flex justify-end">
+                      <Button
+                        type="button"
+                        onClick={avancarPagina}
+                        disabled={!numeroNF || numeroNF.length !== 6}
+                        className="bg-blue-600 hover:bg-blue-700 text-white px-8"
+                      >
+                        Avançar
+                        <ArrowRight className="ml-2 h-4 w-4" />
+                      </Button>
+                    </div>
+                  </form>
+                </Form>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
+        {/* Etapa 2: Seleção de Produtos */}
+        {statusCobranca2 === "display" && (
+          <div className="max-w-6xl mx-auto">
+            <div className="flex items-center gap-4 mb-6">
               <Button
                 type="button"
                 variant="outline"
-                className="text-white hover:text-white shadow-none border-slate-500 border-2 hover:bg-slate-800 bg-slate-700 cursor-pointer"
-                onClick={() => {
-                  if (produtosSelecionados.size === produtos.length) {
-                    setProdutosSelecionados(new Set());
-                  } else {
-                    setProdutosSelecionados(
-                      new Set(produtos.map((p) => p.codigo))
-                    );
-                  }
-                }}
+                onClick={voltarPagina}
+                className="bg-slate-700 border-slate-600 text-slate-300 hover:bg-slate-600"
               >
-                {produtosSelecionados.size === produtos.length
-                  ? "Desselecionar Todos"
-                  : "Selecionar Todos"}
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Voltar
               </Button>
+              <Badge variant="outline" className="text-slate-300 border-slate-600">
+                NF: {numeroNF}
+              </Badge>
+              <Badge variant="outline" className="text-slate-300 border-slate-600">
+                Cliente: {nomeClient}
+              </Badge>
             </div>
-              <CardHeader className="text-center font-bold text-xl py-2">
-                PRODUTOS
+
+            {/* Controles do Tipo de Devolução */}
+            <Card className="bg-slate-800/50 border-slate-700 mb-6">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center gap-2">
+                  <AlertCircle className="h-5 w-5" />
+                  Tipo de Devolução
+                </CardTitle>
               </CardHeader>
-              <CardContent className="w-full p-0">
-                <Table className="bg-slate-700">
+              <CardContent>
+                <Select value={tipoDevolucao} onValueChange={setTipoDevolucao}>
+                  <SelectTrigger className="bg-slate-700 border-slate-600 text-white">
+                    <SelectValue placeholder="Selecione o tipo de devolução" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-slate-700 border-slate-600">
+                    <SelectItem value="total" className="text-white">
+                      <div className="flex items-center gap-2">
+                        <CheckCircle2 className="h-4 w-4 text-green-400" />
+                        Devolução Total
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="parcial" className="text-white">
+                      <div className="flex items-center gap-2">
+                        <XCircle className="h-4 w-4 text-orange-400" />
+                        Devolução Parcial
+                      </div>
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </CardContent>
+            </Card>
+
+            {/* Tabela de Produtos */}
+            <Card className="bg-slate-800/50 border-slate-700">
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="text-white flex items-center gap-2">
+                      <ShoppingCart className="h-5 w-5" />
+                      Produtos da Nota Fiscal
+                    </CardTitle>
+                    <CardDescription className="text-slate-400">
+                      Selecione os produtos que deseja devolver
+                    </CardDescription>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => {
+                      if (produtosSelecionados.size === produtos.length) {
+                        setProdutosSelecionados(new Set());
+                      } else {
+                        setProdutosSelecionados(new Set(produtos.map((p) => p.codigo)));
+                      }
+                    }}
+                    className="bg-slate-700 border-slate-600 text-slate-300 hover:bg-slate-600"
+                  >
+                    {produtosSelecionados.size === produtos.length
+                      ? "Desselecionar Todos"
+                      : "Selecionar Todos"}
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <Table>
                   <TableHeader>
-                    <TableRow className="bg-slate-800">
-                      <TableHead className="text-white font-bold">
-                        Selecionar
-                      </TableHead>
-                      <TableHead className="text-white font-bold">
-                        Código Produto
-                      </TableHead>
-                      <TableHead className="text-white font-bold">
-                        Nome
-                      </TableHead>
-                      <TableHead className="text-white font-bold">
-                        Quantidade
-                      </TableHead>
-                      <TableHead className="text-white font-bold">
-                        Preço Unitário
-                      </TableHead>
-                      <TableHead className="text-white font-bold">
-                        Valor Total
-                      </TableHead>
+                    <TableRow className="border-slate-700">
+                      <TableHead className="text-slate-300">Selecionar</TableHead>
+                      <TableHead className="text-slate-300">Código</TableHead>
+                      <TableHead className="text-slate-300">Produto</TableHead>
+                      <TableHead className="text-slate-300 text-center">Quantidade</TableHead>
+                      <TableHead className="text-slate-300 text-center">Preço Unit.</TableHead>
+                      <TableHead className="text-slate-300 text-center">Valor Total</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {Array.isArray(produtos) && produtos.length > 0 ? (
-                      produtos.map(
-                        (p: {
-                          codigo: string;
-                          descricao: string;
-                          quantidade: string;
-                          punit: string;
-                        }) => (
-                          <TableRow
-                            key={p.codigo}
-                            className="border-b border-slate-400"
-                          >
-                            <TableCell className="text-center text-white">
-                              <div className="flex items-center justify-center">
-                                <Checkbox
-                                  checked={produtosSelecionados.has(p.codigo)}
-                                  onCheckedChange={(checked) => {
-                                    const newSelecionados = new Set(
-                                      produtosSelecionados
-                                    );
-                                    if (checked) {
-                                      newSelecionados.add(p.codigo);
-                                    } else {
-                                      newSelecionados.delete(p.codigo);
-                                    }
-                                    setProdutosSelecionados(newSelecionados);
-                                  }}
-                                />
-                              </div>
-                            </TableCell>
-                            <TableCell className="text-center text-white">
+                      produtos.map((p) => (
+                        <TableRow key={p.codigo} className="border-slate-700 hover:bg-slate-700/30">
+                          <TableCell>
+                            <div className="flex items-center justify-center">
+                              <Checkbox
+                                checked={produtosSelecionados.has(p.codigo)}
+                                onCheckedChange={(checked) => {
+                                  const newSelecionados = new Set(produtosSelecionados);
+                                  if (checked) {
+                                    newSelecionados.add(p.codigo);
+                                  } else {
+                                    newSelecionados.delete(p.codigo);
+                                  }
+                                  setProdutosSelecionados(newSelecionados);
+                                }}
+                              />
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant="outline" className="text-slate-300 border-slate-600">
                               {p.codigo}
-                            </TableCell>
-                            <TableCell className="text-white">
-                              {p.descricao}
-                            </TableCell>
-                            <TableCell className="text-center text-white">
-                              {p.quantidade}
-                            </TableCell>
-                            <TableCell className="text-center text-white">
-                              {formatPrice(Number(p.punit))}
-                            </TableCell>
-                            <TableCell className="text-center text-white">
-                              {formatPrice(
-                                Number(p.punit) * Number(p.quantidade)
-                              )}
-                            </TableCell>
-                          </TableRow>
-                        )
-                      )
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="text-white font-medium">{p.descricao}</TableCell>
+                          <TableCell className="text-center text-slate-300">{p.quantidade}</TableCell>
+                          <TableCell className="text-center text-slate-300">
+                            {formatPrice(Number(p.punit))}
+                          </TableCell>
+                          <TableCell className="text-center text-white font-medium">
+                            {formatPrice(Number(p.punit) * Number(p.quantidade))}
+                          </TableCell>
+                        </TableRow>
+                      ))
                     ) : (
                       <TableRow>
-                        <TableCell
-                          colSpan={6}
-                          className="text-center text-white py-4"
-                        >
+                        <TableCell colSpan={6} className="text-center py-8 text-slate-400">
                           Nenhum produto encontrado
                         </TableCell>
                       </TableRow>
                     )}
                   </TableBody>
                   <TableFooter>
-                    <TableRow>
-                      <TableCell
-                        colSpan={5}
-                        className="w-full justify-start text-center text-white py-4"
-                      >
-                        <div className="flex justify-start">
-                          <span className="text-white font-bold text-start text-xl pl-10">
-                            Total:{" "}
-                          </span>
+                    <TableRow className="bg-slate-700/50">
+                      <TableCell colSpan={5} className="text-right">
+                        <div className="flex items-center justify-end gap-2">
+                          <Calculator className="h-4 w-4 text-slate-400" />
+                          <span className="text-white font-bold">Total Selecionado:</span>
                         </div>
                       </TableCell>
-                      <TableCell
-                        colSpan={1}
-                        className="text-center text-white py-4"
-                      >
-                        <span className="text-white text-xl pr-10">
+                      <TableCell className="text-center">
+                        <span className="text-xl font-bold text-green-400">
                           {formatPrice(
                             produtos
                               .filter((p) => produtosSelecionados.has(p.codigo))
-                              .reduce(
-                                (acc, p) =>
-                                  acc + Number(p.punit) * Number(p.quantidade),
-                                0
-                              )
+                              .reduce((acc, p) => acc + Number(p.punit) * Number(p.quantidade), 0)
                           )}
                         </span>
                       </TableCell>
@@ -506,168 +705,30 @@ export default function Solicitacao() {
                 </Table>
               </CardContent>
             </Card>
-          </CardContent>
-        </Card>
-        <Card
-          className={`w-full max-w-[90%] lg:max-w-[30%] shadow-2xl bg-slate-800 rounded-lg p-0 gap-0 max-h-full ${statusCobranca1}`}
-        >
-          <CardHeader className="px-8 py-4 m-0 flex items-center justify-center">
-            <CardTitle className="text-center text-2xl font-bold text-white">
-              Criar Solicitação
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="w-full max-w-full px-8 py-8">
-            <Form {...form}>
-              <form
-                onSubmit={form.handleSubmit(onSubmit)}
-                className="flex flex-col gap-4"
-              >
-                <div className="grid grid-cols-1 gap-2 lg:grid-cols-2">
-                  <div className="col-span-2">
-                    <FormField
-                      control={form.control}
-                      name="numero_nf"
-                      render={({ field }) => (
-                        <FormItem className="w-full">
-                          <FormLabel className="text-white">NºNF:</FormLabel>
-                          <FormControl className="bg-slate-700 text-white border-slate-600 placeholder:text-white/40 w-full">
-                            <Input
-                              type="text"
-                              {...field}
-                              className="w-full"
-                              placeholder="Número da Nota"
-                              value={numeroNF}
-                              maxLength={6}
-                              onChange={(e) => {
-                                const val = e.target.value;
-                                if (/^\d*$/.test(val)) {
-                                  setNumeroNF(val);
-                                  field.onChange(val); // sincroniza com react-hook-form
-                                }
-                              }}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                  <div className="flex flex-col w-full text-white text-sm col-span-2">
-                    <span className="font-bold">Nome do Cliente:</span>
-                    <span className="w-full border-1 border-slate-600 bg-slate-700 p-2 rounded-md text-white/60">
-                      {nomeClient ? nomeClient : "CLIENTE NÃO ENCONTRADO"}
-                    </span>
-                  </div>
-                  <div className="flex flex-col w-full text-white text-sm">
-                    <span className="font-bold">Código do Cliente:</span>
-                    <span className="w-full border-1 border-slate-600 bg-slate-700 p-2 rounded-md text-white/60">
-                      {numeroCodigoCliente
-                        ? numeroCodigoCliente
-                        : "CLIENTE NÃO ENCONTRADO"}
-                    </span>
-                  </div>
-                  <div className="flex flex-col w-full text-white text-sm">
-                    <span className="font-bold">Número da Carga:</span>
-                    <span className="w-full border-1 border-slate-600 bg-slate-700 p-2 rounded-md text-white/60">
-                      {numeroCarga ? numeroCarga : "CARGA NÃO ENCONTRADA"}
-                    </span>
-                  </div>
-                  <div className="flex flex-col w-full text-white text-sm">
-                    <span className="font-bold">Código da Cobrança:</span>
-                    <span className="w-full border-1 border-slate-600 bg-slate-700 p-2 rounded-md text-white/60">
-                      {numeroCodigoCobranca
-                        ? numeroCodigoCobranca
-                        : "COBRANÇA NÃO ENCONTRADA"}
-                    </span>
-                  </div>
-                  <div className="flex flex-col w-full text-white text-sm">
-                    <span className="font-bold">Nome da Cobrança:</span>
-                    <span className="w-full border-1 border-slate-600 bg-slate-700 p-2 rounded-md text-white/60">
-                      {nomeCodigoCobranca
-                        ? nomeCodigoCobranca
-                        : "COBRANÇA NÃO ENCONTRADA"}
-                    </span>
-                  </div>
-                  <div className="flex flex-col w-full text-white text-sm">
-                    <span className="font-bold">Código RCA:</span>
-                    <span className="w-full border-1 border-slate-600 bg-slate-700 p-2 rounded-md text-white/60">
-                      {codigoRca ? codigoRca : "RCA NÃO ENCONTRADA"}
-                    </span>
-                  </div>
-                  <div className="flex flex-col w-full text-white text-sm">
-                    <span className="font-bold">Código Filial:</span>
-                    <span className="w-full border-1 border-slate-600 bg-slate-700 p-2 rounded-md text-white/60">
-                      {codigoFilial ? codigoFilial : "COBRANÇA NÃO ENCONTRADA"}
-                    </span>
-                  </div>
-                </div>
-                <FormField
-                  control={form.control}
-                  name="motivo_devolucao"
-                  render={({ field }) => (
-                    <FormItem className="w-full">
-                      <FormLabel className="text-white">
-                        Motivo da Devolução:
-                      </FormLabel>
-                      <FormControl className="bg-slate-700 text-white border-slate-600 placeholder:text-white/40 w-full">
-                        <Textarea
-                          {...field}
-                          className="w-full resize-none scrollbar-dark"
-                          placeholder="Digite o motivo da Devolução:"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
 
-                {/* Lista de produtos adicionados */}
-                {produtos.length > 0 && (
-                  <div className="w-full mt-4">
-                    <Table className="bg-slate-700">
-                      <TableBody>
-                        <TableRow>
-                          <TableCell className="font-bold text-white">
-                            Código
-                          </TableCell>
-                          <TableCell className="font-bold text-white">
-                            Nome
-                          </TableCell>
-                          <TableCell className="font-bold text-white">
-                            Quantidade
-                          </TableCell>
-                        </TableRow>
-                        {produtos.map((p, idx) => (
-                          <TableRow key={idx}>
-                            <TableCell className="text-white">
-                              {p.codigo}
-                            </TableCell>
-                            <TableCell className="text-white">
-                              {p.descricao}
-                            </TableCell>
-                            <TableCell className="text-white">
-                              {p.quantidade}
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </div>
-                )}
-                <Button
-                  type="button"
-                  className="w-full mt-4 bg-green-600 hover:bg-green-700 text-white font-bold cursor-pointer"
-                  onClick={() => {
-                    avancarPagina();
-                  }}
-                >
-                  Avançar
-                </Button>
-              </form>
-            </Form>
-          </CardContent>
-        </Card>
+            {/* Botões de ação */}
+            <div className="flex justify-between mt-6">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={voltarPagina}
+                className="bg-slate-700 border-slate-600 text-slate-300 hover:bg-slate-600"
+              >
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Voltar
+              </Button>
+              <Button
+                type="button"
+                disabled={produtosSelecionados.size === 0 || !tipoDevolucao}
+                className="bg-green-600 hover:bg-green-700 text-white px-8"
+              >
+                Finalizar Solicitação
+                <CheckCircle2 className="ml-2 h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
-    </>
+    </div>
   );
 }
