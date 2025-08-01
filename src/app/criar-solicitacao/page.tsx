@@ -5,20 +5,14 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
+  CardDescription,
 } from "../../components/ui/card";
 import { Input } from "../../components/ui/input";
 import { Button } from "../../components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "../../components/ui/select";
 import { Textarea } from "../../components/ui/textarea";
+import { Badge } from "../../components/ui/badge";
 import { useForm } from "react-hook-form";
 import Header from "../../components/header";
-// import { supabase } from "../../lib/supabaseClient";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -29,7 +23,40 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableFooter,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "../../components/ui/table";
 import { useState, useEffect } from "react";
+import { 
+  ArrowLeft, 
+  ArrowRight, 
+  FileText, 
+  Package, 
+  User, 
+  CreditCard, 
+  MapPin, 
+  Search,
+  CheckCircle2,
+  XCircle,
+  AlertCircle,
+  ShoppingCart,
+  Calculator
+} from "lucide-react";
+import { formatPrice } from "../../utils/formatPrice";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const formSchema = z.object({
   nome: z.string().min(1, { message: "" }).max(14, { message: "" }),
@@ -85,20 +112,81 @@ export async function fetchNameClient(cod: string): Promise<string> {
   return data.nameClient || "";
 }
 
+interface Produto {
+  codprod: string;
+  descricao: string;
+  qt: number;
+  punit: number;
+}
+
+interface InfosNF {
+  codcli: string;
+  numcar: string;
+  codusur: string;
+  codcob: string;
+  cobranca: string;
+  cliente: string;
+  codfilial: string;
+  cgcent: string;
+}
+
+export async function fetchProdutosNF(numnota: string): Promise<Produto[]> {
+  try {
+    console.log("Fazendo requisição para:", `/api/getProdutosNF/${numnota}`);
+    const res = await fetch(`/api/getProdutosNF/${numnota}`);
+    console.log("Status da resposta:", res.status);
+
+    if (!res.ok) {
+      throw new Error(`HTTP error! status: ${res.status}`);
+    }
+
+    const data = await res.json();
+    console.log("Dados recebidos da API:", data);
+
+    return data.produtos || [];
+  } catch (error) {
+    console.error("Erro na função fetchProdutosNF:", error);
+    return [];
+  }
+}
+
+export async function fetchInfosNF(numnota: string): Promise<InfosNF | null> {
+  const res = await fetch(`/api/getInfosNF/${numnota}`);
+  if (!res.ok) {
+    console.error("Erro na requisição:", res.status, res.statusText);
+    return null;
+  }
+  const data = await res.json();
+  return data;
+}
+
 export default function Solicitacao() {
   const [toast, setToast] = useState<{
     message: string;
     type: "success" | "error";
   } | null>(null);
-  const [codigo, setCodigo] = useState<string>("");
+  const [numeroNF, setNumeroNF] = useState<string>("");
   const [codigoRca, setCodigoRca] = useState<string>("");
-  const [numeroNota, setNumeroNota] = useState<string>("");
-  const [nomeProd, setNomeProd] = useState<string>("");
   const [nomeClient, setNomeClient] = useState<string>("");
-  const [numeroQuantidade, setNumeroQuantidade] = useState<string>("");
   const [numeroCarga, setNumeroCarga] = useState<string>("");
+  const [codigoFilial, setCodigoFilial] = useState<string>("");
+  const [nomeCodigoCobranca, setNomeCodigoCobranca] = useState<string>("");
   const [numeroCodigoCobranca, setNumeroCodigoCobranca] = useState<string>("");
   const [numeroCodigoCliente, setNumeroCodigoCliente] = useState<string>("");
+  const [statusCobranca1, setstatusCobranca1] = useState<string>("hidden");
+  const [statusCobranca2, setstatusCobranca2] = useState<string>("display");
+  const [tipoDevolucao, setTipoDevolucao] = useState<string>("");
+  const [produtosSelecionados, setProdutosSelecionados] = useState<Set<string>>(
+    new Set()
+  );
+  const [produtos, setProdutos] = useState<
+    Array<{
+      codigo: string;
+      descricao: string;
+      quantidade: string;
+      punit: string;
+    }>
+  >([]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -130,29 +218,65 @@ export default function Solicitacao() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [toast]);
 
+  // Monitorar mudanças nos produtos
   useEffect(() => {
-    const fetchProduct = async () => {
-      if (codigo.length === 4) {
-        const nome_produto = await fetchNameProd(codigo);
-        setNomeProd(nome_produto);
-      } else {
-        setNomeProd("");
-      }
-    };
-    fetchProduct();
-  }, [codigo]);
+    console.log("Estado dos produtos atualizado:", produtos);
+  }, [produtos]);
 
   useEffect(() => {
-    const fetchClient = async () => {
-      if (numeroCodigoCliente.length >= 4 && numeroCodigoCliente.length <= 5) {
-        const nome_cliente = await fetchNameClient(numeroCodigoCliente);
-        setNomeClient(nome_cliente);
+    const fetchInfosNota = async () => {
+      if (numeroNF.length == 6) {
+        const infos_nota = await fetchInfosNF(numeroNF);
+        if (infos_nota) {
+          setNomeClient(infos_nota.cliente);
+          setNumeroCodigoCliente(infos_nota.codcli);
+          setCodigoRca(infos_nota.codusur);
+          setNumeroCodigoCobranca(infos_nota.codcob);
+          setNumeroCarga(infos_nota.numcar);
+          setNomeCodigoCobranca(infos_nota.cobranca);
+          setCodigoFilial(infos_nota.codfilial);
+        } else {
+          setNomeClient("");
+        }
       } else {
         setNomeClient("");
       }
     };
-    fetchClient();
-  }, [numeroCodigoCliente]);
+    fetchInfosNota();
+  }, [numeroNF]);
+
+  async function avancarPagina() {
+    // Buscar produtos da NF
+    if (numeroNF) {
+      try {
+        console.log("Buscando produtos para NF:", numeroNF);
+        const produtosNF = await fetchProdutosNF(numeroNF);
+        console.log("Produtos recebidos da API:", produtosNF);
+
+        const produtosFormatados = produtosNF.map((produto) => ({
+          codigo: produto.codprod,
+          descricao: produto.descricao,
+          quantidade: produto.qt.toString(),
+          punit: produto.punit.toString(),
+        }));
+
+        console.log("Produtos formatados:", produtosFormatados);
+        setProdutos(produtosFormatados);
+        setstatusCobranca1("hidden");
+        setstatusCobranca2("display");
+      } catch (error) {
+        console.error("Erro ao buscar produtos:", error);
+        setProdutos([]);
+      }
+    } else {
+      console.log("Número da NF não informado");
+    }
+  }
+
+  function voltarPagina() {
+    setstatusCobranca1("display");
+    setstatusCobranca2("hidden");
+  }
 
   // Função nova para salvar no banco, adptar ela em relação à antiga
 
@@ -195,365 +319,416 @@ export default function Solicitacao() {
   }
 
   return (
-    <>
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
       <Header />
-      <div className="flex items-center justify-center h-[90%] w-full bg-slate-900 0-0">
-        {/* Toast Overlay */}
-        {toast && (
-          <Toast
-            message={toast.message}
-            type={toast.type}
-            onClose={() => setToast(null)}
-          />
-        )}
-        <Card className="w-full max-w-[90%] lg:max-w-[30%] shadow-2xl bg-slate-800 rounded-lg p-0 gap-0 max-h-full">
-          <CardHeader className="px-8 py-4 m-0 flex items-center justify-center">
-            <CardTitle className="text-center text-2xl font-bold text-white">
-              Criar Solicitação
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="w-full max-w-full px-8 py-8">
-            <Form {...form}>
-              <form
-                onSubmit={form.handleSubmit(onSubmit)}
-                className="flex flex-col gap-4"
-              >
-                <div className="grid grid-cols-1 gap-2 lg:grid-cols-2">
-                  <FormField
-                    control={form.control}
-                    name="codigo_cliente"
-                    render={({ field }) => (
-                      <FormItem className="w-full">
-                        <FormLabel className="text-white">
-                          Código do Cliente:
-                        </FormLabel>
-                        <FormControl className="bg-slate-700 text-white border-slate-600 placeholder:text-white/40 w-full">
-                          <Input
-                            type="text"
-                            {...field}
-                            className="w-full"
-                            placeholder="Código do Cliente"
-                            value={numeroCodigoCliente}
-                            maxLength={5}
-                            onChange={(e) => {
-                              const val = e.target.value;
-                              if (/^\d*$/.test(val)) {
-                                setNumeroCodigoCliente(val);
-                                field.onChange(val); // sincroniza com react-hook-form
-                              }
-                            }}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <div className="flex flex-col w-full text-white text-sm">
-                    <span className="font-bold">Nome do Cliente:</span>
-                    <span className="w-full border-1 border-slate-600 bg-slate-700 p-2 rounded-md text-white/60">
-                      {nomeClient ? nomeClient : "CLIENTE NÃO ENCONTRADO"}
-                    </span>
-                  </div>
-                  <FormField
-                    control={form.control}
-                    name="numero_nf"
-                    render={({ field }) => (
-                      <FormItem className="w-full">
-                        <FormLabel className="text-white">NºNF:</FormLabel>
-                        <FormControl className="bg-slate-700 text-white border-slate-600 placeholder:text-white/40 w-full">
-                          <Input
-                            type="text"
-                            {...field}
-                            className="w-full"
-                            placeholder="Número da Nota"
-                            value={numeroNota}
-                            maxLength={6}
-                            onChange={(e) => {
-                              const val = e.target.value;
-                              if (/^\d*$/.test(val)) {
-                                setNumeroNota(val); // atualiza o estado local
-                                field.onChange(val); // atualiza o valor do formulário
-                              }
-                            }}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="carga"
-                    render={({ field }) => (
-                      <FormItem className="w-full">
-                        <FormLabel className="text-white">Carga:</FormLabel>
-                        <FormControl className="bg-slate-700 text-white border-slate-600 placeholder:text-white/40 w-full">
-                          <Input
-                            type="text"
-                            {...field}
-                            className="w-full"
-                            placeholder="Número da carga"
-                            value={numeroCarga}
-                            maxLength={6}
-                            onChange={(e) => {
-                              const val = e.target.value;
-                              if (/^\d*$/.test(val)) {
-                                setNumeroCarga(val); // atualiza o estado local
-                                field.onChange(val); // atualiza o valor do formulário
-                              }
-                            }}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <div className="flex justify-center w-full col-span-2 gap-2">
-                    <FormField
-                      control={form.control}
-                      name="codigo_cobranca"
-                      render={({ field }) => (
-                        <FormItem className="w-full">
-                          <FormLabel className="text-white">
-                            Cód. Cobrança:
-                          </FormLabel>
-                          <FormControl className="bg-slate-700 text-white border-slate-600 placeholder:text-white/40 w-full">
-                            <Input
-                              type="text"
-                              {...field}
-                              className="w-full"
-                              placeholder="Código da cobrança"
-                              value={numeroCodigoCobranca}
-                              maxLength={4}
-                              onChange={(e) => {
-                                const val = e.target.value;
-                                if (/^\d*$/.test(val)) {
-                                  setNumeroCodigoCobranca(val); // atualiza o estado local
-                                  field.onChange(val); // atualiza o valor do formulário
-                                }
-                              }}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="rca"
-                      render={({ field }) => (
-                        <FormItem className="w-full">
-                          <FormLabel className="text-white">RCA:</FormLabel>
-                          <FormControl className="bg-slate-700 text-white border-slate-600 placeholder:text-white/40 w-full">
-                            <Input
-                              type="text"
-                              {...field}
-                              className="w-full"
-                              placeholder="Código do RCA"
-                              value={codigoRca}
-                              maxLength={3}
-                              onChange={(e) => {
-                                const val = e.target.value;
-                                if (/^\d*$/.test(val)) {
-                                  setCodigoRca(val); // atualiza o estado local
-                                  field.onChange(val); // atualiza o valor do formulário
-                                }
-                              }}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                </div>
-                <FormField
-                  control={form.control}
-                  name="motivo_devolucao"
-                  render={({ field }) => (
-                    <FormItem className="w-full">
-                      <FormLabel className="text-white">
-                        Motivo da Devolução:
-                      </FormLabel>
-                      <FormControl className="bg-slate-700 text-white border-slate-600 placeholder:text-white/40 w-full">
-                        <Textarea
-                          {...field}
-                          className="w-full resize-none scrollbar-dark"
-                          placeholder="Digite o motivo da Devolução:"
+      
+      {/* Toast Overlay */}
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
+
+      <div className="container mx-auto px-4 py-8">
+        {/* Header Section */}
+        <div className="mb-8">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="p-2 bg-blue-500/20 rounded-lg">
+              <FileText className="h-8 w-8 text-blue-400" />
+            </div>
+            <div>
+              <h1 className="text-3xl font-bold text-white">Nova Solicitação de Devolução</h1>
+              <p className="text-slate-400">Crie uma nova solicitação de devolução de produtos</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Progress Indicator */}
+        <div className="mb-8">
+          <div className="flex items-center justify-center gap-4">
+            <div className={`flex items-center gap-2 px-4 py-2 rounded-lg ${
+              statusCobranca1 === "display" ? "bg-blue-500/20 text-blue-400" : "bg-slate-700 text-slate-400"
+            }`}>
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                statusCobranca1 === "display" ? "bg-blue-500 text-white" : "bg-slate-600 text-slate-400"
+              }`}>1</div>
+              <span className="font-medium">Informações da NF</span>
+            </div>
+            <ArrowRight className="h-5 w-5 text-slate-400" />
+            <div className={`flex items-center gap-2 px-4 py-2 rounded-lg ${
+              statusCobranca2 === "display" ? "bg-blue-500/20 text-blue-400" : "bg-slate-700 text-slate-400"
+            }`}>
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                statusCobranca2 === "display" ? "bg-blue-500 text-white" : "bg-slate-600 text-slate-400"
+              }`}>2</div>
+              <span className="font-medium">Seleção de Produtos</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Etapa 1: Informações da NF */}
+        {statusCobranca1 === "display" && (
+          <div className="max-w-4xl mx-auto">
+            <Card className="bg-slate-800/50 border-slate-700">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center gap-2">
+                  <Search className="h-5 w-5" />
+                  Buscar Nota Fiscal
+                </CardTitle>
+                <CardDescription className="text-slate-400">
+                  Digite o número da nota fiscal para buscar as informações
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Form {...form}>
+                  <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="md:col-span-2">
+                        <FormField
+                          control={form.control}
+                          name="numero_nf"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="text-slate-300">Número da Nota Fiscal</FormLabel>
+                              <FormControl>
+                                <Input
+                                  type="text"
+                                  {...field}
+                                  placeholder="Digite o número da NF (6 dígitos)"
+                                  value={numeroNF}
+                                  maxLength={6}
+                                  onChange={(e) => {
+                                    const val = e.target.value;
+                                    if (/^\d*$/.test(val)) {
+                                      setNumeroNF(val);
+                                      field.onChange(val);
+                                    }
+                                  }}
+                                  className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-400"
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
                         />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <div className="flex max-w-full gap-2 flex-col xl:flex-row">
-                  <FormField
-                    control={form.control}
-                    name="tipo_devolucao"
-                    render={({ field }) => (
-                      <FormItem
-                        className="w-full flex flex-col py-2
-                          "
+                      </div>
+
+                      {/* Informações do Cliente */}
+                      <Card className="md:col-span-2 bg-slate-700/50 border-slate-600">
+                        <CardHeader>
+                          <CardTitle className="text-white text-lg flex items-center gap-2">
+                            <User className="h-5 w-5" />
+                            Informações do Cliente
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <label className="text-sm font-medium text-slate-300">Nome do Cliente</label>
+                            <div className="mt-1 p-3 bg-slate-600 rounded-lg border border-slate-500">
+                              <span className="text-white">
+                                {nomeClient || "CLIENTE NÃO ENCONTRADO"}
+                              </span>
+                            </div>
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium text-slate-300">Código do Cliente</label>
+                            <div className="mt-1 p-3 bg-slate-600 rounded-lg border border-slate-500">
+                              <span className="text-white">
+                                {numeroCodigoCliente || "CÓDIGO NÃO ENCONTRADO"}
+                              </span>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+
+                      {/* Informações da Carga e Cobrança */}
+                      <Card className="bg-slate-700/50 border-slate-600">
+                        <CardHeader>
+                          <CardTitle className="text-white text-lg flex items-center gap-2">
+                            <Package className="h-5 w-5" />
+                            Informações da Carga
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                          <div>
+                            <label className="text-sm font-medium text-slate-300">Número da Carga</label>
+                            <div className="mt-1 p-3 bg-slate-600 rounded-lg border border-slate-500">
+                              <span className="text-white">
+                                {numeroCarga || "CARGA NÃO ENCONTRADA"}
+                              </span>
+                            </div>
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium text-slate-300">Código RCA</label>
+                            <div className="mt-1 p-3 bg-slate-600 rounded-lg border border-slate-500">
+                              <span className="text-white">
+                                {codigoRca || "RCA NÃO ENCONTRADO"}
+                              </span>
+                            </div>
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium text-slate-300">Código Filial</label>
+                            <div className="mt-1 p-3 bg-slate-600 rounded-lg border border-slate-500">
+                              <span className="text-white">
+                                {codigoFilial || "FILIAL NÃO ENCONTRADA"}
+                              </span>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+
+                      <Card className="bg-slate-700/50 border-slate-600">
+                        <CardHeader>
+                          <CardTitle className="text-white text-lg flex items-center gap-2">
+                            <CreditCard className="h-5 w-5" />
+                            Informações de Cobrança
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                          <div>
+                            <label className="text-sm font-medium text-slate-300">Código da Cobrança</label>
+                            <div className="mt-1 p-3 bg-slate-600 rounded-lg border border-slate-500">
+                              <span className="text-white">
+                                {numeroCodigoCobranca || "CÓDIGO NÃO ENCONTRADO"}
+                              </span>
+                            </div>
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium text-slate-300">Nome da Cobrança</label>
+                            <div className="mt-1 p-3 bg-slate-600 rounded-lg border border-slate-500">
+                              <span className="text-white">
+                                {nomeCodigoCobranca || "COBRANÇA NÃO ENCONTRADA"}
+                              </span>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+
+                      <div className="md:col-span-2">
+                        <FormField
+                          control={form.control}
+                          name="motivo_devolucao"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="text-slate-300">Motivo da Devolução</FormLabel>
+                              <FormControl>
+                                <Textarea
+                                  {...field}
+                                  placeholder="Descreva o motivo da devolução..."
+                                  className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-400 resize-none min-h-[100px]"
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="flex justify-end">
+                      <Button
+                        type="button"
+                        onClick={avancarPagina}
+                        disabled={!numeroNF || numeroNF.length !== 6}
+                        className="bg-blue-600 hover:bg-blue-700 text-white px-8"
                       >
-                        <FormLabel className="text-white">
-                          Tipo de Devolução:
-                        </FormLabel>
-                        <FormControl>
-                          <Select
-                            value={field.value}
-                            onValueChange={(value) => field.onChange(value)}
-                          >
-                            <SelectTrigger
-                              className="text-white w-full border-slate-600 bg-slate-700
-                                      border rounded-md placeholder:text-white/40"
-                            >
-                              <SelectValue placeholder="Selecione o tipo de Devolução" />
-                            </SelectTrigger>
-                            <SelectContent className="bg-slate-700 border-slate-600 text-white">
-                              <SelectItem
-                                value="total"
-                                className="bg-slate-700 text-white data-[state=checked]:bg-slate-600 hover:!bg-slate-600 hover:!text-white focus:bg-slate-600 focus:text-white"
-                              >
-                                Total
-                              </SelectItem>
-                              <SelectItem
-                                value="parcial"
-                                className="bg-slate-700 text-white data-[state=checked]:bg-slate-600 hover:!bg-slate-600 hover:!text-white focus:bg-slate-600 focus:text-white"
-                              >
-                                Parcial
-                              </SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="filial"
-                    render={({ field }) => (
-                      <FormItem
-                        className="w-full flex flex-col py-2
-                          "
-                      >
-                        <FormLabel className="text-white">Filial:</FormLabel>
-                        <FormControl className="bg-slate-700 text-white border-slate-600 placeholder:text-white/40 w-full">
-                          <Select
-                            value={field.value}
-                            onValueChange={(value) => field.onChange(value)}
-                          >
-                            <SelectTrigger
-                              className="text-white w-full border-slate-600 bg-slate-700
-                                      border rounded-md placeholder:text-white/40
-                                      "
-                            >
-                              <SelectValue
-                                className="text-white placeholder:text-white/40"
-                                placeholder="Selecione a Filial"
-                              />
-                            </SelectTrigger>
-                            <SelectContent className="bg-slate-700 border-slate-600 text-white">
-                              <SelectItem
-                                value="filial1"
-                                className="bg-slate-700 text-white data-[state=checked]:bg-slate-600 hover:!bg-slate-600 hover:!text-white focus:bg-slate-600 focus:text-white"
-                              >
-                                Filial 1
-                              </SelectItem>
-                              <SelectItem
-                                value="filial5"
-                                className="bg-slate-700 text-white data-[state=checked]:bg-slate-600 hover:!bg-slate-600 hover:!text-white focus:bg-slate-600 focus:text-white"
-                              >
-                                Filial 5
-                              </SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                <div className="flex gap-2 max-w-full">
-                  <FormField
-                    control={form.control}
-                    name="codigo_produto"
-                    render={({ field }) => (
-                      <FormItem className="w-full">
-                        <FormLabel className="text-white">
-                          Código do Produto:
-                        </FormLabel>
-                        <FormControl className="bg-slate-700 text-white border-slate-600 placeholder:text-white/40 w-full">
-                          <Input
-                            type="text"
-                            {...field}
-                            className="w-full"
-                            placeholder="Código do Produto"
-                            value={codigo}
-                            maxLength={4}
-                            onChange={(e) => {
-                              const val = e.target.value;
-                              if (/^\d*$/.test(val)) {
-                                setCodigo(val); // atualiza o estado local
-                                field.onChange(val); // atualiza o valor do formulário
-                              }
-                            }}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="quantidade"
-                    render={({ field }) => (
-                      <FormItem className="w-full">
-                        <FormLabel className="text-white">
-                          Quantidade:
-                        </FormLabel>
-                        <FormControl className="bg-slate-700 text-white border-slate-600 placeholder:text-white/40 w-full">
-                          <Input
-                            type="text"
-                            {...field}
-                            className="w-full"
-                            placeholder="Quantidade"
-                            value={numeroQuantidade}
-                            maxLength={6}
-                            onChange={(e) => {
-                              const val = e.target.value;
-                              if (/^\d*$/.test(val)) {
-                                setNumeroQuantidade(val); // atualiza o estado local
-                                field.onChange(val); // atualiza o valor do formulário
-                              }
-                            }}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <div className="flex items-end h-full mt-auto">
-                    <Button className="justify-center bg-slate-500 hover:bg-slate-600 text-white font-bold cursor-pointer">
-                      +
-                    </Button>
+                        Avançar
+                        <ArrowRight className="ml-2 h-4 w-4" />
+                      </Button>
+                    </div>
+                  </form>
+                </Form>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
+        {/* Etapa 2: Seleção de Produtos */}
+        {statusCobranca2 === "display" && (
+          <div className="max-w-6xl mx-auto">
+            <div className="flex items-center gap-4 mb-6">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={voltarPagina}
+                className="bg-slate-700 border-slate-600 text-slate-300 hover:bg-slate-600"
+              >
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Voltar
+              </Button>
+              <Badge variant="outline" className="text-slate-300 border-slate-600">
+                NF: {numeroNF}
+              </Badge>
+              <Badge variant="outline" className="text-slate-300 border-slate-600">
+                Cliente: {nomeClient}
+              </Badge>
+            </div>
+
+            {/* Controles do Tipo de Devolução */}
+            <Card className="bg-slate-800/50 border-slate-700 mb-6">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center gap-2">
+                  <AlertCircle className="h-5 w-5" />
+                  Tipo de Devolução
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Select value={tipoDevolucao} onValueChange={setTipoDevolucao}>
+                  <SelectTrigger className="bg-slate-700 border-slate-600 text-white">
+                    <SelectValue placeholder="Selecione o tipo de devolução" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-slate-700 border-slate-600">
+                    <SelectItem value="total" className="text-white">
+                      <div className="flex items-center gap-2">
+                        <CheckCircle2 className="h-4 w-4 text-green-400" />
+                        Devolução Total
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="parcial" className="text-white">
+                      <div className="flex items-center gap-2">
+                        <XCircle className="h-4 w-4 text-orange-400" />
+                        Devolução Parcial
+                      </div>
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </CardContent>
+            </Card>
+
+            {/* Tabela de Produtos */}
+            <Card className="bg-slate-800/50 border-slate-700">
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="text-white flex items-center gap-2">
+                      <ShoppingCart className="h-5 w-5" />
+                      Produtos da Nota Fiscal
+                    </CardTitle>
+                    <CardDescription className="text-slate-400">
+                      Selecione os produtos que deseja devolver
+                    </CardDescription>
                   </div>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => {
+                      if (produtosSelecionados.size === produtos.length) {
+                        setProdutosSelecionados(new Set());
+                      } else {
+                        setProdutosSelecionados(new Set(produtos.map((p) => p.codigo)));
+                      }
+                    }}
+                    className="bg-slate-700 border-slate-600 text-slate-300 hover:bg-slate-600"
+                  >
+                    {produtosSelecionados.size === produtos.length
+                      ? "Desselecionar Todos"
+                      : "Selecionar Todos"}
+                  </Button>
                 </div>
-                <div className="flex flex-col w-full text-white text-sm">
-                  <span className="font-bold">Nome do Produto:</span>
-                  <span className="w-full border-1 border-slate-600 bg-slate-700 p-2 rounded-md text-white/60">
-                    {nomeProd ? nomeProd : "PRODUTO NÃO ENCONTRADO"}
-                  </span>
-                </div>
-                <Button
-                  type="submit"
-                  className="w-full mt-4 bg-green-600 hover:bg-green-700 text-white font-bold cursor-pointer"
-                >
-                  Criar Solicitação
-                </Button>
-              </form>
-            </Form>
-          </CardContent>
-        </Card>
+              </CardHeader>
+              <CardContent>
+                <Table>
+                  <TableHeader>
+                    <TableRow className="border-slate-700">
+                      <TableHead className="text-slate-300">Selecionar</TableHead>
+                      <TableHead className="text-slate-300">Código</TableHead>
+                      <TableHead className="text-slate-300">Produto</TableHead>
+                      <TableHead className="text-slate-300 text-center">Quantidade</TableHead>
+                      <TableHead className="text-slate-300 text-center">Preço Unit.</TableHead>
+                      <TableHead className="text-slate-300 text-center">Valor Total</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {Array.isArray(produtos) && produtos.length > 0 ? (
+                      produtos.map((p) => (
+                        <TableRow key={p.codigo} className="border-slate-700 hover:bg-slate-700/30">
+                          <TableCell>
+                            <div className="flex items-center justify-center">
+                              <Checkbox
+                                checked={produtosSelecionados.has(p.codigo)}
+                                onCheckedChange={(checked) => {
+                                  const newSelecionados = new Set(produtosSelecionados);
+                                  if (checked) {
+                                    newSelecionados.add(p.codigo);
+                                  } else {
+                                    newSelecionados.delete(p.codigo);
+                                  }
+                                  setProdutosSelecionados(newSelecionados);
+                                }}
+                              />
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant="outline" className="text-slate-300 border-slate-600">
+                              {p.codigo}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="text-white font-medium">{p.descricao}</TableCell>
+                          <TableCell className="text-center text-slate-300">{p.quantidade}</TableCell>
+                          <TableCell className="text-center text-slate-300">
+                            {formatPrice(Number(p.punit))}
+                          </TableCell>
+                          <TableCell className="text-center text-white font-medium">
+                            {formatPrice(Number(p.punit) * Number(p.quantidade))}
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    ) : (
+                      <TableRow>
+                        <TableCell colSpan={6} className="text-center py-8 text-slate-400">
+                          Nenhum produto encontrado
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </TableBody>
+                  <TableFooter>
+                    <TableRow className="bg-slate-700/50">
+                      <TableCell colSpan={5} className="text-right">
+                        <div className="flex items-center justify-end gap-2">
+                          <Calculator className="h-4 w-4 text-slate-400" />
+                          <span className="text-white font-bold">Total Selecionado:</span>
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <span className="text-xl font-bold text-green-400">
+                          {formatPrice(
+                            produtos
+                              .filter((p) => produtosSelecionados.has(p.codigo))
+                              .reduce((acc, p) => acc + Number(p.punit) * Number(p.quantidade), 0)
+                          )}
+                        </span>
+                      </TableCell>
+                    </TableRow>
+                  </TableFooter>
+                </Table>
+              </CardContent>
+            </Card>
+
+            {/* Botões de ação */}
+            <div className="flex justify-between mt-6">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={voltarPagina}
+                className="bg-slate-700 border-slate-600 text-slate-300 hover:bg-slate-600"
+              >
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Voltar
+              </Button>
+              <Button
+                type="button"
+                disabled={produtosSelecionados.size === 0 || !tipoDevolucao}
+                className="bg-green-600 hover:bg-green-700 text-white px-8"
+              >
+                Finalizar Solicitação
+                <CheckCircle2 className="ml-2 h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
-    </>
+    </div>
   );
 }
