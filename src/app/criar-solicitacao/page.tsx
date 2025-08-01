@@ -8,17 +8,9 @@ import {
 } from "../../components/ui/card";
 import { Input } from "../../components/ui/input";
 import { Button } from "../../components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "../../components/ui/select";
 import { Textarea } from "../../components/ui/textarea";
 import { useForm } from "react-hook-form";
 import Header from "../../components/header";
-// import { supabase } from "../../lib/supabaseClient";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -29,7 +21,26 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableFooter,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "../../components/ui/table";
 import { useState, useEffect } from "react";
+import { Undo2 } from "lucide-react";
+import { formatPrice } from "../../utils/formatPrice";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const formSchema = z.object({
   nome: z.string().min(1, { message: "" }).max(14, { message: "" }),
@@ -85,20 +96,81 @@ export async function fetchNameClient(cod: string): Promise<string> {
   return data.nameClient || "";
 }
 
+interface Produto {
+  codprod: string;
+  descricao: string;
+  qt: number;
+  punit: number;
+}
+
+interface InfosNF {
+  codcli: string;
+  numcar: string;
+  codusur: string;
+  codcob: string;
+  cobranca: string;
+  cliente: string;
+  codfilial: string;
+  cgcent: string;
+}
+
+export async function fetchProdutosNF(numnota: string): Promise<Produto[]> {
+  try {
+    console.log("Fazendo requisição para:", `/api/getProdutosNF/${numnota}`);
+    const res = await fetch(`/api/getProdutosNF/${numnota}`);
+    console.log("Status da resposta:", res.status);
+
+    if (!res.ok) {
+      throw new Error(`HTTP error! status: ${res.status}`);
+    }
+
+    const data = await res.json();
+    console.log("Dados recebidos da API:", data);
+
+    return data.produtos || [];
+  } catch (error) {
+    console.error("Erro na função fetchProdutosNF:", error);
+    return [];
+  }
+}
+
+export async function fetchInfosNF(numnota: string): Promise<InfosNF | null> {
+  const res = await fetch(`/api/getInfosNF/${numnota}`);
+  if (!res.ok) {
+    console.error("Erro na requisição:", res.status, res.statusText);
+    return null;
+  }
+  const data = await res.json();
+  return data;
+}
+
 export default function Solicitacao() {
   const [toast, setToast] = useState<{
     message: string;
     type: "success" | "error";
   } | null>(null);
-  const [codigo, setCodigo] = useState<string>("");
+  const [numeroNF, setNumeroNF] = useState<string>("");
   const [codigoRca, setCodigoRca] = useState<string>("");
-  const [numeroNota, setNumeroNota] = useState<string>("");
-  const [nomeProd, setNomeProd] = useState<string>("");
   const [nomeClient, setNomeClient] = useState<string>("");
-  const [numeroQuantidade, setNumeroQuantidade] = useState<string>("");
   const [numeroCarga, setNumeroCarga] = useState<string>("");
+  const [codigoFilial, setCodigoFilial] = useState<string>("");
+  const [nomeCodigoCobranca, setNomeCodigoCobranca] = useState<string>("");
   const [numeroCodigoCobranca, setNumeroCodigoCobranca] = useState<string>("");
   const [numeroCodigoCliente, setNumeroCodigoCliente] = useState<string>("");
+  const [statusCobranca1, setstatusCobranca1] = useState<string>("hidden");
+  const [statusCobranca2, setstatusCobranca2] = useState<string>("display");
+  const [tipoDevolucao, setTipoDevolucao] = useState<string>("");
+  const [produtosSelecionados, setProdutosSelecionados] = useState<Set<string>>(
+    new Set()
+  );
+  const [produtos, setProdutos] = useState<
+    Array<{
+      codigo: string;
+      descricao: string;
+      quantidade: string;
+      punit: string;
+    }>
+  >([]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -130,29 +202,65 @@ export default function Solicitacao() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [toast]);
 
+  // Monitorar mudanças nos produtos
   useEffect(() => {
-    const fetchProduct = async () => {
-      if (codigo.length === 4) {
-        const nome_produto = await fetchNameProd(codigo);
-        setNomeProd(nome_produto);
-      } else {
-        setNomeProd("");
-      }
-    };
-    fetchProduct();
-  }, [codigo]);
+    console.log("Estado dos produtos atualizado:", produtos);
+  }, [produtos]);
 
   useEffect(() => {
-    const fetchClient = async () => {
-      if (numeroCodigoCliente.length >= 4 && numeroCodigoCliente.length <= 5) {
-        const nome_cliente = await fetchNameClient(numeroCodigoCliente);
-        setNomeClient(nome_cliente);
+    const fetchInfosNota = async () => {
+      if (numeroNF.length == 6) {
+        const infos_nota = await fetchInfosNF(numeroNF);
+        if (infos_nota) {
+          setNomeClient(infos_nota.cliente);
+          setNumeroCodigoCliente(infos_nota.codcli);
+          setCodigoRca(infos_nota.codusur);
+          setNumeroCodigoCobranca(infos_nota.codcob);
+          setNumeroCarga(infos_nota.numcar);
+          setNomeCodigoCobranca(infos_nota.cobranca);
+          setCodigoFilial(infos_nota.codfilial);
+        } else {
+          setNomeClient("");
+        }
       } else {
         setNomeClient("");
       }
     };
-    fetchClient();
-  }, [numeroCodigoCliente]);
+    fetchInfosNota();
+  }, [numeroNF]);
+
+  async function avancarPagina() {
+    // Buscar produtos da NF
+    if (numeroNF) {
+      try {
+        console.log("Buscando produtos para NF:", numeroNF);
+        const produtosNF = await fetchProdutosNF(numeroNF);
+        console.log("Produtos recebidos da API:", produtosNF);
+
+        const produtosFormatados = produtosNF.map((produto) => ({
+          codigo: produto.codprod,
+          descricao: produto.descricao,
+          quantidade: produto.qt.toString(),
+          punit: produto.punit.toString(),
+        }));
+
+        console.log("Produtos formatados:", produtosFormatados);
+        setProdutos(produtosFormatados);
+        setstatusCobranca1("hidden");
+        setstatusCobranca2("display");
+      } catch (error) {
+        console.error("Erro ao buscar produtos:", error);
+        setProdutos([]);
+      }
+    } else {
+      console.log("Número da NF não informado");
+    }
+  }
+
+  function voltarPagina() {
+    setstatusCobranca1("display");
+    setstatusCobranca2("hidden");
+  }
 
   // Função nova para salvar no banco, adptar ela em relação à antiga
 
@@ -206,17 +314,203 @@ export default function Solicitacao() {
             onClose={() => setToast(null)}
           />
         )}
-        <Card className="w-full max-w-[90%] lg:max-w-[30%] shadow-2xl bg-slate-800 rounded-lg p-0 gap-0 max-h-full">
-          <CardHeader>
-            <CardTitle>
+        <Card
+          className={`w-full max-w-[90%] lg:max-w-[50%] shadow-2xl bg-slate-800 rounded-lg p-8 gap-0 max-h-full ${statusCobranca2} relative`}
+        >
+          <Button
+            type="button"
+            className="mt-4 bg-slate-600 hover:bg-slate-700 text-white font-bold cursor-pointer absolute left-4 top-[0]"
+            onClick={() => {
+              voltarPagina();
+            }}
+          >
+            <Undo2 />
+            Voltar
+          </Button>
+          <div className="w-full flex py-2">
+            <div>
+              <label className="text-white mb-2">Tipo de Devolução:</label>
+              <Select
+                value={tipoDevolucao}
+                onValueChange={(value) => setTipoDevolucao(value)}
+              >
+                <SelectTrigger
+                  className="text-white border-slate-600 bg-slate-700
+                          border rounded-md placeholder:text-white/40"
+                >
+                  <SelectValue placeholder="Selecione o tipo de Devolução" />
+                </SelectTrigger>
+                <SelectContent className="bg-slate-700 border-slate-600 text-white">
+                  <SelectItem
+                    value="total"
+                    className="bg-slate-700 text-white data-[state=checked]:bg-slate-600 hover:!bg-slate-600 hover:!text-white focus:bg-slate-600 focus:text-white"
+                  >
+                    Total
+                  </SelectItem>
+                  <SelectItem
+                    value="parcial"
+                    className="bg-slate-700 text-white data-[state=checked]:bg-slate-600 hover:!bg-slate-600 hover:!text-white focus:bg-slate-600 focus:text-white"
+                  >
+                    Parcial
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+              </div>
+          </div>
+          <CardHeader className="">
+            <CardTitle className="text-center text-2xl font-bold text-white p-12">
               Continuar Solicitação
             </CardTitle>
           </CardHeader>
           <CardContent>
-            
+            <Card className="bg-slate-600 text-white col-span-3 max-h-80 flex flex-col gap-0 p-0 relative">
+            <div className="mb-4 absolute left-2 top-2">
+              <Button
+                type="button"
+                variant="outline"
+                className="text-white hover:text-white shadow-none border-slate-500 border-2 hover:bg-slate-800 bg-slate-700 cursor-pointer"
+                onClick={() => {
+                  if (produtosSelecionados.size === produtos.length) {
+                    setProdutosSelecionados(new Set());
+                  } else {
+                    setProdutosSelecionados(
+                      new Set(produtos.map((p) => p.codigo))
+                    );
+                  }
+                }}
+              >
+                {produtosSelecionados.size === produtos.length
+                  ? "Desselecionar Todos"
+                  : "Selecionar Todos"}
+              </Button>
+            </div>
+              <CardHeader className="text-center font-bold text-xl py-2">
+                PRODUTOS
+              </CardHeader>
+              <CardContent className="w-full p-0">
+                <Table className="bg-slate-700">
+                  <TableHeader>
+                    <TableRow className="bg-slate-800">
+                      <TableHead className="text-white font-bold">
+                        Selecionar
+                      </TableHead>
+                      <TableHead className="text-white font-bold">
+                        Código Produto
+                      </TableHead>
+                      <TableHead className="text-white font-bold">
+                        Nome
+                      </TableHead>
+                      <TableHead className="text-white font-bold">
+                        Quantidade
+                      </TableHead>
+                      <TableHead className="text-white font-bold">
+                        Preço Unitário
+                      </TableHead>
+                      <TableHead className="text-white font-bold">
+                        Valor Total
+                      </TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {Array.isArray(produtos) && produtos.length > 0 ? (
+                      produtos.map(
+                        (p: {
+                          codigo: string;
+                          descricao: string;
+                          quantidade: string;
+                          punit: string;
+                        }) => (
+                          <TableRow
+                            key={p.codigo}
+                            className="border-b border-slate-400"
+                          >
+                            <TableCell className="text-center text-white">
+                              <div className="flex items-center justify-center">
+                                <Checkbox
+                                  checked={produtosSelecionados.has(p.codigo)}
+                                  onCheckedChange={(checked) => {
+                                    const newSelecionados = new Set(
+                                      produtosSelecionados
+                                    );
+                                    if (checked) {
+                                      newSelecionados.add(p.codigo);
+                                    } else {
+                                      newSelecionados.delete(p.codigo);
+                                    }
+                                    setProdutosSelecionados(newSelecionados);
+                                  }}
+                                />
+                              </div>
+                            </TableCell>
+                            <TableCell className="text-center text-white">
+                              {p.codigo}
+                            </TableCell>
+                            <TableCell className="text-white">
+                              {p.descricao}
+                            </TableCell>
+                            <TableCell className="text-center text-white">
+                              {p.quantidade}
+                            </TableCell>
+                            <TableCell className="text-center text-white">
+                              {formatPrice(Number(p.punit))}
+                            </TableCell>
+                            <TableCell className="text-center text-white">
+                              {formatPrice(
+                                Number(p.punit) * Number(p.quantidade)
+                              )}
+                            </TableCell>
+                          </TableRow>
+                        )
+                      )
+                    ) : (
+                      <TableRow>
+                        <TableCell
+                          colSpan={6}
+                          className="text-center text-white py-4"
+                        >
+                          Nenhum produto encontrado
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </TableBody>
+                  <TableFooter>
+                    <TableRow>
+                      <TableCell
+                        colSpan={5}
+                        className="w-full justify-start text-center text-white py-4"
+                      >
+                        <div className="flex justify-start">
+                          <span className="text-white font-bold text-start text-xl pl-10">
+                            Total:{" "}
+                          </span>
+                        </div>
+                      </TableCell>
+                      <TableCell
+                        colSpan={1}
+                        className="text-center text-white py-4"
+                      >
+                        <span className="text-white text-xl pr-10">
+                          {formatPrice(
+                            produtos
+                              .filter((p) => produtosSelecionados.has(p.codigo))
+                              .reduce(
+                                (acc, p) =>
+                                  acc + Number(p.punit) * Number(p.quantidade),
+                                0
+                              )
+                          )}
+                        </span>
+                      </TableCell>
+                    </TableRow>
+                  </TableFooter>
+                </Table>
+              </CardContent>
+            </Card>
           </CardContent>
         </Card>
-        <Card className="w-full max-w-[90%] lg:max-w-[30%] shadow-2xl bg-slate-800 rounded-lg p-0 gap-0 max-h-full hidden">
+        <Card
+          className={`w-full max-w-[90%] lg:max-w-[30%] shadow-2xl bg-slate-800 rounded-lg p-0 gap-0 max-h-full ${statusCobranca1}`}
+        >
           <CardHeader className="px-8 py-4 m-0 flex items-center justify-center">
             <CardTitle className="text-center text-2xl font-bold text-white">
               Criar Solicitação
@@ -229,152 +523,82 @@ export default function Solicitacao() {
                 className="flex flex-col gap-4"
               >
                 <div className="grid grid-cols-1 gap-2 lg:grid-cols-2">
-                  <FormField
-                    control={form.control}
-                    name="codigo_cliente"
-                    render={({ field }) => (
-                      <FormItem className="w-full">
-                        <FormLabel className="text-white">
-                          Código do Cliente:
-                        </FormLabel>
-                        <FormControl className="bg-slate-700 text-white border-slate-600 placeholder:text-white/40 w-full">
-                          <Input
-                            type="text"
-                            {...field}
-                            className="w-full"
-                            placeholder="Código do Cliente"
-                            value={numeroCodigoCliente}
-                            maxLength={5}
-                            onChange={(e) => {
-                              const val = e.target.value;
-                              if (/^\d*$/.test(val)) {
-                                setNumeroCodigoCliente(val);
-                                field.onChange(val); // sincroniza com react-hook-form
-                              }
-                            }}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <div className="flex flex-col w-full text-white text-sm">
+                  <div className="col-span-2">
+                    <FormField
+                      control={form.control}
+                      name="numero_nf"
+                      render={({ field }) => (
+                        <FormItem className="w-full">
+                          <FormLabel className="text-white">NºNF:</FormLabel>
+                          <FormControl className="bg-slate-700 text-white border-slate-600 placeholder:text-white/40 w-full">
+                            <Input
+                              type="text"
+                              {...field}
+                              className="w-full"
+                              placeholder="Número da Nota"
+                              value={numeroNF}
+                              maxLength={6}
+                              onChange={(e) => {
+                                const val = e.target.value;
+                                if (/^\d*$/.test(val)) {
+                                  setNumeroNF(val);
+                                  field.onChange(val); // sincroniza com react-hook-form
+                                }
+                              }}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  <div className="flex flex-col w-full text-white text-sm col-span-2">
                     <span className="font-bold">Nome do Cliente:</span>
                     <span className="w-full border-1 border-slate-600 bg-slate-700 p-2 rounded-md text-white/60">
                       {nomeClient ? nomeClient : "CLIENTE NÃO ENCONTRADO"}
                     </span>
                   </div>
-                  <FormField
-                    control={form.control}
-                    name="numero_nf"
-                    render={({ field }) => (
-                      <FormItem className="w-full">
-                        <FormLabel className="text-white">NºNF:</FormLabel>
-                        <FormControl className="bg-slate-700 text-white border-slate-600 placeholder:text-white/40 w-full">
-                          <Input
-                            type="text"
-                            {...field}
-                            className="w-full"
-                            placeholder="Número da Nota"
-                            value={numeroNota}
-                            maxLength={6}
-                            onChange={(e) => {
-                              const val = e.target.value;
-                              if (/^\d*$/.test(val)) {
-                                setNumeroNota(val); // atualiza o estado local
-                                field.onChange(val); // atualiza o valor do formulário
-                              }
-                            }}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="carga"
-                    render={({ field }) => (
-                      <FormItem className="w-full">
-                        <FormLabel className="text-white">Carga:</FormLabel>
-                        <FormControl className="bg-slate-700 text-white border-slate-600 placeholder:text-white/40 w-full">
-                          <Input
-                            type="text"
-                            {...field}
-                            className="w-full"
-                            placeholder="Número da carga"
-                            value={numeroCarga}
-                            maxLength={6}
-                            onChange={(e) => {
-                              const val = e.target.value;
-                              if (/^\d*$/.test(val)) {
-                                setNumeroCarga(val); // atualiza o estado local
-                                field.onChange(val); // atualiza o valor do formulário
-                              }
-                            }}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <div className="flex justify-center w-full col-span-2 gap-2">
-                    <FormField
-                      control={form.control}
-                      name="codigo_cobranca"
-                      render={({ field }) => (
-                        <FormItem className="w-full">
-                          <FormLabel className="text-white">
-                            Cód. Cobrança:
-                          </FormLabel>
-                          <FormControl className="bg-slate-700 text-white border-slate-600 placeholder:text-white/40 w-full">
-                            <Input
-                              type="text"
-                              {...field}
-                              className="w-full"
-                              placeholder="Código da cobrança"
-                              value={numeroCodigoCobranca}
-                              maxLength={4}
-                              onChange={(e) => {
-                                const val = e.target.value;
-                                if (/^\d*$/.test(val)) {
-                                  setNumeroCodigoCobranca(val); // atualiza o estado local
-                                  field.onChange(val); // atualiza o valor do formulário
-                                }
-                              }}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="rca"
-                      render={({ field }) => (
-                        <FormItem className="w-full">
-                          <FormLabel className="text-white">RCA:</FormLabel>
-                          <FormControl className="bg-slate-700 text-white border-slate-600 placeholder:text-white/40 w-full">
-                            <Input
-                              type="text"
-                              {...field}
-                              className="w-full"
-                              placeholder="Código do RCA"
-                              value={codigoRca}
-                              maxLength={3}
-                              onChange={(e) => {
-                                const val = e.target.value;
-                                if (/^\d*$/.test(val)) {
-                                  setCodigoRca(val); // atualiza o estado local
-                                  field.onChange(val); // atualiza o valor do formulário
-                                }
-                              }}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                  <div className="flex flex-col w-full text-white text-sm">
+                    <span className="font-bold">Código do Cliente:</span>
+                    <span className="w-full border-1 border-slate-600 bg-slate-700 p-2 rounded-md text-white/60">
+                      {numeroCodigoCliente
+                        ? numeroCodigoCliente
+                        : "CLIENTE NÃO ENCONTRADO"}
+                    </span>
+                  </div>
+                  <div className="flex flex-col w-full text-white text-sm">
+                    <span className="font-bold">Número da Carga:</span>
+                    <span className="w-full border-1 border-slate-600 bg-slate-700 p-2 rounded-md text-white/60">
+                      {numeroCarga ? numeroCarga : "CARGA NÃO ENCONTRADA"}
+                    </span>
+                  </div>
+                  <div className="flex flex-col w-full text-white text-sm">
+                    <span className="font-bold">Código da Cobrança:</span>
+                    <span className="w-full border-1 border-slate-600 bg-slate-700 p-2 rounded-md text-white/60">
+                      {numeroCodigoCobranca
+                        ? numeroCodigoCobranca
+                        : "COBRANÇA NÃO ENCONTRADA"}
+                    </span>
+                  </div>
+                  <div className="flex flex-col w-full text-white text-sm">
+                    <span className="font-bold">Nome da Cobrança:</span>
+                    <span className="w-full border-1 border-slate-600 bg-slate-700 p-2 rounded-md text-white/60">
+                      {nomeCodigoCobranca
+                        ? nomeCodigoCobranca
+                        : "COBRANÇA NÃO ENCONTRADA"}
+                    </span>
+                  </div>
+                  <div className="flex flex-col w-full text-white text-sm">
+                    <span className="font-bold">Código RCA:</span>
+                    <span className="w-full border-1 border-slate-600 bg-slate-700 p-2 rounded-md text-white/60">
+                      {codigoRca ? codigoRca : "RCA NÃO ENCONTRADA"}
+                    </span>
+                  </div>
+                  <div className="flex flex-col w-full text-white text-sm">
+                    <span className="font-bold">Código Filial:</span>
+                    <span className="w-full border-1 border-slate-600 bg-slate-700 p-2 rounded-md text-white/60">
+                      {codigoFilial ? codigoFilial : "COBRANÇA NÃO ENCONTRADA"}
+                    </span>
                   </div>
                 </div>
                 <FormField
@@ -396,166 +620,46 @@ export default function Solicitacao() {
                     </FormItem>
                   )}
                 />
-                <div className="flex max-w-full gap-2 flex-col xl:flex-row">
-                  <FormField
-                    control={form.control}
-                    name="tipo_devolucao"
-                    render={({ field }) => (
-                      <FormItem
-                        className="w-full flex flex-col py-2
-                          "
-                      >
-                        <FormLabel className="text-white">
-                          Tipo de Devolução:
-                        </FormLabel>
-                        <FormControl>
-                          <Select
-                            value={field.value}
-                            onValueChange={(value) => field.onChange(value)}
-                          >
-                            <SelectTrigger
-                              className="text-white w-full border-slate-600 bg-slate-700
-                                      border rounded-md placeholder:text-white/40"
-                            >
-                              <SelectValue placeholder="Selecione o tipo de Devolução" />
-                            </SelectTrigger>
-                            <SelectContent className="bg-slate-700 border-slate-600 text-white">
-                              <SelectItem
-                                value="total"
-                                className="bg-slate-700 text-white data-[state=checked]:bg-slate-600 hover:!bg-slate-600 hover:!text-white focus:bg-slate-600 focus:text-white"
-                              >
-                                Total
-                              </SelectItem>
-                              <SelectItem
-                                value="parcial"
-                                className="bg-slate-700 text-white data-[state=checked]:bg-slate-600 hover:!bg-slate-600 hover:!text-white focus:bg-slate-600 focus:text-white"
-                              >
-                                Parcial
-                              </SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="filial"
-                    render={({ field }) => (
-                      <FormItem
-                        className="w-full flex flex-col py-2
-                          "
-                      >
-                        <FormLabel className="text-white">Filial:</FormLabel>
-                        <FormControl className="bg-slate-700 text-white border-slate-600 placeholder:text-white/40 w-full">
-                          <Select
-                            value={field.value}
-                            onValueChange={(value) => field.onChange(value)}
-                          >
-                            <SelectTrigger
-                              className="text-white w-full border-slate-600 bg-slate-700
-                                      border rounded-md placeholder:text-white/40
-                                      "
-                            >
-                              <SelectValue
-                                className="text-white placeholder:text-white/40"
-                                placeholder="Selecione a Filial"
-                              />
-                            </SelectTrigger>
-                            <SelectContent className="bg-slate-700 border-slate-600 text-white">
-                              <SelectItem
-                                value="filial1"
-                                className="bg-slate-700 text-white data-[state=checked]:bg-slate-600 hover:!bg-slate-600 hover:!text-white focus:bg-slate-600 focus:text-white"
-                              >
-                                Filial 1
-                              </SelectItem>
-                              <SelectItem
-                                value="filial5"
-                                className="bg-slate-700 text-white data-[state=checked]:bg-slate-600 hover:!bg-slate-600 hover:!text-white focus:bg-slate-600 focus:text-white"
-                              >
-                                Filial 5
-                              </SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                <div className="flex gap-2 max-w-full">
-                  <FormField
-                    control={form.control}
-                    name="codigo_produto"
-                    render={({ field }) => (
-                      <FormItem className="w-full">
-                        <FormLabel className="text-white">
-                          Código do Produto:
-                        </FormLabel>
-                        <FormControl className="bg-slate-700 text-white border-slate-600 placeholder:text-white/40 w-full">
-                          <Input
-                            type="text"
-                            {...field}
-                            className="w-full"
-                            placeholder="Código do Produto"
-                            value={codigo}
-                            maxLength={4}
-                            onChange={(e) => {
-                              const val = e.target.value;
-                              if (/^\d*$/.test(val)) {
-                                setCodigo(val); // atualiza o estado local
-                                field.onChange(val); // atualiza o valor do formulário
-                              }
-                            }}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="quantidade"
-                    render={({ field }) => (
-                      <FormItem className="w-full">
-                        <FormLabel className="text-white">
-                          Quantidade:
-                        </FormLabel>
-                        <FormControl className="bg-slate-700 text-white border-slate-600 placeholder:text-white/40 w-full">
-                          <Input
-                            type="text"
-                            {...field}
-                            className="w-full"
-                            placeholder="Quantidade"
-                            value={numeroQuantidade}
-                            maxLength={6}
-                            onChange={(e) => {
-                              const val = e.target.value;
-                              if (/^\d*$/.test(val)) {
-                                setNumeroQuantidade(val); // atualiza o estado local
-                                field.onChange(val); // atualiza o valor do formulário
-                              }
-                            }}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <div className="flex items-end h-full mt-auto">
-                    <Button className="justify-center bg-slate-500 hover:bg-slate-600 text-white font-bold cursor-pointer">
-                      +
-                    </Button>
+
+                {/* Lista de produtos adicionados */}
+                {produtos.length > 0 && (
+                  <div className="w-full mt-4">
+                    <Table className="bg-slate-700">
+                      <TableBody>
+                        <TableRow>
+                          <TableCell className="font-bold text-white">
+                            Código
+                          </TableCell>
+                          <TableCell className="font-bold text-white">
+                            Nome
+                          </TableCell>
+                          <TableCell className="font-bold text-white">
+                            Quantidade
+                          </TableCell>
+                        </TableRow>
+                        {produtos.map((p, idx) => (
+                          <TableRow key={idx}>
+                            <TableCell className="text-white">
+                              {p.codigo}
+                            </TableCell>
+                            <TableCell className="text-white">
+                              {p.descricao}
+                            </TableCell>
+                            <TableCell className="text-white">
+                              {p.quantidade}
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
                   </div>
-                </div>
-                <div className="flex flex-col w-full text-white text-sm">
-                  <span className="font-bold">Nome do Produto:</span>
-                  <span className="w-full border-1 border-slate-600 bg-slate-700 p-2 rounded-md text-white/60">
-                    {nomeProd ? nomeProd : "PRODUTO NÃO ENCONTRADO"}
-                  </span>
-                </div>
+                )}
                 <Button
-                  type="submit"
+                  type="button"
                   className="w-full mt-4 bg-green-600 hover:bg-green-700 text-white font-bold cursor-pointer"
+                  onClick={() => {
+                    avancarPagina();
+                  }}
                 >
                   Avançar
                 </Button>
