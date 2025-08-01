@@ -4,7 +4,11 @@ import Header from '../../components/header';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
-// import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../../components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../../components/ui/dialog';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../components/ui/table';
+import { Avatar, AvatarFallback } from '../../components/ui/avatar';
+import { Badge } from '../../components/ui/badge';
 import {
   Select as CustomSelect,
   SelectTrigger,
@@ -14,11 +18,23 @@ import {
 } from '../../components/ui/select';
 import { fetchUsuarios } from '../../utils/usuarios/fetchUsuarios';
 import { createUser, editUser as editUserAPI, deleteUser } from '../../utils/usuarios/apiUtils';
-import { Select } from '@radix-ui/react-select';
+import { 
+  Users, 
+  UserPlus, 
+  Edit2, 
+  Trash2, 
+  Search, 
+  Mail,
+  Shield,
+  User,
+  Phone,
+  Filter,
+  MoreHorizontal
+} from 'lucide-react';
 
 // Tipo do usuário conforme a tabela user_profiles
 export interface Usuario {
-  id: string;
+  id: string | number;
   first_name: string;
   last_name: string;
   role: string;
@@ -41,8 +57,9 @@ function Toast({ message, type, onClose }: { message: string, type: 'success' | 
 }
 
 export default function Usuarios() {
-  // const router = useRouter();
   const [usuarios, setUsuarios] = useState<Usuario[]>([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedLevel, setSelectedLevel] = useState<string>('all');
   const [showModal, setShowModal] = useState(false);
   const [form, setForm] = useState<Omit<Usuario, 'id' | 'created_at'> & { password: string }>({
     first_name: '',
@@ -62,8 +79,6 @@ export default function Usuarios() {
     email: '',
   });
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
-  // const [resetEmail, setResetEmail] = useState<string | null>(null);
-  // const [resetStatus, setResetStatus] = useState<string | null>(null);
   const [toast, setToast] = useState<{ message: string, type: 'success' | 'error' } | null>(null);
 
   useEffect(() => {
@@ -146,131 +161,464 @@ export default function Usuarios() {
     });
   };
 
+  // Função para obter as iniciais do nome
+  const getInitials = (firstName: string, lastName: string) => {
+    return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
+  };
+
+  // Função para obter a cor do badge baseada no nível
+  const getLevelBadgeVariant = (level: string) => {
+    switch (level.toLowerCase()) {
+      case 'adm':
+        return 'destructive';
+      case 'vendas':
+        return 'default';
+      case 'financeiro':
+        return 'secondary';
+      case 'logistica':
+        return 'outline';
+      default:
+        return 'secondary';
+    }
+  };
+
+  // Filtrar usuários baseado na busca e nível selecionado
+  const filteredUsuarios = usuarios.filter(usuario => {
+    const matchesSearch = 
+      usuario.first_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      usuario.last_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      usuario.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      usuario.role.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const matchesLevel = selectedLevel === 'all' || usuario.user_level === selectedLevel;
+    
+    return matchesSearch && matchesLevel;
+  });
+
   return (
-    <>
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
       <Header />
-      <div className="flex flex-col items-center justify-center w-full h-full">
-        {/* Toast Overlay */}
-        {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
-        <h1 className="text-3xl font-bold text-center md:text-left text-white">Usuários</h1>
-        <Button className="bg-green-600 hover:bg-green-700 mt-6 mb-4 cursor-pointer" onClick={() => setShowModal(true)}>
-          Cadastrar novo usuário
-        </Button>
-
-        {/* Modal de criação */}
-        {showModal && (
-          <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center">
-            <div className="bg-slate-800 rounded-lg shadow-lg p-8 w-full max-w-md relative text-white">
-              <button className="absolute top-2 right-3 text-xl" onClick={() => setShowModal(false)} type="button">×</button>
-              <h2 className="text-xl font-bold mb-4">Cadastrar novo usuário</h2>
-              <form onSubmit={handleCreateUserSubmit} className="flex flex-col gap-3">
-                <div><Label htmlFor="email">E-mail</Label><Input id="email" name="email" value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} required /></div>
-                <div><Label htmlFor="first_name">Nome</Label><Input id="first_name" name="first_name" value={form.first_name} onChange={e => setForm(f => ({ ...f, first_name: e.target.value }))} required /></div>
-                <div><Label htmlFor="last_name">Sobrenome</Label><Input id="last_name" name="last_name" value={form.last_name} onChange={e => setForm(f => ({ ...f, last_name: e.target.value }))} required /></div>
-                <div><Label htmlFor="role">Cargo</Label><Input id="role" name="role" value={form.role} onChange={e => setForm(f => ({ ...f, role: e.target.value }))} required /></div>
-                <div><Label htmlFor="user_level">Nível</Label>
-                  <select
-                    id="user_level"
-                    name="user_level"
-                    className="w-full rounded border px-2 py-2 text-white bg-slate-700"
-                    value={form.user_level}
-                    onChange={e => setForm(f => ({ ...f, user_level: e.target.value }))}
-                    required
-                  >
-                    <option value="">Selecione o nível</option>
-                    <option value="adm">Adm</option>
-                    <option value="vendas">Vendas</option>
-                    <option value="financeiro">Financeiro</option>
-                    <option value="logistica">Logística</option>
-                  </select>
-                </div>
-                <div><Label htmlFor="password">Senha</Label><Input id="password" name="password" type="password" value={form.password} onChange={e => setForm(f => ({ ...f, password: e.target.value }))} required /></div>
-                {error && <div className="text-red-600 text-sm">{error}</div>}
-                <Button type="submit" className="w-full mt-2 cursor-pointer bg-blue-500 hover:bg-blue-600">Cadastrar</Button>
-              </form>
+      
+      {/* Toast Overlay */}
+      {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
+      
+      <div className="container mx-auto px-4 py-8">
+        {/* Header Section */}
+        <div className="mb-8">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="p-2 bg-blue-500/20 rounded-lg">
+              <Users className="h-8 w-8 text-blue-400" />
             </div>
-          </div>
-        )}
-        {/* Modal de edição */}
-        {editUser && (
-          <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center">
-            <div className="bg-slate-800 rounded-lg shadow-lg p-8 w-full max-w-md relative text-white">
-              <button className="absolute top-2 right-3 text-xl" onClick={() => setEditUser(null)} type="button">×</button>
-              <h2 className="text-xl font-bold mb-4">Editar usuário</h2>
-              <form onSubmit={handleEditUserSubmit} className="flex flex-col gap-3">
-                <div><Label className='mb-2' htmlFor="edit_email">E-mail</Label><Input id="edit_email" name="email" value={editForm.email} onChange={e => setEditForm(f => ({ ...f, email: e.target.value }))} required /></div>
-                <div><Label className='mb-2' htmlFor="edit_first_name">Nome</Label><Input id="edit_first_name" name="first_name" value={editForm.first_name} onChange={e => setEditForm(f => ({ ...f, first_name: e.target.value }))} required /></div>
-                <div><Label className='mb-2' htmlFor="edit_last_name">Sobrenome</Label><Input id="edit_last_name" name="last_name" value={editForm.last_name} onChange={e => setEditForm(f => ({ ...f, last_name: e.target.value }))} required /></div>
-                <div><Label className='mb-2' htmlFor="edit_role">Cargo</Label><Input id="edit_role" name="role" value={editForm.role} onChange={e => setEditForm(f => ({ ...f, role: e.target.value }))} required /></div>
-                <div><Label className='mb-2' htmlFor="edit_user_level">Nível</Label>
-                  <CustomSelect value={editForm.user_level} onValueChange={value => setEditForm(f => ({ ...f, user_level: value }))} required>
-                    <SelectTrigger className="w-full bg-slate-700 text-white">
-                      <SelectValue placeholder="Selecione o nível" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-slate-700 text-white">
-                      <SelectItem value="adm">Adm</SelectItem>
-                      <SelectItem value="vendas">Vendas</SelectItem>
-                      <SelectItem value="financeiro">Financeiro</SelectItem>
-                      <SelectItem value="logistica">Logística</SelectItem>
-                    </SelectContent>
-                  </CustomSelect>
-                </div>
-                <Button type="submit" className="w-full mt-2 cursor-pointer bg-blue-500 hover:bg-blue-600">Salvar</Button>
-              </form>
+            <div>
+              <h1 className="text-3xl font-bold text-white">Gerenciar Usuários</h1>
+              <p className="text-slate-400">Administre os usuários do sistema</p>
             </div>
-          </div>
-        )}
-        {/* Modal de confirmação de exclusão */}
-        {confirmDeleteId && (
-          <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center">
-            <div className="bg-slate-800 rounded-lg shadow-lg p-8 w-full max-w-md relative text-white">
-              <h2 className="text-xl font-bold mb-4">Confirmar exclusão</h2>
-              <div className="mb-6 text-center">Tem certeza que deseja excluir este usuário?</div>
-              <div className="flex flex-row gap-2 justify-end">
-                <Button className="bg-gray-500 hover:bg-gray-600 cursor-pointer" onClick={() => setConfirmDeleteId(null)} type="button">Cancelar</Button>
-                <Button className="bg-red-500 hover:bg-red-600 cursor-pointer" onClick={() => handleDeleteUserConfirm(confirmDeleteId)} type="button">Excluir</Button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Tabela de usuários */}
-        <div className="w-full max-w-4xl mt-6">
-          <div className="overflow-x-auto">
-            <table className="min-w-full text-sm bg-slate-800 text-white rounded-lg">
-              <thead>
-                <tr className="bg-slate-700 text-slate-300">
-                  <th className="px-4 py-2 text-left">ID</th>
-                  <th className="px-4 py-2 text-left">Nome</th>
-                  <th className="px-4 py-2 text-left">Sobrenome</th>
-                  <th className="px-4 py-2 text-left">E-mail</th>
-                  <th className="px-4 py-2 text-left">Cargo</th>
-                  <th className="px-4 py-2 text-left">Nível</th>
-                  <th className="px-4 py-2 text-left">Ações</th>
-                </tr>
-              </thead>
-              <tbody>
-                {usuarios.map(usuario => (
-                  <tr key={usuario.id} className="even:bg-slate-700 odd:bg-slate-800 border-b border-slate-700">
-                    <td className="px-4 py-2 break-all">{usuario.id}</td>
-                    <td className="px-4 py-2">{usuario.first_name}</td>
-                    <td className="px-4 py-2">{usuario.last_name}</td>
-                    <td className="px-4 py-2">{usuario.email}</td>
-                    <td className="px-4 py-2">{usuario.role}</td>
-                    <td className="px-4 py-2">{usuario.user_level}</td>
-                    <td className="px-4 py-2">
-                      <div className="flex gap-2">
-                        <Button className="bg-blue-500 hover:bg-blue-600 cursor-pointer" onClick={() => openEditModal(usuario)} size="sm">Editar</Button>
-                        <Button className="bg-red-500 hover:bg-red-600 cursor-pointer" onClick={() => setConfirmDeleteId(usuario.id)} size="sm">Excluir</Button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
           </div>
         </div>
+
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+          <Card className="bg-slate-800/50 border-slate-700">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-blue-500/20 rounded-lg">
+                  <Users className="h-5 w-5 text-blue-400" />
+                </div>
+                <div>
+                  <p className="text-sm text-slate-400">Total de Usuários</p>
+                  <p className="text-2xl font-bold text-white">{usuarios.length}</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card className="bg-slate-800/50 border-slate-700">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-red-500/20 rounded-lg">
+                  <Shield className="h-5 w-5 text-red-400" />
+                </div>
+                <div>
+                  <p className="text-sm text-slate-400">Administradores</p>
+                  <p className="text-2xl font-bold text-white">{usuarios.filter(u => u.user_level === 'adm').length}</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card className="bg-slate-800/50 border-slate-700">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-green-500/20 rounded-lg">
+                  <User className="h-5 w-5 text-green-400" />
+                </div>
+                <div>
+                  <p className="text-sm text-slate-400">Vendas</p>
+                  <p className="text-2xl font-bold text-white">{usuarios.filter(u => u.user_level === 'vendas').length}</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card className="bg-slate-800/50 border-slate-700">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-purple-500/20 rounded-lg">
+                  <Phone className="h-5 w-5 text-purple-400" />
+                </div>
+                <div>
+                  <p className="text-sm text-slate-400">Outros</p>
+                  <p className="text-2xl font-bold text-white">{usuarios.filter(u => !['adm', 'vendas'].includes(u.user_level)).length}</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Controls Section */}
+        <Card className="bg-slate-800/50 border-slate-700 mb-6">
+          <CardHeader>
+            <CardTitle className="text-white flex items-center gap-2">
+              <Filter className="h-5 w-5" />
+              Filtros e Ações
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-col md:flex-row gap-4 items-end">
+              <div className="flex-1">
+                <Label htmlFor="search" className="text-slate-300">Buscar usuários</Label>
+                <div className="relative">
+                  <Search className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
+                  <Input
+                    id="search"
+                    placeholder="Nome, email, cargo..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-10 bg-slate-700 border-slate-600 text-white placeholder:text-slate-400"
+                  />
+                </div>
+              </div>
+              
+              <div className="w-full md:w-48">
+                <Label className="text-slate-300">Filtrar por nível</Label>
+                <CustomSelect value={selectedLevel} onValueChange={setSelectedLevel}>
+                  <SelectTrigger className="bg-slate-700 border-slate-600 text-white">
+                    <SelectValue placeholder="Todos os níveis" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-slate-700 border-slate-600">
+                    <SelectItem value="all" className="text-white">Todos os níveis</SelectItem>
+                    <SelectItem value="adm" className="text-white">Administrador</SelectItem>
+                    <SelectItem value="vendas" className="text-white">Vendas</SelectItem>
+                    <SelectItem value="financeiro" className="text-white">Financeiro</SelectItem>
+                    <SelectItem value="logistica" className="text-white">Logística</SelectItem>
+                  </SelectContent>
+                </CustomSelect>
+              </div>
+              
+              <Button 
+                onClick={() => setShowModal(true)} 
+                className="bg-blue-600 hover:bg-blue-700 text-white h-10 px-6"
+              >
+                <UserPlus className="h-4 w-4 mr-2" />
+                Novo Usuário
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Users Table */}
+        <Card className="bg-slate-800/50 border-slate-700">
+          <CardHeader>
+            <CardTitle className="text-white">
+              Lista de Usuários ({filteredUsuarios.length})
+            </CardTitle>
+            <CardDescription className="text-slate-400">
+              Gerencie todos os usuários do sistema
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Table>
+              <TableHeader>
+                <TableRow className="border-slate-700 hover:bg-slate-700/30">
+                  <TableHead className="text-slate-300">Usuário</TableHead>
+                  <TableHead className="text-slate-300">Contato</TableHead>
+                  <TableHead className="text-slate-300">Cargo</TableHead>
+                  <TableHead className="text-slate-300">Nível</TableHead>
+                  <TableHead className="text-slate-300 text-right">Ações</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredUsuarios.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={5} className="text-center py-8 text-slate-400">
+                      Nenhum usuário encontrado
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  filteredUsuarios.map((usuario) => (
+                    <TableRow key={usuario.id} className="border-slate-700 hover:bg-slate-700/30">
+                      <TableCell>
+                        <div className="flex items-center gap-3">
+                          <Avatar className="h-10 w-10">
+                            <AvatarFallback className="bg-blue-500/20 text-blue-400 font-semibold">
+                              {getInitials(usuario.first_name, usuario.last_name)}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div>
+                            <p className="font-medium text-white">
+                              {usuario.first_name} {usuario.last_name}
+                            </p>
+                            <p className="text-sm text-slate-400">ID: {String(usuario.id).slice(0, 8)}...</p>
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2 text-slate-300">
+                          <Mail className="h-4 w-4 text-slate-400" />
+                          {usuario.email}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <p className="text-slate-300">{usuario.role}</p>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant={getLevelBadgeVariant(usuario.user_level)} className="capitalize">
+                          {usuario.user_level}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex items-center justify-end gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => openEditModal(usuario)}
+                            className="bg-slate-700 border-slate-600 text-slate-300 hover:bg-slate-600"
+                          >
+                            <Edit2 className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setConfirmDeleteId(String(usuario.id))}
+                            className="bg-red-500/20 border-red-500/30 text-red-400 hover:bg-red-500/30"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+
+        {/* Modal de criação */}
+        <Dialog open={showModal} onOpenChange={setShowModal}>
+          <DialogContent className="bg-slate-800 border-slate-700 text-white max-w-md">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2 text-white">
+                <UserPlus className="h-5 w-5" />
+                Cadastrar Novo Usuário
+              </DialogTitle>
+            </DialogHeader>
+            <form onSubmit={handleCreateUserSubmit} className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="first_name" className="text-slate-300">Nome</Label>
+                  <Input
+                    id="first_name"
+                    value={form.first_name}
+                    onChange={e => setForm(f => ({ ...f, first_name: e.target.value }))}
+                    className="bg-slate-700 border-slate-600 text-white"
+                    required
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="last_name" className="text-slate-300">Sobrenome</Label>
+                  <Input
+                    id="last_name"
+                    value={form.last_name}
+                    onChange={e => setForm(f => ({ ...f, last_name: e.target.value }))}
+                    className="bg-slate-700 border-slate-600 text-white"
+                    required
+                  />
+                </div>
+              </div>
+              
+              <div>
+                <Label htmlFor="email" className="text-slate-300">E-mail</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={form.email}
+                  onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
+                  className="bg-slate-700 border-slate-600 text-white"
+                  required
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="role" className="text-slate-300">Cargo</Label>
+                <Input
+                  id="role"
+                  value={form.role}
+                  onChange={e => setForm(f => ({ ...f, role: e.target.value }))}
+                  className="bg-slate-700 border-slate-600 text-white"
+                  required
+                />
+              </div>
+              
+              <div>
+                <Label className="text-slate-300">Nível de Acesso</Label>
+                <CustomSelect value={form.user_level} onValueChange={value => setForm(f => ({ ...f, user_level: value }))}>
+                  <SelectTrigger className="bg-slate-700 border-slate-600 text-white">
+                    <SelectValue placeholder="Selecione o nível" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-slate-700 border-slate-600">
+                    <SelectItem value="adm" className="text-white">Administrador</SelectItem>
+                    <SelectItem value="vendas" className="text-white">Vendas</SelectItem>
+                    <SelectItem value="financeiro" className="text-white">Financeiro</SelectItem>
+                    <SelectItem value="logistica" className="text-white">Logística</SelectItem>
+                  </SelectContent>
+                </CustomSelect>
+              </div>
+              
+              <div>
+                <Label htmlFor="password" className="text-slate-300">Senha</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  value={form.password}
+                  onChange={e => setForm(f => ({ ...f, password: e.target.value }))}
+                  className="bg-slate-700 border-slate-600 text-white"
+                  required
+                />
+              </div>
+              
+              {error && <div className="text-red-400 text-sm">{error}</div>}
+              
+              <DialogFooter>
+                <Button type="button" variant="outline" onClick={() => setShowModal(false)} className="bg-slate-700 border-slate-600 text-slate-300">
+                  Cancelar
+                </Button>
+                <Button type="submit" className="bg-blue-600 hover:bg-blue-700">
+                  Cadastrar
+                </Button>
+              </DialogFooter>
+            </form>
+          </DialogContent>
+        </Dialog>
+
+        {/* Modal de edição */}
+        <Dialog open={!!editUser} onOpenChange={() => setEditUser(null)}>
+          <DialogContent className="bg-slate-800 border-slate-700 text-white max-w-md">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2 text-white">
+                <Edit2 className="h-5 w-5" />
+                Editar Usuário
+              </DialogTitle>
+            </DialogHeader>
+            <form onSubmit={handleEditUserSubmit} className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="edit_first_name" className="text-slate-300">Nome</Label>
+                  <Input
+                    id="edit_first_name"
+                    value={editForm.first_name}
+                    onChange={e => setEditForm(f => ({ ...f, first_name: e.target.value }))}
+                    className="bg-slate-700 border-slate-600 text-white"
+                    required
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="edit_last_name" className="text-slate-300">Sobrenome</Label>
+                  <Input
+                    id="edit_last_name"
+                    value={editForm.last_name}
+                    onChange={e => setEditForm(f => ({ ...f, last_name: e.target.value }))}
+                    className="bg-slate-700 border-slate-600 text-white"
+                    required
+                  />
+                </div>
+              </div>
+              
+              <div>
+                <Label htmlFor="edit_email" className="text-slate-300">E-mail</Label>
+                <Input
+                  id="edit_email"
+                  type="email"
+                  value={editForm.email}
+                  onChange={e => setEditForm(f => ({ ...f, email: e.target.value }))}
+                  className="bg-slate-700 border-slate-600 text-white"
+                  required
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="edit_role" className="text-slate-300">Cargo</Label>
+                <Input
+                  id="edit_role"
+                  value={editForm.role}
+                  onChange={e => setEditForm(f => ({ ...f, role: e.target.value }))}
+                  className="bg-slate-700 border-slate-600 text-white"
+                  required
+                />
+              </div>
+              
+              <div>
+                <Label className="text-slate-300">Nível de Acesso</Label>
+                <CustomSelect value={editForm.user_level} onValueChange={value => setEditForm(f => ({ ...f, user_level: value }))}>
+                  <SelectTrigger className="bg-slate-700 border-slate-600 text-white">
+                    <SelectValue placeholder="Selecione o nível" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-slate-700 border-slate-600">
+                    <SelectItem value="adm" className="text-white">Administrador</SelectItem>
+                    <SelectItem value="vendas" className="text-white">Vendas</SelectItem>
+                    <SelectItem value="financeiro" className="text-white">Financeiro</SelectItem>
+                    <SelectItem value="logistica" className="text-white">Logística</SelectItem>
+                  </SelectContent>
+                </CustomSelect>
+              </div>
+              
+              <DialogFooter>
+                <Button type="button" variant="outline" onClick={() => setEditUser(null)} className="bg-slate-700 border-slate-600 text-slate-300">
+                  Cancelar
+                </Button>
+                <Button type="submit" className="bg-blue-600 hover:bg-blue-700">
+                  Salvar Alterações
+                </Button>
+              </DialogFooter>
+            </form>
+          </DialogContent>
+        </Dialog>
+
+        {/* Modal de confirmação de exclusão */}
+        <Dialog open={!!confirmDeleteId} onOpenChange={() => setConfirmDeleteId(null)}>
+          <DialogContent className="bg-slate-800 border-slate-700 text-white max-w-md">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2 text-red-400">
+                <Trash2 className="h-5 w-5" />
+                Confirmar Exclusão
+              </DialogTitle>
+            </DialogHeader>
+            <div className="py-4">
+              <p className="text-slate-300">
+                Tem certeza que deseja excluir este usuário? Esta ação não pode ser desfeita.
+              </p>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setConfirmDeleteId(null)} className="bg-slate-700 border-slate-600 text-slate-300">
+                Cancelar
+              </Button>
+              <Button onClick={() => confirmDeleteId && handleDeleteUserConfirm(confirmDeleteId)} className="bg-red-600 hover:bg-red-700">
+                Confirmar Exclusão
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
-    </>
+    </div>
   );
 }
