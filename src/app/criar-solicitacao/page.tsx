@@ -327,40 +327,38 @@ export default function Solicitacao() {
             <Undo2 />
             Voltar
           </Button>
-          <div className="w-full flex py-2">
-            <div>
-              <label className="text-white mb-2">Tipo de Devolução:</label>
-              <Select
-                value={tipoDevolucao}
-                onValueChange={(value) => setTipoDevolucao(value)}
-              >
-                <SelectTrigger
-                  className="text-white border-slate-600 bg-slate-700
-                          border rounded-md placeholder:text-white/40"
-                >
-                  <SelectValue placeholder="Selecione o tipo de Devolução" />
-                </SelectTrigger>
-                <SelectContent className="bg-slate-700 border-slate-600 text-white">
-                  <SelectItem
-                    value="total"
-                    className="bg-slate-700 text-white data-[state=checked]:bg-slate-600 hover:!bg-slate-600 hover:!text-white focus:bg-slate-600 focus:text-white"
-                  >
-                    Total
-                  </SelectItem>
-                  <SelectItem
-                    value="parcial"
-                    className="bg-slate-700 text-white data-[state=checked]:bg-slate-600 hover:!bg-slate-600 hover:!text-white focus:bg-slate-600 focus:text-white"
-                  >
-                    Parcial
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-              </div>
-          </div>
-          <CardHeader className="">
+          <CardHeader className="relative">
             <CardTitle className="text-center text-2xl font-bold text-white p-12">
               Continuar Solicitação
             </CardTitle>
+            <div className="flex flex-col py-2 absolute right-2 top-6 gap-1">
+                <label className="text-white mb-2">Tipo de Devolução:</label>
+                <Select
+                  value={tipoDevolucao}
+                  onValueChange={(value) => setTipoDevolucao(value)}
+                >
+                  <SelectTrigger
+                    className="text-white border-slate-600 bg-slate-700
+                            border rounded-md placeholder:text-white/40"
+                  >
+                    <SelectValue placeholder="Selecione o tipo de Devolução" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-slate-700 border-slate-600 text-white">
+                    <SelectItem
+                      value="total"
+                      className="bg-slate-700 text-white data-[state=checked]:bg-slate-600 hover:!bg-slate-600 hover:!text-white focus:bg-slate-600 focus:text-white"
+                    >
+                      Total
+                    </SelectItem>
+                    <SelectItem
+                      value="parcial"
+                      className="bg-slate-700 text-white data-[state=checked]:bg-slate-600 hover:!bg-slate-600 hover:!text-white focus:bg-slate-600 focus:text-white"
+                    >
+                      Parcial
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+            </div>
           </CardHeader>
           <CardContent>
             <Card className="bg-slate-600 text-white col-span-3 max-h-80 flex flex-col gap-0 p-0 relative">
