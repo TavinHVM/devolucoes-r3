@@ -8,13 +8,13 @@ import { Button } from "@/components/ui/button";
 import { getStoredUser, getUserDisplayName, logout, User } from "@/lib/auth";
 
 // Ícones Lucide
-import { Home, FileText, Plus, Users, Power, Receipt } from 'lucide-react';
+import { Home, FileText, Plus, Users, Power } from 'lucide-react';
 
 const navLinks = [
   { href: "/", label: "Início", icon: <Home size={20} /> },
   { href: "/solicitacoes", label: "Solicitações", icon: <FileText size={20} /> },
   { href: "/criar-solicitacao", label: "Criar Solicitação", icon: <Plus size={20} /> },
-  { href: "/criar-codcobranca", label: "Códigos Cobrança", icon: <Receipt size={20} /> },
+  // { href: "/criar-codcobranca", label: "Códigos Cobrança", icon: <Receipt size={20} /> },
   { href: "/usuarios", label: "Usuários", icon: <Users size={20} /> },
 ];
 
