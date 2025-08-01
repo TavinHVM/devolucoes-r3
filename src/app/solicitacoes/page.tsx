@@ -1,8 +1,9 @@
 "use client";
 import { useEffect, useState } from "react";
 import { truncateText } from "../../utils/truncateText";
-import { Card, CardContent, CardHeader } from "../../components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../../components/ui/card";
 import { Input } from "../../components/ui/input";
+import { Badge } from "../../components/ui/badge";
 import {
   Select,
   SelectContent,
@@ -20,12 +21,13 @@ import {
   PaginationPrevious,
 } from "../../components/ui/pagination";
 import Header from "../../components/header";
-// import { useRouter } from "next/navigation";
 import {
   Dialog,
   DialogContent,
   DialogTitle,
   DialogTrigger,
+  DialogHeader,
+  DialogFooter,
 } from "../../components/ui/dialog";
 import {
   Table,
@@ -36,9 +38,28 @@ import {
   TableRow,
 } from "../../components/ui/table";
 import OrderBtn from "@/components/orderBtn";
-import { X } from "lucide-react";
+import { 
+  X, 
+  RefreshCw, 
+  Search, 
+  Filter, 
+  Download, 
+  FileText, 
+  Eye, 
+  Calendar, 
+  Package, 
+  User, 
+  Building,
+  CreditCard,
+  CheckCircle2,
+  XCircle,
+  Clock,
+  AlertTriangle,
+  RotateCcw,
+  Zap,
+  Target
+} from "lucide-react";
 import { DialogClose } from "@radix-ui/react-dialog";
-import { RefreshCw } from "lucide-react";
 import { filterTableHeader } from "@/utils/filters/filterTableHeader";
 import { filterBySearch } from "@/utils/filters/filterBySearch";
 import { filterByStatus } from "@/utils/filters/filterByStatus";
@@ -89,6 +110,48 @@ export default function VisualizacaoSolicitacoes() {
   const [sortColumns, setSortColumns] = useState<
     { column: string; direction: "asc" | "desc" }[]
   >([]);
+
+  // Função para obter ícone do status
+  const getStatusIcon = (status: string) => {
+    switch (status?.toUpperCase()) {
+      case "APROVADA":
+        return <CheckCircle2 className="h-4 w-4" />;
+      case "RECUSADA":
+        return <XCircle className="h-4 w-4" />;
+      case "PENDENTE":
+        return <Clock className="h-4 w-4" />;
+      case "REENVIADA":
+        return <RotateCcw className="h-4 w-4" />;
+      case "DESDOBRADA":
+        return <Target className="h-4 w-4" />;
+      case "ABATIDA":
+        return <AlertTriangle className="h-4 w-4" />;
+      case "FINALIZADA":
+        return <Zap className="h-4 w-4" />;
+      default:
+        return <FileText className="h-4 w-4" />;
+    }
+  };
+
+  // Função para obter variante do badge baseada no status
+  const getStatusBadgeVariant = (status: string) => {
+    switch (status?.toUpperCase()) {
+      case "APROVADA":
+      case "FINALIZADA":
+        return "default";
+      case "RECUSADA":
+        return "destructive";
+      case "PENDENTE":
+        return "secondary";
+      case "REENVIADA":
+      case "ABATIDA":
+        return "outline";
+      case "DESDOBRADA":
+        return "outline";
+      default:
+        return "secondary";
+    }
+  };
 
   // Função para buscar as solicitações
   useEffect(() => {
@@ -215,496 +278,604 @@ export default function VisualizacaoSolicitacoes() {
   const endPage = Math.min(totalPages, startPage + 14); // Termina 15 páginas após o início
 
   return (
-    <>
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
       <Header />
-      <div
-        className="flex flex-col items-center min-h-screen bg-gray-900 p-8"
-        style={{ minHeight: "100vh" }}
-      >
-        <h1 className="text-3xl font-bold mb-4 text-center text-white">
-          Painel de Solicitações
-        </h1>
-        <div className="w-full max-w-[90%] mx-auto">
-          <Card className="bg-slate-800 border-none h-full">
-            <CardHeader>
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <Input
-                  placeholder="Pesquise uma solicitação..."
-                  value={busca}
-                  onChange={(e) => setBusca(e.target.value)}
-                  className="max-w-md bg-slate-700 text-white border-slate-600 placeholder:text-slate-400"
-                />
-                <Button
-                  className="ml-2 bg-blue-500 hover:bg-blue-600 text-white cursor-pointer"
-                  // onClick={() => fetchSolicitacoes()}
-                  disabled={refreshing}
-                >
-                  <RefreshCw />
-                  {refreshing ? "Atualizando..." : "Atualizar"}
-                </Button>
-                <div className="flex gap-4 items-center">
-                  <span className="text-white">Filtrar por status:</span>
-                  <Select
-                    value={status}
-                    onValueChange={(v) => {
-                      setStatus(v || "Todos");
-                    }}
-                  >
-                    <SelectTrigger className="w-40 bg-slate-700 text-white border-slate-600 cursor-pointer">
-                      <SelectValue placeholder="Todos" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-slate-800">
-                      <SelectItem
-                        value="Todos"
-                        className="bg-slate-600 text-white font-bold px-1 py-2 rounded flex justify-center h-full cursor-pointer"
-                      >
-                        Todos
-                      </SelectItem>
-                      <SelectItem
-                        className="bg-slate-400 text-white font-bold px-1 py-2 rounded flex justify-center h-full cursor-pointer transition-all"
-                        value="PENDENTE"
-                      >
-                        Pendente
-                      </SelectItem>
-                      <SelectItem
-                        className="bg-green-600 text-white font-bold px-1 py-2 rounded flex justify-center h-full cursor-pointer transition-all"
-                        value="APROVADA"
-                      >
-                        Aprovada
-                      </SelectItem>
-                      <SelectItem
-                        className="bg-red-600 text-white font-bold px-1 py-2 rounded flex justify-center h-full cursor-pointer transition-all"
-                        value="RECUSADA"
-                      >
-                        Recusada
-                      </SelectItem>
-                      <SelectItem
-                        className="bg-blue-700 text-white font-bold px-1 py-2 rounded flex justify-center h-full cursor-pointer transition-all"
-                        value="DESDOBRADA"
-                      >
-                        Desdobrada
-                      </SelectItem>
-                      <SelectItem
-                        className="bg-yellow-400 text-white font-bold px-1 py-2 rounded flex justify-center h-full cursor-pointer transition-all"
-                        value="REENVIADA"
-                      >
-                        Reenviada
-                      </SelectItem>
-                      <SelectItem
-                        className="bg-yellow-600 text-white font-bold px-1 py-2 rounded flex justify-center h-full cursor-pointer transition-all"
-                        value="ABATIDA"
-                      >
-                        Abatida
-                      </SelectItem>
-                      <SelectItem
-                        className="bg-lime-500 text-white font-bold px-1 py-2 rounded flex justify-center h-full cursor-pointer transition-all"
-                        value="FINALIZADA"
-                      >
-                        Finalizada
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <Button className="ml-4 bg-green-600 hover:bg-green-700 text-white cursor-pointer">
-                    Baixar Relatório
-                  </Button>
+      
+      <div className="container mx-auto px-4 py-8">
+        {/* Header Section */}
+        <div className="mb-8">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="p-2 bg-blue-500/20 rounded-lg">
+              <FileText className="h-8 w-8 text-blue-400" />
+            </div>
+            <div>
+              <h1 className="text-3xl font-bold text-white">Painel de Solicitações</h1>
+              <p className="text-slate-400">Gerencie todas as solicitações de devolução</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Stats Cards */}
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4 mb-8">
+          <Card className="bg-slate-800/50 border-slate-700">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-blue-500/20 rounded-lg">
+                  <FileText className="h-5 w-5 text-blue-400" />
+                </div>
+                <div>
+                  <p className="text-sm text-slate-400">Total</p>
+                  <p className="text-2xl font-bold text-white">{solicitacoes.length}</p>
                 </div>
               </div>
-            </CardHeader>
-            <CardContent>
-              <div>
-                <Table className="bg-slate-800 text-white rounded-lg">
-                  <TableHeader>
-                    <TableRow className="border-slate-700 text-white hover:bg-slate-800 h-20 items-center">
-                      <TableHead className="text-white whitespace-nowrap">
-                        <OrderBtn
-                          label="ID"
-                          columnKey="id"
-                          activeSort={sortColumns}
-                          onSort={handleSort}
-                          onClearSort={handleClearSort}
-                        />
-                      </TableHead>
-                      <TableHead className="text-white whitespace-nowrap">
-                        <OrderBtn
-                          label="Nome"
-                          columnKey="nome"
-                          activeSort={sortColumns}
-                          onSort={handleSort}
-                          onClearSort={handleClearSort}
-                        />
-                      </TableHead>
-                      <TableHead className="text-white whitespace-nowrap">
-                        <OrderBtn
-                          label="Filial"
-                          columnKey="filial"
-                          activeSort={sortColumns}
-                          onSort={handleSort}
-                          onClearSort={handleClearSort}
-                        />
-                      </TableHead>
-                      <TableHead className="text-white whitespace-nowrap">
-                        <OrderBtn
-                          label="NºNF"
-                          columnKey="numero_nf"
-                          activeSort={sortColumns}
-                          onSort={handleSort}
-                          onClearSort={handleClearSort}
-                        />
-                      </TableHead>
-                      <TableHead className="text-white whitespace-nowrap">
-                        <OrderBtn
-                          label="Carga"
-                          columnKey="carga"
-                          activeSort={sortColumns}
-                          onSort={handleSort}
-                          onClearSort={handleClearSort}
-                        />
-                      </TableHead>
-                      <TableHead className="text-white whitespace-nowrap">
-                        <OrderBtn
-                          label="Cód. Cobrança"
-                          columnKey="codigo_cobranca"
-                          activeSort={sortColumns}
-                          onSort={handleSort}
-                          onClearSort={handleClearSort}
-                        />
-                      </TableHead>
-                      <TableHead className="text-white whitespace-nowrap">
-                        <OrderBtn
-                          label="Código Cliente"
-                          columnKey="codigo_cliente"
-                          activeSort={sortColumns}
-                          onSort={handleSort}
-                          onClearSort={handleClearSort}
-                        />
-                      </TableHead>
-                      <TableHead className="text-white whitespace-nowrap">
-                        <OrderBtn
-                          label="RCA"
-                          columnKey="rca"
-                          activeSort={sortColumns}
-                          onSort={handleSort}
-                          onClearSort={handleClearSort}
-                        />
-                      </TableHead>
-                      <TableHead className="text-white whitespace-nowrap">
-                        <OrderBtn
-                          label="Motivo da Devolução"
-                          columnKey="motivo_devolucao"
-                          activeSort={sortColumns}
-                          onSort={handleSort}
-                          onClearSort={handleClearSort}
-                        />
-                      </TableHead>
-                      <TableHead className="text-white whitespace-nowrap">
-                        <OrderBtn
-                          label="Vale"
-                          columnKey="vale"
-                          activeSort={sortColumns}
-                          onSort={handleSort}
-                          onClearSort={handleClearSort}
-                        />
-                      </TableHead>
-                      <TableHead className="text-white whitespace-nowrap">
-                        <OrderBtn
-                          label="Tipo de Devolução"
-                          columnKey="tipo_devolucao"
-                          activeSort={sortColumns}
-                          onSort={handleSort}
-                          onClearSort={handleClearSort}
-                        />
-                      </TableHead>
-                      <TableHead className="text-white whitespace-nowrap">
-                        <OrderBtn
-                          label="Data de Criação"
-                          columnKey="created_at"
-                          activeSort={sortColumns}
-                          onSort={handleSort}
-                          onClearSort={handleClearSort}
-                        />
-                      </TableHead>
-                      <TableHead className="text-white whitespace-nowrap">
-                        <OrderBtn
-                          label="Status"
-                          columnKey="status"
-                          activeSort={sortColumns}
-                          onSort={handleSort}
-                          onClearSort={handleClearSort}
-                        />
-                      </TableHead>
-                      <TableHead className="text-white whitespace-nowrap">
-                        <OrderBtn
-                          label="Anexo"
-                          columnKey="arquivo_url"
-                          activeSort={sortColumns}
-                          onSort={handleSort}
-                          onClearSort={handleClearSort}
-                        />
-                      </TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {currentItems.length > 0 ? (
-                      currentItems.map((s, idx) => (
-                        <Dialog key={s.id}>
-                          <DialogTrigger asChild>
-                            <TableRow
-                              className={`border-slate-700 cursor-pointer transition-all hover:bg-slate-600 ${
-                                idx % 2 === 0 ? "bg-slate-700" : ""
-                              }`}
-                            >
-                              <TableCell className="pl-6">{s.id}</TableCell>
-                              <TableCell>{truncateText(s.nome, 15)}</TableCell>
-                              <TableCell className="pl-8">{s.filial}</TableCell>
-                              <TableCell>{s.numero_nf}</TableCell>
-                              <TableCell>{s.carga}</TableCell>
-                              <TableCell className="text-center max-w-[70px]">
-                                {s.cod_cobranca}
-                              </TableCell>
-                              <TableCell className="text-center max-w-2">
-                                {s.cod_cliente}
-                              </TableCell>
-                              <TableCell className="text-center max-w-2">
-                                {s.rca}
-                              </TableCell>
-                              <TableCell>
-                                {truncateText(s.motivo_devolucao, 10)}
-                              </TableCell>
-                              <TableCell className="text-center max-w-12">
-                                {s.vale}
-                              </TableCell>
-                              <TableCell className="text-center max-w-12">
-                                {s.tipo_devolucao}
-                              </TableCell>
-                              <TableCell className="pl-4">
-                                {new Date(s.created_at).toLocaleDateString()}
-                              </TableCell>
-                              <TableCell className={getStatusClass(s.status)}>
-                                {s.status.toUpperCase()}
-                              </TableCell>
-                              <TableCell>
-                                {s.arquivo_url && (
-                                  <Button
-                                    className="bg-blue-600 hover:bg-blue-700 text-white cursor-pointer"
-                                    variant="secondary"
-                                    // onClick={() => baixarAnexo(s.arquivo_url)}
-                                  >
-                                    Baixar NF
-                                  </Button>
-                                )}
-                              </TableCell>
-                            </TableRow>
-                          </DialogTrigger>
+            </CardContent>
+          </Card>
+          
+          <Card className="bg-slate-800/50 border-slate-700">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-gray-500/20 rounded-lg">
+                  <Clock className="h-5 w-5 text-gray-400" />
+                </div>
+                <div>
+                  <p className="text-sm text-slate-400">Pendentes</p>
+                  <p className="text-2xl font-bold text-white">{solicitacoes.filter(s => s.status === 'PENDENTE').length}</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card className="bg-slate-800/50 border-slate-700">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-green-500/20 rounded-lg">
+                  <CheckCircle2 className="h-5 w-5 text-green-400" />
+                </div>
+                <div>
+                  <p className="text-sm text-slate-400">Aprovadas</p>
+                  <p className="text-2xl font-bold text-white">{solicitacoes.filter(s => s.status === 'APROVADA').length}</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card className="bg-slate-800/50 border-slate-700">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-red-500/20 rounded-lg">
+                  <XCircle className="h-5 w-5 text-red-400" />
+                </div>
+                <div>
+                  <p className="text-sm text-slate-400">Recusadas</p>
+                  <p className="text-2xl font-bold text-white">{solicitacoes.filter(s => s.status === 'RECUSADA').length}</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card className="bg-slate-800/50 border-slate-700">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-yellow-500/20 rounded-lg">
+                  <RotateCcw className="h-5 w-5 text-yellow-400" />
+                </div>
+                <div>
+                  <p className="text-sm text-slate-400">Reenviadas</p>
+                  <p className="text-2xl font-bold text-white">{solicitacoes.filter(s => s.status === 'REENVIADA').length}</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card className="bg-slate-800/50 border-slate-700">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-blue-500/20 rounded-lg">
+                  <Target className="h-5 w-5 text-blue-400" />
+                </div>
+                <div>
+                  <p className="text-sm text-slate-400">Desdobradas</p>
+                  <p className="text-2xl font-bold text-white">{solicitacoes.filter(s => s.status === 'DESDOBRADA').length}</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card className="bg-slate-800/50 border-slate-700">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-lime-500/20 rounded-lg">
+                  <Zap className="h-5 w-5 text-lime-400" />
+                </div>
+                <div>
+                  <p className="text-sm text-slate-400">Finalizadas</p>
+                  <p className="text-2xl font-bold text-white">{solicitacoes.filter(s => s.status === 'FINALIZADA').length}</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
 
-                          {/* Dialog */}
-                          <DialogContent className="min-w-[50%] max-h-[95%] overflow-y-auto rounded-xl scrollbar-dark">
-                            <DialogTitle></DialogTitle>
-                            <div className="grid grid-cols-3 gap-4 p-6 text-white rounded-lg relative">
-                              <DialogClose className="absolute right-0">
-                                <span className="rounded-md cursor-pointer p-0 py-2 w-8 h-auto m-0 bg-red-500 hover:bg-red-700 transition-all flex items-center justify-center shadow-transparent">
-                                  <X
-                                    className="items-center p-0"
-                                    style={{
-                                      width: "18px",
-                                      height: "18px",
-                                      strokeWidth: "5px",
-                                    }}
-                                  />
-                                </span>
-                              </DialogClose>
-
-                              <div className="flex gap-2 items-center">
-                                <span className="font-bold bg-slate-700 p-1 rounded-md">
-                                  Nome:
-                                </span>
-                                <span className="text-white text-lg">
-                                  {s.nome}
-                                </span>
-                              </div>
-
-                              <Card className="bg-slate-600 text-white col-span-3 max-h-80 flex flex-col gap-0 p-0">
-                                <CardHeader className="text-center font-bold text-xl py-2">
-                                  PRODUTOS
-                                </CardHeader>
-                                <CardContent className="w-full p-0">
-                                  <div className="flex min-w-full bg-slate-800">
-                                    <div className="w-[25%] py-2 text-lg text-center border-r-2 border-white">
-                                      <span className="text-white font-bold">
-                                        Código Produto
-                                      </span>
-                                    </div>
-                                    <div className="w-[50%] py-2 text-lg text-center border-l-2 border-r-2 border-white">
-                                      <span className="text-white font-bold">
-                                        Nome
-                                      </span>
-                                    </div>
-                                    <div className="w-[25%] py-2 text-lg text-center border-l-2 border-white">
-                                      <span className="text-white font-bold">
-                                        Quantidade
-                                      </span>
-                                    </div>
-                                  </div>
-                                  {/* Produtos */}
-                                  <Table className="bg-slate-500 max-h-24 h-10">
-                                    <TableBody className="mx-6 px-32">
-                                      {Array.isArray(s.products_list) &&
-                                        s.products_list.map(
-                                          (p: {
-                                            codigo: number;
-                                            descricao: string;
-                                            quantidade: number;
-                                          }) => (
-                                            <TableRow
-                                              key={p.codigo}
-                                              className="px-32 w-full"
-                                            >
-                                              <TableCell className="text-center w-[25%] text-lg">
-                                                {p.codigo}
-                                              </TableCell>
-                                              <TableCell className="text-lg">
-                                                {p.descricao}
-                                              </TableCell>
-                                              <TableCell className="pl-8 w-[25%] text-center text-lg">
-                                                {p.quantidade}
-                                              </TableCell>
-                                            </TableRow>
-                                          )
-                                        )}
-                                    </TableBody>
-                                  </Table>
-                                </CardContent>
-                              </Card>
-                              <div className="flex gap-2 w-full justify-center px-8 col-span-3">
-                                {s.status.toUpperCase() === "PENDENTE" && (
-                                  <>
-                                    <Button
-                                      className="bg-green-600 cursor-pointer transition-all px-20"
-                                      onClick={() => AprovarSolicitacao(s.id)}
-                                    >
-                                      Aprovar
-                                    </Button>
-                                    <Button
-                                      className="bg-red-600 cursor-pointer transition-all px-20"
-                                      onClick={() => RecusarSolicitacao(s.id)}
-                                    >
-                                      Recusar
-                                    </Button>
-                                  </>
-                                )}
-
-                                {s.status.toUpperCase() === "APROVADA" && (
-                                  <>
-                                    <Button
-                                      className="bg-blue-700 cursor-pointer transition-all px-20"
-                                      onClick={() => DesdobrarSolicitacao(s.id)}
-                                    >
-                                      Desdobrar
-                                    </Button>
-                                  </>
-                                )}
-                                {s.status.toUpperCase() === "DESDOBRADA" && (
-                                  <>
-                                    <Button
-                                      className="bg-yellow-600 cursor-pointer transition-all px-20"
-                                      onClick={() => AbaterSolicitacao(s.id)}
-                                    >
-                                      Abater
-                                    </Button>
-                                  </>
-                                )}
-                                {s.status.toUpperCase() === "ABATIDA" && (
-                                  <>
-                                    <Button
-                                      className="bg-lime-500 cursor-pointer transition-all px-20"
-                                      onClick={() => FinalizarSolicitacao(s.id)}
-                                    >
-                                      Finalizar
-                                    </Button>
-                                  </>
-                                )}
-                                {s.status.toUpperCase() === "RECUSADA" && (
-                                  <Button
-                                    className="bg-yellow-400 cursor-pointer transition-all px-20"
-                                    onClick={() => ReenviarSolicitacao(s.id)}
-                                  >
-                                    Reenviar
-                                  </Button>
-                                )}
-                              </div>
+        {/* Controls Section */}
+        <Card className="bg-slate-800/50 border-slate-700 mb-6">
+          <CardHeader>
+            <CardTitle className="text-white flex items-center gap-2">
+              <Filter className="h-5 w-5" />
+              Filtros e Ações
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-col lg:flex-row gap-4 items-end">
+              <div className="flex-1">
+                <label className="text-slate-300 text-sm font-medium">Buscar solicitações</label>
+                <div className="relative mt-1">
+                  <Search className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
+                  <Input
+                    placeholder="Nome, NF, cliente, RCA..."
+                    value={busca}
+                    onChange={(e) => setBusca(e.target.value)}
+                    className="pl-10 bg-slate-700 border-slate-600 text-white placeholder:text-slate-400"
+                  />
+                </div>
+              </div>
+              
+              <div className="w-full lg:w-48">
+                <label className="text-slate-300 text-sm font-medium">Status</label>
+                <Select value={status} onValueChange={(v) => setStatus(v || "Todos")}>
+                  <SelectTrigger className="mt-1 bg-slate-700 border-slate-600 text-white">
+                    <SelectValue placeholder="Todos os status" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-slate-700 border-slate-600">
+                    <SelectItem value="Todos" className="text-white">Todos</SelectItem>
+                    <SelectItem value="PENDENTE" className="text-white">Pendente</SelectItem>
+                    <SelectItem value="APROVADA" className="text-white">Aprovada</SelectItem>
+                    <SelectItem value="RECUSADA" className="text-white">Recusada</SelectItem>
+                    <SelectItem value="DESDOBRADA" className="text-white">Desdobrada</SelectItem>
+                    <SelectItem value="REENVIADA" className="text-white">Reenviada</SelectItem>
+                    <SelectItem value="ABATIDA" className="text-white">Abatida</SelectItem>
+                    <SelectItem value="FINALIZADA" className="text-white">Finalizada</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div className="flex gap-2">
+                <Button
+                  onClick={() => {
+                    // fetchSolicitacoes()
+                  }}
+                  disabled={refreshing}
+                  className="bg-blue-600 hover:bg-blue-700 text-white h-10"
+                >
+                  <RefreshCw className={`h-4 w-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
+                  {refreshing ? "Atualizando..." : "Atualizar"}
+                </Button>
+                
+                <Button className="bg-green-600 hover:bg-green-700 text-white h-10">
+                  <Download className="h-4 w-4 mr-2" />
+                  Relatório
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        {/* Main Table */}
+        <Card className="bg-slate-800/50 border-slate-700">
+          <CardHeader>
+            <CardTitle className="text-white">
+              Lista de Solicitações ({finalSolicitacoes.length})
+            </CardTitle>
+            <CardDescription className="text-slate-400">
+              {finalSolicitacoes.length} de {solicitacoes.length} solicitações
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow className="border-slate-700 hover:bg-slate-700/30">
+                    <TableHead className="text-slate-300">
+                      <OrderBtn
+                        label="ID"
+                        columnKey="id"
+                        activeSort={sortColumns}
+                        onSort={handleSort}
+                        onClearSort={handleClearSort}
+                      />
+                    </TableHead>
+                    <TableHead className="text-slate-300">
+                      <OrderBtn
+                        label="Solicitante"
+                        columnKey="nome"
+                        activeSort={sortColumns}
+                        onSort={handleSort}
+                        onClearSort={handleClearSort}
+                      />
+                    </TableHead>
+                    <TableHead className="text-slate-300">
+                      <OrderBtn
+                        label="NF"
+                        columnKey="numero_nf"
+                        activeSort={sortColumns}
+                        onSort={handleSort}
+                        onClearSort={handleClearSort}
+                      />
+                    </TableHead>
+                    <TableHead className="text-slate-300">Cliente</TableHead>
+                    <TableHead className="text-slate-300">Tipo</TableHead>
+                    <TableHead className="text-slate-300">
+                      <OrderBtn
+                        label="Data"
+                        columnKey="created_at"
+                        activeSort={sortColumns}
+                        onSort={handleSort}
+                        onClearSort={handleClearSort}
+                      />
+                    </TableHead>
+                    <TableHead className="text-slate-300">Status</TableHead>
+                    <TableHead className="text-slate-300 text-right">Ações</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {currentItems.length > 0 ? (
+                    currentItems.map((s) => (
+                      <TableRow key={s.id} className="border-slate-700 hover:bg-slate-700/30">
+                        <TableCell>
+                          <Badge variant="outline" className="text-slate-300 border-slate-600">
+                            #{s.id}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-2">
+                            <User className="h-4 w-4 text-slate-400" />
+                            <div>
+                              <p className="font-medium text-white">{truncateText(s.nome, 20)}</p>
+                              <p className="text-sm text-slate-400">Filial: {s.filial}</p>
                             </div>
-                          </DialogContent>
-                        </Dialog>
-                      ))
-                    ) : (
-                      <TableRow>
-                        <TableCell
-                          colSpan={15}
-                          className="text-center py-8 text-gray-400 bg-slate-800"
-                        >
-                          Nenhuma solicitação encontrada.
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-2">
+                            <FileText className="h-4 w-4 text-slate-400" />
+                            <span className="text-white">{s.numero_nf}</span>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div>
+                            <p className="text-white">Código: {s.cod_cliente}</p>
+                            <p className="text-sm text-slate-400">RCA: {s.rca}</p>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant="secondary" className="capitalize">
+                            {s.tipo_devolucao}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-2">
+                            <Calendar className="h-4 w-4 text-slate-400" />
+                            <span className="text-white">{new Date(s.created_at).toLocaleDateString()}</span>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant={getStatusBadgeVariant(s.status)} className="flex items-center gap-1">
+                            {getStatusIcon(s.status)}
+                            {s.status.toUpperCase()}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex items-center justify-end gap-2">
+                            <Dialog>
+                              <DialogTrigger asChild>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  className="bg-slate-700 border-slate-600 text-slate-300 hover:bg-slate-600"
+                                >
+                                  <Eye className="h-4 w-4" />
+                                </Button>
+                              </DialogTrigger>
+                              <DialogContent className="max-w-4xl max-h-[95vh] overflow-y-auto bg-slate-800 border-slate-700 text-white">
+                                <DialogHeader>
+                                  <DialogTitle className="flex items-center gap-2 text-white">
+                                    <FileText className="h-5 w-5" />
+                                    Detalhes da Solicitação #{s.id}
+                                  </DialogTitle>
+                                </DialogHeader>
+                                
+                                <div className="space-y-6">
+                                  {/* Informações Gerais */}
+                                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                    <Card className="bg-slate-700/50 border-slate-600">
+                                      <CardHeader className="pb-2">
+                                        <CardTitle className="text-sm flex items-center gap-2">
+                                          <User className="h-4 w-4" />
+                                          Solicitante
+                                        </CardTitle>
+                                      </CardHeader>
+                                      <CardContent>
+                                        <p className="text-white font-medium">{s.nome}</p>
+                                        <p className="text-slate-400 text-sm">Filial: {s.filial}</p>
+                                      </CardContent>
+                                    </Card>
+                                    
+                                    <Card className="bg-slate-700/50 border-slate-600">
+                                      <CardHeader className="pb-2">
+                                        <CardTitle className="text-sm flex items-center gap-2">
+                                          <FileText className="h-4 w-4" />
+                                          Nota Fiscal
+                                        </CardTitle>
+                                      </CardHeader>
+                                      <CardContent>
+                                        <p className="text-white font-medium">NF: {s.numero_nf}</p>
+                                        <p className="text-slate-400 text-sm">Carga: {s.carga}</p>
+                                      </CardContent>
+                                    </Card>
+                                    
+                                    <Card className="bg-slate-700/50 border-slate-600">
+                                      <CardHeader className="pb-2">
+                                        <CardTitle className="text-sm flex items-center gap-2">
+                                          <Building className="h-4 w-4" />
+                                          Cliente
+                                        </CardTitle>
+                                      </CardHeader>
+                                      <CardContent>
+                                        <p className="text-white font-medium">Cód: {s.cod_cliente}</p>
+                                        <p className="text-slate-400 text-sm">RCA: {s.rca}</p>
+                                      </CardContent>
+                                    </Card>
+                                    
+                                    <Card className="bg-slate-700/50 border-slate-600">
+                                      <CardHeader className="pb-2">
+                                        <CardTitle className="text-sm flex items-center gap-2">
+                                          <CreditCard className="h-4 w-4" />
+                                          Cobrança
+                                        </CardTitle>
+                                      </CardHeader>
+                                      <CardContent>
+                                        <p className="text-white font-medium">Cód: {s.cod_cobranca}</p>
+                                      </CardContent>
+                                    </Card>
+                                    
+                                    <Card className="bg-slate-700/50 border-slate-600">
+                                      <CardHeader className="pb-2">
+                                        <CardTitle className="text-sm flex items-center gap-2">
+                                          <Package className="h-4 w-4" />
+                                          Devolução
+                                        </CardTitle>
+                                      </CardHeader>
+                                      <CardContent>
+                                        <Badge variant="secondary" className="capitalize mb-1">
+                                          {s.tipo_devolucao}
+                                        </Badge>
+                                        <p className="text-slate-400 text-sm">Vale: {s.vale || 'N/A'}</p>
+                                      </CardContent>
+                                    </Card>
+                                    
+                                    <Card className="bg-slate-700/50 border-slate-600">
+                                      <CardHeader className="pb-2">
+                                        <CardTitle className="text-sm flex items-center gap-2">
+                                          {getStatusIcon(s.status)}
+                                          Status
+                                        </CardTitle>
+                                      </CardHeader>
+                                      <CardContent>
+                                        <Badge variant={getStatusBadgeVariant(s.status)} className="flex items-center gap-1 w-fit">
+                                          {getStatusIcon(s.status)}
+                                          {s.status.toUpperCase()}
+                                        </Badge>
+                                        <p className="text-slate-400 text-sm mt-1">
+                                          {new Date(s.created_at).toLocaleDateString()}
+                                        </p>
+                                      </CardContent>
+                                    </Card>
+                                  </div>
+                                  
+                                  {/* Motivo da Devolução */}
+                                  <Card className="bg-slate-700/50 border-slate-600">
+                                    <CardHeader>
+                                      <CardTitle className="text-white">Motivo da Devolução</CardTitle>
+                                    </CardHeader>
+                                    <CardContent>
+                                      <p className="text-slate-300">{s.motivo_devolucao}</p>
+                                    </CardContent>
+                                  </Card>
+                                  
+                                  {/* Produtos */}
+                                  <Card className="bg-slate-700/50 border-slate-600">
+                                    <CardHeader>
+                                      <CardTitle className="text-white flex items-center gap-2">
+                                        <Package className="h-5 w-5" />
+                                        Produtos
+                                      </CardTitle>
+                                    </CardHeader>
+                                    <CardContent>
+                                      <div className="overflow-x-auto">
+                                        <Table>
+                                          <TableHeader>
+                                            <TableRow className="border-slate-600">
+                                              <TableHead className="text-slate-300">Código</TableHead>
+                                              <TableHead className="text-slate-300">Descrição</TableHead>
+                                              <TableHead className="text-slate-300 text-center">Quantidade</TableHead>
+                                            </TableRow>
+                                          </TableHeader>
+                                          <TableBody>
+                                            {Array.isArray(s.products_list) && s.products_list.length > 0 ? (
+                                              s.products_list.map((p: { codigo: number; descricao: string; quantidade: number }, idx: number) => (
+                                                <TableRow key={idx} className="border-slate-600">
+                                                  <TableCell>
+                                                    <Badge variant="outline" className="text-slate-300 border-slate-500">
+                                                      {p.codigo}
+                                                    </Badge>
+                                                  </TableCell>
+                                                  <TableCell className="text-white">{p.descricao}</TableCell>
+                                                  <TableCell className="text-center text-slate-300">{p.quantidade}</TableCell>
+                                                </TableRow>
+                                              ))
+                                            ) : (
+                                              <TableRow>
+                                                <TableCell colSpan={3} className="text-center text-slate-400 py-4">
+                                                  Nenhum produto encontrado
+                                                </TableCell>
+                                              </TableRow>
+                                            )}
+                                          </TableBody>
+                                        </Table>
+                                      </div>
+                                    </CardContent>
+                                  </Card>
+                                  
+                                  {/* Botões de Ação */}
+                                  <div className="flex gap-2 justify-center">
+                                    {s.status.toUpperCase() === "PENDENTE" && (
+                                      <>
+                                        <Button
+                                          className="bg-green-600 hover:bg-green-700"
+                                          onClick={() => AprovarSolicitacao(s.id)}
+                                        >
+                                          <CheckCircle2 className="h-4 w-4 mr-2" />
+                                          Aprovar
+                                        </Button>
+                                        <Button
+                                          className="bg-red-600 hover:bg-red-700"
+                                          onClick={() => RecusarSolicitacao(s.id)}
+                                        >
+                                          <XCircle className="h-4 w-4 mr-2" />
+                                          Recusar
+                                        </Button>
+                                      </>
+                                    )}
+
+                                    {s.status.toUpperCase() === "APROVADA" && (
+                                      <Button
+                                        className="bg-blue-600 hover:bg-blue-700"
+                                        onClick={() => DesdobrarSolicitacao(s.id)}
+                                      >
+                                        <Target className="h-4 w-4 mr-2" />
+                                        Desdobrar
+                                      </Button>
+                                    )}
+                                    
+                                    {s.status.toUpperCase() === "DESDOBRADA" && (
+                                      <Button
+                                        className="bg-yellow-600 hover:bg-yellow-700"
+                                        onClick={() => AbaterSolicitacao(s.id)}
+                                      >
+                                        <AlertTriangle className="h-4 w-4 mr-2" />
+                                        Abater
+                                      </Button>
+                                    )}
+                                    
+                                    {s.status.toUpperCase() === "ABATIDA" && (
+                                      <Button
+                                        className="bg-lime-600 hover:bg-lime-700"
+                                        onClick={() => FinalizarSolicitacao(s.id)}
+                                      >
+                                        <Zap className="h-4 w-4 mr-2" />
+                                        Finalizar
+                                      </Button>
+                                    )}
+                                    
+                                    {s.status.toUpperCase() === "RECUSADA" && (
+                                      <Button
+                                        className="bg-orange-600 hover:bg-orange-700"
+                                        onClick={() => ReenviarSolicitacao(s.id)}
+                                      >
+                                        <RotateCcw className="h-4 w-4 mr-2" />
+                                        Reenviar
+                                      </Button>
+                                    )}
+                                  </div>
+                                </div>
+                                
+                                <DialogFooter>
+                                  {s.arquivo_url && (
+                                    <Button className="bg-blue-600 hover:bg-blue-700">
+                                      <Download className="h-4 w-4 mr-2" />
+                                      Baixar NF
+                                    </Button>
+                                  )}
+                                </DialogFooter>
+                              </DialogContent>
+                            </Dialog>
+                            
+                            {s.arquivo_url && (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="bg-blue-500/20 border-blue-500/30 text-blue-400 hover:bg-blue-500/30"
+                              >
+                                <Download className="h-4 w-4" />
+                              </Button>
+                            )}
+                          </div>
                         </TableCell>
                       </TableRow>
-                    )}
-                  </TableBody>
-                </Table>
-
-                {/* Paginação */}
-                <Pagination className="mt-4">
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell colSpan={8} className="text-center py-8 text-slate-400">
+                        Nenhuma solicitação encontrada
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </div>
+            
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="mt-6">
+                <Pagination>
                   <PaginationContent>
                     <PaginationItem>
                       <PaginationPrevious
-                        namePrevious="Primeira Página"
                         href="#"
                         onClick={() => setCurrentPage(1)}
+                        className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
                       />
                     </PaginationItem>
                     <PaginationItem>
                       <PaginationPrevious
-                        namePrevious="Anterior"
                         href="#"
-                        onClick={() =>
-                          setCurrentPage((prev) => Math.max(prev - 1, 1))
-                        }
+                        onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                        className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
                       />
                     </PaginationItem>
-                    {[...Array(endPage - startPage + 1)].map((_, i) => (
-                      <PaginationItem key={i + startPage}>
-                        <PaginationLink
-                          className={
-                            currentPage === i + startPage ? "bg-slate-600" : ""
-                          }
-                          href="#"
-                          onClick={() => setCurrentPage(i + startPage)}
-                        >
-                          {i + startPage}
-                        </PaginationLink>
-                      </PaginationItem>
-                    ))}
+                    {[...Array(Math.min(10, totalPages))].map((_, i) => {
+                      const pageNumber = startPage + i;
+                      return (
+                        <PaginationItem key={pageNumber}>
+                          <PaginationLink
+                            href="#"
+                            onClick={() => setCurrentPage(pageNumber)}
+                            className={currentPage === pageNumber ? "bg-slate-600 text-white" : ""}
+                          >
+                            {pageNumber}
+                          </PaginationLink>
+                        </PaginationItem>
+                      );
+                    })}
                     <PaginationItem>
                       <PaginationNext
-                        nameNext="Próxima"
                         href="#"
-                        onClick={() =>
-                          setCurrentPage((prev) =>
-                            Math.min(prev + 1, totalPages)
-                          )
-                        }
+                        onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                        className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
                       />
                     </PaginationItem>
                     <PaginationItem>
                       <PaginationNext
-                        nameNext="Última Página"
                         href="#"
                         onClick={() => setCurrentPage(totalPages)}
+                        className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
                       />
                     </PaginationItem>
                   </PaginationContent>
                 </Pagination>
               </div>
-            </CardContent>
-          </Card>
-        </div>
+            )}
+          </CardContent>
+        </Card>
       </div>
-    </>
+    </div>
   );
 }
