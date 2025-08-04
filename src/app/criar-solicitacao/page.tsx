@@ -39,8 +39,7 @@ import {
   FileText, 
   Package, 
   User, 
-  CreditCard, 
-  MapPin, 
+  CreditCard,
   Search,
   CheckCircle2,
   XCircle,
@@ -176,8 +175,7 @@ export default function Solicitacao() {
   const [statusCobranca1, setstatusCobranca1] = useState<string>("hidden");
   const [statusCobranca2, setstatusCobranca2] = useState<string>("display");
   const [tipoDevolucao, setTipoDevolucao] = useState<string>("");
-  // const [identificador, setIdentificador] = useState<string>("02869783183");
-  const [identificador, setIdentificador] = useState<string>("10641901000116");
+  const [identificador, setIdentificador] = useState<string>("");
   const [produtosSelecionados, setProdutosSelecionados] = useState<Set<string>>(
     new Set()
   );
@@ -237,6 +235,7 @@ export default function Solicitacao() {
           setNumeroCarga(infos_nota.numcar);
           setNomeCodigoCobranca(infos_nota.cobranca);
           setCodigoFilial(infos_nota.codfilial);
+          setIdentificador(infos_nota.cgcent)
         } else {
           setNomeClient("");
         }
