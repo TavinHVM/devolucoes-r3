@@ -33,12 +33,12 @@ import {
   TableRow,
 } from "../../components/ui/table";
 import { useState, useEffect } from "react";
-import { 
-  ArrowLeft, 
-  ArrowRight, 
-  FileText, 
-  Package, 
-  User, 
+import {
+  ArrowLeft,
+  ArrowRight,
+  FileText,
+  Package,
+  User,
   CreditCard,
   Search,
   CheckCircle2,
@@ -84,9 +84,8 @@ function Toast({
 }) {
   return (
     <div
-      className={`fixed z-50 bottom-6 right-6 min-w-[220px] max-w-xs px-4 py-3 rounded shadow-lg text-white font-bold transition-all animate-fade-in-up ${
-        type === "success" ? "bg-green-600" : "bg-red-500"
-      }`}
+      className={`fixed z-50 bottom-6 right-6 min-w-[220px] max-w-xs px-4 py-3 rounded shadow-lg text-white font-bold transition-all animate-fade-in-up ${type === "success" ? "bg-green-600" : "bg-red-500"
+        }`}
       role="alert"
     >
       <div className="flex items-center justify-between gap-2">
@@ -282,7 +281,7 @@ export default function Solicitacao() {
   function checkIdentificador(identificador: string): string {
     // Remove qualquer caractere que não seja número
     const cleaned = identificador.replace(/\D/g, '');
-  
+
     if (cleaned.length > 11) {
       // Formata como CNPJ: 00.000.000/0000-00
       return cleaned.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/, '$1.$2.$3/$4-$5');
@@ -291,7 +290,7 @@ export default function Solicitacao() {
       return cleaned.replace(/^(\d{3})(\d{3})(\d{3})(\d{2})$/, '$1.$2.$3-$4');
     }
   }
-  
+
 
   // Função nova para salvar no banco, adptar ela em relação à antiga
 
@@ -336,7 +335,7 @@ export default function Solicitacao() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
       <Header />
-      
+
       {/* Toast Overlay */}
       {toast && (
         <Toast
@@ -363,21 +362,31 @@ export default function Solicitacao() {
         {/* Progress Indicator */}
         <div className="mb-8">
           <div className="flex items-center justify-center gap-4">
-            <div className={`flex items-center gap-2 px-4 py-2 rounded-lg ${
-              statusCobranca1 === "display" ? "bg-blue-500/20 text-blue-400" : "bg-slate-700 text-slate-400"
-            }`}>
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                statusCobranca1 === "display" ? "bg-blue-500 text-white" : "bg-slate-600 text-slate-400"
-              }`}>1</div>
+            <div
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg cursor-pointer transition-all hover:bg-blue-500/10 ${statusCobranca1 === "display" ? "bg-blue-500/20 text-blue-400" : "bg-slate-700 text-slate-400 hover:text-slate-300"
+                }`}
+              onClick={() => {
+                setstatusCobranca1("display");
+                setstatusCobranca2("hidden");
+              }}
+            >
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${statusCobranca1 === "display" ? "bg-blue-500 text-white" : "bg-slate-600 text-slate-400"
+                }`}>1</div>
               <span className="font-medium">Informações da NF</span>
             </div>
             <ArrowRight className="h-5 w-5 text-slate-400" />
-            <div className={`flex items-center gap-2 px-4 py-2 rounded-lg ${
-              statusCobranca2 === "display" ? "bg-blue-500/20 text-blue-400" : "bg-slate-700 text-slate-400"
-            }`}>
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                statusCobranca2 === "display" ? "bg-blue-500 text-white" : "bg-slate-600 text-slate-400"
-              }`}>2</div>
+            <div
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg cursor-pointer transition-all hover:bg-blue-500/10 ${statusCobranca2 === "display" ? "bg-blue-500/20 text-blue-400" : "bg-slate-700 text-slate-400 hover:text-slate-300"
+                }`}
+              onClick={() => {
+                // Só permite avançar se tiver NF válida
+                if (numeroNF && numeroNF.length === 6) {
+                  avancarPagina();
+                }
+              }}
+            >
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${statusCobranca2 === "display" ? "bg-blue-500 text-white" : "bg-slate-600 text-slate-400"
+                }`}>2</div>
               <span className="font-medium">Seleção de Produtos</span>
             </div>
           </div>
@@ -654,7 +663,7 @@ export default function Solicitacao() {
               <CardContent>
                 <Table>
                   <TableHeader>
-                    <TableRow className="border-slate-700">
+                    <TableRow className="border-slate-700 hover:bg-slate-700/50">
                       <TableHead className="text-slate-300">Selecionar</TableHead>
                       <TableHead className="text-slate-300">Código</TableHead>
                       <TableHead className="text-slate-300">Produto</TableHead>
@@ -666,7 +675,19 @@ export default function Solicitacao() {
                   <TableBody>
                     {Array.isArray(produtos) && produtos.length > 0 ? (
                       produtos.map((p) => (
-                        <TableRow key={p.codigo} className="border-slate-700 hover:bg-slate-700/30">
+                        <TableRow
+                          key={p.codigo}
+                          className="border-slate-700 hover:bg-slate-700/50 cursor-pointer transition-colors"
+                          onClick={() => {
+                            const newSelecionados = new Set(produtosSelecionados);
+                            if (produtosSelecionados.has(p.codigo)) {
+                              newSelecionados.delete(p.codigo);
+                            } else {
+                              newSelecionados.add(p.codigo);
+                            }
+                            setProdutosSelecionados(newSelecionados);
+                          }}
+                        >
                           <TableCell>
                             <div className="flex items-center justify-center">
                               <Checkbox
@@ -680,6 +701,7 @@ export default function Solicitacao() {
                                   }
                                   setProdutosSelecionados(newSelecionados);
                                 }}
+                                onClick={(e) => e.stopPropagation()} // Previne duplo toggle quando clica na checkbox
                               />
                             </div>
                           </TableCell>
@@ -699,7 +721,7 @@ export default function Solicitacao() {
                         </TableRow>
                       ))
                     ) : (
-                      <TableRow>
+                      <TableRow className="hover:bg-slate-700/50">
                         <TableCell colSpan={6} className="text-center py-8 text-slate-400">
                           Nenhum produto encontrado
                         </TableCell>
@@ -707,7 +729,7 @@ export default function Solicitacao() {
                     )}
                   </TableBody>
                   <TableFooter>
-                    <TableRow className="bg-slate-700/50">
+                    <TableRow className="bg-slate-800 hover:bg-slate-700">
                       <TableCell colSpan={5} className="text-right">
                         <div className="flex items-center justify-end gap-2">
                           <Calculator className="h-4 w-4 text-slate-400" />
@@ -730,16 +752,7 @@ export default function Solicitacao() {
             </Card>
 
             {/* Botões de ação */}
-            <div className="flex justify-between mt-6">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={voltarPagina}
-                className="bg-slate-700 border-slate-600 text-slate-300 hover:bg-slate-600"
-              >
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Voltar
-              </Button>
+            <div className="flex justify-end mt-6">
               <Button
                 type="button"
                 disabled={produtosSelecionados.size === 0 || !tipoDevolucao}
