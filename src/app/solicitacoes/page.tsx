@@ -39,7 +39,7 @@ import {
 } from "../../components/ui/table";
 import OrderBtn from "@/components/orderBtn";
 import { 
-  X, 
+  // X, 
   RefreshCw, 
   Search, 
   Filter, 
@@ -59,7 +59,7 @@ import {
   Handshake,
   Wallet
 } from "lucide-react";
-import { DialogClose } from "@radix-ui/react-dialog";
+// import { DialogClose } from "@radix-ui/react-dialog";
 import { filterTableHeader } from "@/utils/filters/filterTableHeader";
 import { filterBySearch } from "@/utils/filters/filterBySearch";
 import { filterByStatus } from "@/utils/filters/filterByStatus";
@@ -71,6 +71,7 @@ import {
   AbaterSolicitacao,
   FinalizarSolicitacao,
 } from "@/utils/solicitacoes/botoesSolicitacoes";
+import { Label } from "@/components/ui/label";
 
 type Solicitacao = {
   id: number;
@@ -110,6 +111,7 @@ export default function VisualizacaoSolicitacoes() {
   const [sortColumns, setSortColumns] = useState<
     { column: string; direction: "asc" | "desc" }[]
   >([]);
+  const [motivoRecusa, setMotivoRecusa] = useState("");
 
   // Função para obter ícone do status
   const getStatusIcon = (status: string) => {
@@ -593,16 +595,48 @@ export default function VisualizacaoSolicitacoes() {
                               </DialogTrigger>
                               <DialogContent className="max-w-4xl max-h-[95vh] overflow-y-auto scrollbar-dark bg-slate-800 border-slate-700 text-white">
                                 <DialogHeader>
-                                  <DialogTitle className="flex items-center gap-2 text-white">
-                                    <FileText className="h-5 w-5" />
-                                    Detalhes da Solicitação #{s.id}
+                                  <DialogTitle className="flex items-center gap-2 text-white w-full justify-between">
+                                    <div className="flex items-center gap-2">
+                                      <FileText className="h-5 w-5" />
+                                      Detalhes da Solicitação #{s.id}
+                                    </div>
+
+                                    <div className="flex items-center justify-end">
+                                      <div className="flex items-center gap-2">
+                                        <span className="text-md text-white flex items-center gap-2 font-bold">
+                                          {getStatusIcon(s.status)}
+                                        </span>
+                                        <span>
+                                          Status
+                                        </span>
+                                      </div>
+                                      <div className="flex flex-col justify-between h-full">
+                                        <div className="flex gap-2 mx-4 h-full">
+                                          <div className="flex justify-center h-full">
+                                            <Badge variant={getStatusBadgeVariant(s.status)} className={`flex items-center gap-1 w-fit ${getStatusClass(s.status)}`}>
+                                              {getStatusIcon(s.status)}
+                                              {s.status.toUpperCase()}
+                                            </Badge>
+                                          </div>
+                                          <div className="flex text-slate-400 justify-end text-sm items-center gap-1">
+                                            <span>
+                                              Criada em: 
+                                            </span> 
+                                            <span>
+                                              {new Date(s.created_at).toLocaleDateString()}
+                                            </span>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+
                                   </DialogTitle>
                                 </DialogHeader>
                                 
                                 <div className="space-y-6">
                                   {/* Informações Gerais */}
                                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
-                                    <Card className="bg-slate-700/50 border-slate-600">
+                                    <Card className="bg-slate-700/50 border-slate-600 col-span-2">
                                       <CardHeader className="pb-2">
                                         <CardTitle className="text-md text-white flex items-center gap-2">
                                           <User className="h-4 w-4" />
@@ -615,13 +649,17 @@ export default function VisualizacaoSolicitacoes() {
                                             <p className="text-slate-400 text-sm">Código do cliente:</p>
                                             <p className="text-white font-medium">{s.cod_cliente}</p>
                                           </div>
-                                          <div className="flex flex-col">
+                                          <div className="flex gap-2 items-center">
                                             <p className="text-slate-400 text-sm">Nome do cliente:</p>
                                             <p className="text-white font-medium">{s.nome}</p>
                                           </div>
                                           <div className="flex gap-2 items-center">
+                                            <p className="text-slate-400 text-sm">Identificador do Cliente:</p>
+                                            <p className="text-white font-medium">{"10.641.901/0001-16"}</p>
+                                          </div>
+                                          <div className="flex gap-2 items-center">
                                             <p className="text-slate-400 text-sm">Filial:</p>
-                                            <p className="text-white font-medium">{s.filial}</p>
+                                            <p className="text-white font-medium">{s.filial === "1" ? "1 - CD APARECIDA" : "5 - LOJA RIO VERDE"}</p>
                                           </div>
                                         </div>
                                       </CardContent>
@@ -688,30 +726,6 @@ export default function VisualizacaoSolicitacoes() {
                                         </div>
                                       </CardContent>
                                     </Card>
-                                    
-                                    <Card className="bg-slate-700/50 border-slate-600">
-                                      <CardHeader className="pb-2">
-                                        <CardTitle className="text-md text-white flex items-center gap-2">
-                                          {getStatusIcon(s.status)}
-                                          Status
-                                        </CardTitle>
-                                      </CardHeader>
-                                      <CardContent className="flex flex-col justify-between h-full">
-                                        <div className="flex flex-col gap-2 mx-4 h-full">
-                                          <div className="flex justify-center h-full">
-                                            <Badge variant={getStatusBadgeVariant(s.status)} className={`flex items-center gap-1 w-fit ${getStatusClass(s.status)}`}>
-                                              {getStatusIcon(s.status)}
-                                              {s.status.toUpperCase()}
-                                            </Badge>
-                                          </div>
-                                          <div className="flex justify-end h-full items-end">  
-                                            <p className="text-slate-400 text-lg mt-1">
-                                              {new Date(s.created_at).toLocaleDateString()}
-                                            </p>
-                                          </div>
-                                        </div>
-                                      </CardContent>
-                                    </Card>
                                   </div>
                                   
                                   {/* Motivo da Devolução */}
@@ -769,6 +783,50 @@ export default function VisualizacaoSolicitacoes() {
                                       </div>
                                     </CardContent>
                                   </Card>
+
+                                  {/* Produtos Devolvidos*/}
+                                  <Card className="bg-slate-700/50 border-slate-600">
+                                    <CardHeader>
+                                      <CardTitle className="text-white flex items-center gap-2">
+                                        <Package className="h-5 w-5" />
+                                        Produtos Devolvidos
+                                      </CardTitle>
+                                    </CardHeader>
+                                    <CardContent>
+                                      <div className="overflow-x-auto">
+                                        <Table>
+                                          <TableHeader>
+                                            <TableRow className="border-slate-600">
+                                              <TableHead className="text-slate-300">Código</TableHead>
+                                              <TableHead className="text-slate-300">Descrição</TableHead>
+                                              <TableHead className="text-slate-300 text-center">Quantidade</TableHead>
+                                            </TableRow>
+                                          </TableHeader>
+                                          <TableBody>
+                                            {Array.isArray(s.products_list) && s.products_list.length > 0 ? (
+                                              s.products_list.map((p: { codigo: number; descricao: string; quantidade: number }, idx: number) => (
+                                                <TableRow key={idx} className="border-slate-600">
+                                                  <TableCell>
+                                                    <Badge variant="outline" className="text-slate-300 border-slate-500">
+                                                      {p.codigo}
+                                                    </Badge>
+                                                  </TableCell>
+                                                  <TableCell className="text-white">{p.descricao}</TableCell>
+                                                  <TableCell className="text-center text-slate-300">{p.quantidade}</TableCell>
+                                                </TableRow>
+                                              ))
+                                            ) : (
+                                              <TableRow>
+                                                <TableCell colSpan={3} className="text-center text-slate-400 py-4">
+                                                  Nenhum produto encontrado
+                                                </TableCell>
+                                              </TableRow>
+                                            )}
+                                          </TableBody>
+                                        </Table>
+                                      </div>
+                                    </CardContent>
+                                  </Card>
                                   
                                   {/* Botões de Ação */}
                                   <div className="flex gap-2 justify-center">
@@ -781,13 +839,39 @@ export default function VisualizacaoSolicitacoes() {
                                           <CheckCircle2 className="h-4 w-4 mr-2" />
                                           Aprovar
                                         </Button>
-                                        <Button
-                                          className="bg-red-600 hover:bg-red-700"
-                                          onClick={() => RecusarSolicitacao(s.id)}
-                                        >
-                                          <XCircle className="h-4 w-4 mr-2" />
-                                          Recusar
-                                        </Button>
+                                        <Dialog>
+                                          <DialogTrigger className="flex items-center justify-center text-sm font-semibold gap-1 bg-red-600 hover:bg-red-700 cursor-pointer px-4 rounded-md">
+                                            <XCircle className="h-4 w-4 mr-2" />
+                                            <span>Recusar</span>
+                                          </DialogTrigger>
+                                          <DialogContent>
+                                            <Card className="bg-slate-800 border-slate-600 rounded-lg p-6 border-none shadow-none">
+                                              <CardHeader>
+                                                <span className="text-lg font-bold text-red-400 flex items-center gap-2">
+                                                  <XCircle className="h-5 w-5" />
+                                                  Motivo da Recusa
+                                                </span>
+                                              </CardHeader>
+                                              <CardContent>
+                                                <Label className="text-slate-300 mb-2 block">Digite o Motivo da Recusa:</Label>
+                                                <Input
+                                                  className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-400 mb-4"
+                                                  placeholder="Descreva o motivo..."
+                                                  value={motivoRecusa}
+                                                  onChange={e => setMotivoRecusa(e.target.value)}
+                                                />
+                                                <Button
+                                                  className="bg-red-600 hover:bg-red-700 text-white font-bold w-full mt-2"
+                                                  onClick={() => RecusarSolicitacao(s.id, motivoRecusa)}
+                                                  disabled={motivoRecusa.trim() === ""}
+                                                >
+                                                  <XCircle className="h-4 w-4 mr-2" />
+                                                  Recusar
+                                                </Button>
+                                              </CardContent>
+                                            </Card>
+                                          </DialogContent>
+                                        </Dialog>
                                       </>
                                     )}
 

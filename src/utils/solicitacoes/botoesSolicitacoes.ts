@@ -27,14 +27,14 @@ export async function AprovarSolicitacao(id: number) {
     }
 }
 
-export async function RecusarSolicitacao(id: number) {
+export async function RecusarSolicitacao(id: number, motivo_recusa: string) {
     try {
         const response = await fetch(`/api/btnsSolicitacoes/recusarSolicitacao/${id}`, {
         method: "POST",
         headers: {
             "Cache-Control": "no-cache",
         },
-        // cache: 'no-store',
+        body: JSON.stringify({ motivo_recusa }),
         });
         if (!response.ok) {
         throw new Error("Erro ao mudar Status da solicitação para Recusada.");

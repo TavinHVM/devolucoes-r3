@@ -572,7 +572,7 @@ export default function Solicitacao() {
                         type="button"
                         onClick={avancarPagina}
                         disabled={!numeroNF || numeroNF.length !== 6}
-                        className="bg-blue-600 hover:bg-blue-700 text-white px-8"
+                        className="bg-blue-600 hover:bg-blue-700 text-white px-8 cursor-pointer"
                       >
                         Avançar
                         <ArrowRight className="ml-2 h-4 w-4" />
@@ -593,7 +593,7 @@ export default function Solicitacao() {
                 type="button"
                 variant="outline"
                 onClick={voltarPagina}
-                className="bg-slate-700 border-slate-600 text-slate-300 hover:bg-slate-600"
+                className="bg-slate-700 border-slate-600 text-slate-300 hover:bg-slate-600 cursor-pointer hover:text-white"
               >
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Voltar
@@ -669,7 +669,7 @@ export default function Solicitacao() {
                         setProdutosSelecionados(new Set(produtos.map((p) => p.codigo)));
                       }
                     }}
-                    className={`border-slate-600 hover:bg-slate-600 transition-colors ${
+                    className={`border-slate-600 hover:bg-slate-600 transition-colors hover:text-slate-200 cursor-pointer ${
                       produtosSelecionados.size === produtos.length && produtos.length > 0
                         ? "bg-green-600/20 text-green-400 border-green-500/50 hover:bg-green-600/30"
                         : produtosSelecionados.size > 0
@@ -714,7 +714,6 @@ export default function Solicitacao() {
                           <TableCell>
                             <div className="flex items-center justify-center">
                               <Checkbox
-                                className="data-[state=checked]:bg-amber-400 border-slate-500"
                                 checked={produtosSelecionados.has(p.codigo)}
                                 onCheckedChange={(checked) => {
                                   const newSelecionados = new Set(produtosSelecionados);
@@ -765,7 +764,7 @@ export default function Solicitacao() {
                           <span className="text-white font-bold">Total Selecionado:</span>
                         </div>
                       </TableCell>
-                      <TableCell className="text-center">
+                      <TableCell className="text-center w-[20%]">
                         <span className="text-xl font-bold text-green-400">
                           {formatPrice(
                             produtos

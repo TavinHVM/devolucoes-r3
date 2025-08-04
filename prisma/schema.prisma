@@ -20,8 +20,8 @@ model user_profiles {
   password                  String
   role                      String
   user_level                String
-  created_at                DateTime  @default(now())
   email                     String
+  created_at                DateTime  @default(now())
   updated_at                DateTime  @default(now())
 }
 
@@ -36,19 +36,20 @@ model solicitacoes {
   rca                       Int
   cgent                     String?
   motivo_devolucao          String
+  motivo_recusa             String?
   tipo_devolucao            String
   arquivo_url               Bytes?
-  created_at                DateTime  @default(now())
   cod_cliente               Int
   status                    String
   vale                      String
-  pendente_at               DateTime
+  pendente_at               DateTime?
   aprovada_at               DateTime?
   recusada_at               DateTime?
   desdobrada_at             DateTime?
   reenviada_at              DateTime?
   abatida_at                DateTime?
   finalizada_at             DateTime?
+  created_at                DateTime  @default(now())
   updated_at                DateTime?  @default(now())
 }
 
