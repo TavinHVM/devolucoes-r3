@@ -31,8 +31,10 @@ model solicitacoes {
   filial                    String
   numero_nf                 String
   carga                     String
+  nome_cobranca             String?
   cod_cobranca              String
   rca                       Int
+  cgent                     String?
   motivo_devolucao          String
   products_list             Json
   products_list_returned    Json?
@@ -44,7 +46,7 @@ model solicitacoes {
   vale                      String
   pendente_at               DateTime
   aprovada_at               DateTime?
-  rejeitada_at              DateTime?
+  recusada_at               DateTime?
   desdobrada_at             DateTime?
   reenviada_at              DateTime?
   abatida_at                DateTime?
@@ -52,11 +54,5 @@ model solicitacoes {
   updated_at                DateTime?  @default(now())
 }
 
-model lista_codigos_cobranca {
-  id Int @id @default(autoincrement())
-  codigo                    String
-  nome                      String
-  created_at                DateTime  @default(now())
-}
 
 
