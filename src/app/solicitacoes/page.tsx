@@ -48,16 +48,16 @@ import {
   Eye, 
   Calendar, 
   Package, 
-  User, 
-  Building,
-  CreditCard,
+  User,
   CheckCircle2,
   XCircle,
   Clock,
   AlertTriangle,
   RotateCcw,
   Zap,
-  Target
+  Target,
+  Handshake,
+  Wallet
 } from "lucide-react";
 import { DialogClose } from "@radix-ui/react-dialog";
 import { filterTableHeader } from "@/utils/filters/filterTableHeader";
@@ -137,17 +137,19 @@ export default function VisualizacaoSolicitacoes() {
   const getStatusBadgeVariant = (status: string) => {
     switch (status?.toUpperCase()) {
       case "APROVADA":
+        return "default";
       case "FINALIZADA":
         return "default";
       case "RECUSADA":
-        return "destructive";
+        return "default";
       case "PENDENTE":
-        return "secondary";
-      case "REENVIADA":
+        return "default";
+        case "REENVIADA":
+        return "default";
       case "ABATIDA":
-        return "outline";
+        return "default";
       case "DESDOBRADA":
-        return "outline";
+        return "default";
       default:
         return "secondary";
     }
@@ -249,21 +251,21 @@ export default function VisualizacaoSolicitacoes() {
   function getStatusClass(status: string) {
     switch (status?.toUpperCase()) {
       case "APROVADA":
-        return "min-w-32 max-w-32 w-full bg-green-600 text-white font-bold px-1 py-4 rounded flex justify-center h-full";
+        return "min-w-32 max-w-32 w-full bg-green-600 hover:bg-green-700 text-white font-bold px-1 py-[10px] rounded-3xl flex justify-center h-full";
       case "RECUSADA":
-        return "min-w-32 max-w-32 w-full bg-red-600 text-white font-bold px-1 py-4 rounded flex justify-center h-full";
+        return "min-w-32 max-w-32 w-full bg-red-600 hover:bg-red-700 text-white font-bold px-1 py-[10px] rounded-3xl flex justify-center h-full";
       case "PENDENTE":
-        return "min-w-32 max-w-32 w-full bg-slate-400 text-white font-bold px-1 py-4 rounded flex justify-center h-full";
+        return "min-w-32 max-w-32 w-full bg-slate-400 hover:bg-slate-500 text-white font-bold px-1 py-[10px] rounded-3xl flex justify-center h-full";
       case "REENVIADA":
-        return "min-w-32 max-w-32 w-full bg-yellow-400 text-white font-bold px-1 py-4 rounded flex justify-center h-full";
+        return "min-w-32 max-w-32 w-full bg-yellow-400 hover:bg-yellow-500 text-white font-bold px-1 py-[10px] rounded-3xl flex justify-center h-full";
       case "DESDOBRADA":
-        return "min-w-32 max-w-32 w-full bg-blue-500 text-white font-bold px-1 py-4 rounded flex justify-center h-full";
+        return "min-w-32 max-w-32 w-full bg-blue-500 hover:bg-blue-600 text-white font-bold px-1 py-[10px] rounded-3xl flex justify-center h-full";
       case "ABATIDA":
-        return "min-w-32 max-w-32 w-full bg-yellow-600 text-white font-bold px-1 py-4 rounded flex justify-center h-full";
+        return "min-w-32 max-w-32 w-full bg-yellow-600 hover:bg-yellow-700 text-white font-bold px-1 py-[10px] rounded-3xl flex justify-center h-full";
       case "FINALIZADA":
-        return "min-w-32 max-w-32 w-full bg-lime-500 text-white font-bold px-1 py-4 rounded flex justify-center h-full";
+        return "min-w-32 max-w-32 w-full bg-lime-500 hover:bg-lime-600 text-white font-bold px-1 py-[10px] rounded-3xl flex justify-center h-full";
       default:
-        return "min-w-32 max-w-32 w-full bg-blue-900 text-white font-bold px-1 py-4 rounded flex justify-center h-full";
+        return "min-w-32 max-w-32 w-full bg-blue-900 hover:bg-blue-950 text-white font-bold px-1 py-[10px] rounded-3xl flex justify-center h-full";
     }
   }
 
@@ -319,7 +321,7 @@ export default function VisualizacaoSolicitacoes() {
                 </div>
                 <div>
                   <p className="text-sm text-slate-400">Pendentes</p>
-                  <p className="text-2xl font-bold text-white">{solicitacoes.filter(s => s.status === 'PENDENTE').length}</p>
+                  <p className="text-2xl font-bold text-white">{solicitacoes.filter(s => s.status.toUpperCase() === 'PENDENTE').length}</p>
                 </div>
               </div>
             </CardContent>
@@ -333,7 +335,7 @@ export default function VisualizacaoSolicitacoes() {
                 </div>
                 <div>
                   <p className="text-sm text-slate-400">Aprovadas</p>
-                  <p className="text-2xl font-bold text-white">{solicitacoes.filter(s => s.status === 'APROVADA').length}</p>
+                  <p className="text-2xl font-bold text-white">{solicitacoes.filter(s => s.status.toUpperCase() === 'APROVADA').length}</p>
                 </div>
               </div>
             </CardContent>
@@ -347,7 +349,7 @@ export default function VisualizacaoSolicitacoes() {
                 </div>
                 <div>
                   <p className="text-sm text-slate-400">Recusadas</p>
-                  <p className="text-2xl font-bold text-white">{solicitacoes.filter(s => s.status === 'RECUSADA').length}</p>
+                  <p className="text-2xl font-bold text-white">{solicitacoes.filter(s => s.status.toUpperCase() === 'RECUSADA').length}</p>
                 </div>
               </div>
             </CardContent>
@@ -361,7 +363,7 @@ export default function VisualizacaoSolicitacoes() {
                 </div>
                 <div>
                   <p className="text-sm text-slate-400">Reenviadas</p>
-                  <p className="text-2xl font-bold text-white">{solicitacoes.filter(s => s.status === 'REENVIADA').length}</p>
+                  <p className="text-2xl font-bold text-white">{solicitacoes.filter(s => s.status.toUpperCase() === 'REENVIADA').length}</p>
                 </div>
               </div>
             </CardContent>
@@ -375,7 +377,7 @@ export default function VisualizacaoSolicitacoes() {
                 </div>
                 <div>
                   <p className="text-sm text-slate-400">Desdobradas</p>
-                  <p className="text-2xl font-bold text-white">{solicitacoes.filter(s => s.status === 'DESDOBRADA').length}</p>
+                  <p className="text-2xl font-bold text-white">{solicitacoes.filter(s => s.status.toUpperCase() === 'DESDOBRADA').length}</p>
                 </div>
               </div>
             </CardContent>
@@ -389,7 +391,7 @@ export default function VisualizacaoSolicitacoes() {
                 </div>
                 <div>
                   <p className="text-sm text-slate-400">Finalizadas</p>
-                  <p className="text-2xl font-bold text-white">{solicitacoes.filter(s => s.status === 'FINALIZADA').length}</p>
+                  <p className="text-2xl font-bold text-white">{solicitacoes.filter(s => s.status.toUpperCase() === 'FINALIZADA').length}</p>
                 </div>
               </div>
             </CardContent>
@@ -405,7 +407,7 @@ export default function VisualizacaoSolicitacoes() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="flex flex-col lg:flex-row gap-4 items-end">
+            <div className="flex flex-col lg:flex-row gap-4 items-end pl-4">
               <div className="flex-1">
                 <label className="text-slate-300 text-sm font-medium">Buscar solicitações</label>
                 <div className="relative mt-1">
@@ -422,7 +424,7 @@ export default function VisualizacaoSolicitacoes() {
               <div className="w-full lg:w-48">
                 <label className="text-slate-300 text-sm font-medium">Status</label>
                 <Select value={status} onValueChange={(v) => setStatus(v || "Todos")}>
-                  <SelectTrigger className="mt-1 bg-slate-700 border-slate-600 text-white">
+                  <SelectTrigger className="mt-1 bg-slate-700 border-slate-600 text-white w-full">
                     <SelectValue placeholder="Todos os status" />
                   </SelectTrigger>
                   <SelectContent className="bg-slate-700 border-slate-600">
@@ -438,19 +440,19 @@ export default function VisualizacaoSolicitacoes() {
                 </Select>
               </div>
               
-              <div className="flex gap-2">
+              <div className="flex gap-2 pr-4">
                 <Button
                   onClick={() => {
                     // fetchSolicitacoes()
                   }}
                   disabled={refreshing}
-                  className="bg-blue-600 hover:bg-blue-700 text-white h-10"
+                  className="bg-blue-600 hover:bg-blue-700 text-white h-10 cursor-pointer"
                 >
                   <RefreshCw className={`h-4 w-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
                   {refreshing ? "Atualizando..." : "Atualizar"}
                 </Button>
                 
-                <Button className="bg-green-600 hover:bg-green-700 text-white h-10">
+                <Button className="bg-green-600 hover:bg-green-700 text-white h-10 cursor-pointer">
                   <Download className="h-4 w-4 mr-2" />
                   Relatório
                 </Button>
@@ -484,8 +486,17 @@ export default function VisualizacaoSolicitacoes() {
                     </TableHead>
                     <TableHead className="text-slate-300">
                       <OrderBtn
-                        label="Solicitante"
+                        label="Nome Cliente"
                         columnKey="nome"
+                        activeSort={sortColumns}
+                        onSort={handleSort}
+                        onClearSort={handleClearSort}
+                      />
+                    </TableHead>
+                    <TableHead className="text-slate-300">
+                      <OrderBtn
+                        label="Código Cliente"
+                        columnKey="cod_cliente"
                         activeSort={sortColumns}
                         onSort={handleSort}
                         onClearSort={handleClearSort}
@@ -500,7 +511,7 @@ export default function VisualizacaoSolicitacoes() {
                         onClearSort={handleClearSort}
                       />
                     </TableHead>
-                    <TableHead className="text-slate-300">Cliente</TableHead>
+                    <TableHead className="text-slate-300">Código RCA</TableHead>
                     <TableHead className="text-slate-300">Tipo</TableHead>
                     <TableHead className="text-slate-300">
                       <OrderBtn
@@ -512,7 +523,7 @@ export default function VisualizacaoSolicitacoes() {
                       />
                     </TableHead>
                     <TableHead className="text-slate-300">Status</TableHead>
-                    <TableHead className="text-slate-300 text-right">Ações</TableHead>
+                    <TableHead className="text-slate-300 pl-7">Ações</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -535,18 +546,24 @@ export default function VisualizacaoSolicitacoes() {
                         </TableCell>
                         <TableCell>
                           <div className="flex items-center gap-2">
+                            <Handshake className="h-4 w-4 text-slate-400" />
+                            <span className="text-white">{s.cod_cliente}</span>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-2">
                             <FileText className="h-4 w-4 text-slate-400" />
                             <span className="text-white">{s.numero_nf}</span>
                           </div>
                         </TableCell>
                         <TableCell>
-                          <div>
-                            <p className="text-white">Código: {s.cod_cliente}</p>
-                            <p className="text-sm text-slate-400">RCA: {s.rca}</p>
+                          <div className="flex items-center gap-2">
+                            <Wallet className="h-4 w-4 text-slate-400" />
+                            <p className="text-sm text-white">{s.rca}</p>
                           </div>
                         </TableCell>
                         <TableCell>
-                          <Badge variant="secondary" className="capitalize">
+                          <Badge variant="secondary" className={`text-white flex justify-center py-2 w-full max-w-16 text-sm capitalize ${ s.tipo_devolucao.toUpperCase() === "PARCIAL" ? "bg-amber-500 hover:bg-amber-500" : "bg-emerald-500 hover:bg-emerald-500"}`}>
                             {s.tipo_devolucao}
                           </Badge>
                         </TableCell>
@@ -557,15 +574,15 @@ export default function VisualizacaoSolicitacoes() {
                           </div>
                         </TableCell>
                         <TableCell>
-                          <Badge variant={getStatusBadgeVariant(s.status)} className="flex items-center gap-1">
+                          <Badge variant={getStatusBadgeVariant(s.status)} className={`flex items-center gap-1 ${getStatusClass(s.status)}`}>
                             {getStatusIcon(s.status)}
                             {s.status.toUpperCase()}
                           </Badge>
                         </TableCell>
                         <TableCell className="text-right">
-                          <div className="flex items-center justify-end gap-2">
+                          <div className="flex items-center gap-2">
                             <Dialog>
-                              <DialogTrigger asChild>
+                              <DialogTrigger asChild className="cursor-pointer hover:text-white">
                                 <Button
                                   variant="outline"
                                   size="sm"
@@ -574,7 +591,7 @@ export default function VisualizacaoSolicitacoes() {
                                   <Eye className="h-4 w-4" />
                                 </Button>
                               </DialogTrigger>
-                              <DialogContent className="max-w-4xl max-h-[95vh] overflow-y-auto bg-slate-800 border-slate-700 text-white">
+                              <DialogContent className="max-w-4xl max-h-[95vh] overflow-y-auto scrollbar-dark bg-slate-800 border-slate-700 text-white">
                                 <DialogHeader>
                                   <DialogTitle className="flex items-center gap-2 text-white">
                                     <FileText className="h-5 w-5" />
@@ -584,88 +601,115 @@ export default function VisualizacaoSolicitacoes() {
                                 
                                 <div className="space-y-6">
                                   {/* Informações Gerais */}
-                                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
                                     <Card className="bg-slate-700/50 border-slate-600">
                                       <CardHeader className="pb-2">
-                                        <CardTitle className="text-sm flex items-center gap-2">
+                                        <CardTitle className="text-md text-white flex items-center gap-2">
                                           <User className="h-4 w-4" />
-                                          Solicitante
+                                          Cliente
                                         </CardTitle>
                                       </CardHeader>
                                       <CardContent>
-                                        <p className="text-white font-medium">{s.nome}</p>
-                                        <p className="text-slate-400 text-sm">Filial: {s.filial}</p>
+                                        <div className="flex flex-col gap-2 mx-4">
+                                          <div className="flex gap-2 items-center">
+                                            <p className="text-slate-400 text-sm">Código do cliente:</p>
+                                            <p className="text-white font-medium">{s.cod_cliente}</p>
+                                          </div>
+                                          <div className="flex flex-col">
+                                            <p className="text-slate-400 text-sm">Nome do cliente:</p>
+                                            <p className="text-white font-medium">{s.nome}</p>
+                                          </div>
+                                          <div className="flex gap-2 items-center">
+                                            <p className="text-slate-400 text-sm">Filial:</p>
+                                            <p className="text-white font-medium">{s.filial}</p>
+                                          </div>
+                                        </div>
                                       </CardContent>
                                     </Card>
                                     
                                     <Card className="bg-slate-700/50 border-slate-600">
                                       <CardHeader className="pb-2">
-                                        <CardTitle className="text-sm flex items-center gap-2">
+                                        <CardTitle className="text-md text-white flex items-center gap-2">
                                           <FileText className="h-4 w-4" />
                                           Nota Fiscal
                                         </CardTitle>
                                       </CardHeader>
                                       <CardContent>
-                                        <p className="text-white font-medium">NF: {s.numero_nf}</p>
-                                        <p className="text-slate-400 text-sm">Carga: {s.carga}</p>
+                                      <div className="flex flex-col gap-2 mx-4">
+                                        <div className="flex gap-2 items-center">
+                                          <p className="text-slate-400 text-sm">Carga:</p>
+                                          <p className="text-white font-medium">{s.carga}</p>
+                                        </div>
+                                        <div className="flex gap-2 items-center">
+                                          <p className="text-slate-400 text-sm">NF:</p>
+                                          <p className="text-white font-medium">{s.numero_nf}</p>
+                                        </div>
+                                        <div className="flex gap-2 items-center">
+                                          <p className="text-slate-400 text-sm">Cód:</p>
+                                          <p className="text-white font-medium">{s.cod_cliente}</p>
+                                        </div>
+                                        <div className="flex gap-2 items-center">
+                                          <p className="text-slate-400 text-sm">RCA:</p>
+                                          <p className="text-white font-medium">{s.rca}</p>
+                                        </div>
+                                      </div>
                                       </CardContent>
                                     </Card>
                                     
                                     <Card className="bg-slate-700/50 border-slate-600">
                                       <CardHeader className="pb-2">
-                                        <CardTitle className="text-sm flex items-center gap-2">
-                                          <Building className="h-4 w-4" />
-                                          Cliente
-                                        </CardTitle>
-                                      </CardHeader>
-                                      <CardContent>
-                                        <p className="text-white font-medium">Cód: {s.cod_cliente}</p>
-                                        <p className="text-slate-400 text-sm">RCA: {s.rca}</p>
-                                      </CardContent>
-                                    </Card>
-                                    
-                                    <Card className="bg-slate-700/50 border-slate-600">
-                                      <CardHeader className="pb-2">
-                                        <CardTitle className="text-sm flex items-center gap-2">
-                                          <CreditCard className="h-4 w-4" />
-                                          Cobrança
-                                        </CardTitle>
-                                      </CardHeader>
-                                      <CardContent>
-                                        <p className="text-white font-medium">Cód: {s.cod_cobranca}</p>
-                                      </CardContent>
-                                    </Card>
-                                    
-                                    <Card className="bg-slate-700/50 border-slate-600">
-                                      <CardHeader className="pb-2">
-                                        <CardTitle className="text-sm flex items-center gap-2">
+                                        <CardTitle className="text-md text-white flex items-center gap-2">
                                           <Package className="h-4 w-4" />
                                           Devolução
                                         </CardTitle>
                                       </CardHeader>
                                       <CardContent>
-                                        <Badge variant="secondary" className="capitalize mb-1">
-                                          {s.tipo_devolucao}
-                                        </Badge>
-                                        <p className="text-slate-400 text-sm">Vale: {s.vale || 'N/A'}</p>
+                                        <div className="flex flex-col gap-2 mx-4">
+                                          <div className="flex gap-2 items-center">
+                                            <p className="text-slate-400 text-sm">Tipo de Devolução:</p>
+                                            <Badge variant="secondary" className={`text-white text-md w-fit capitalize ${ s.tipo_devolucao.toUpperCase() === "PARCIAL" ? "bg-amber-500 hover:bg-amber-500" : "bg-emerald-500 hover:bg-emerald-500"}`}>
+                                              {s.tipo_devolucao}
+                                            </Badge>
+                                          </div>
+                                          <div className="flex gap-2 items-center">
+                                            <p className="text-slate-400 text-sm">Vale:</p>
+                                            <Badge variant="secondary" className={`text-white text-md w-fit capitalize ${ (s.vale as string).toUpperCase() === "SIM" ? "bg-green-500 hover:bg-green-500" : "bg-red-800 hover:bg-red-800"}`}>
+                                              {s.vale || 'N/A'}
+                                            </Badge>
+                                          </div>
+                                          <div className="flex gap-2 items-center">
+                                            <p className="text-slate-400 text-sm">Código Cobrança:</p>
+                                            <p className="text-white font-medium">{s.cod_cobranca}</p>
+                                          </div>
+                                          <div className="flex gap-2 items-center">
+                                            <p className="text-slate-400 text-sm">Nome Cobrança:</p>
+                                            <p className="text-white font-medium">{s.cod_cobranca}</p>
+                                          </div>
+                                        </div>
                                       </CardContent>
                                     </Card>
                                     
                                     <Card className="bg-slate-700/50 border-slate-600">
                                       <CardHeader className="pb-2">
-                                        <CardTitle className="text-sm flex items-center gap-2">
+                                        <CardTitle className="text-md text-white flex items-center gap-2">
                                           {getStatusIcon(s.status)}
                                           Status
                                         </CardTitle>
                                       </CardHeader>
-                                      <CardContent>
-                                        <Badge variant={getStatusBadgeVariant(s.status)} className="flex items-center gap-1 w-fit">
-                                          {getStatusIcon(s.status)}
-                                          {s.status.toUpperCase()}
-                                        </Badge>
-                                        <p className="text-slate-400 text-sm mt-1">
-                                          {new Date(s.created_at).toLocaleDateString()}
-                                        </p>
+                                      <CardContent className="flex flex-col justify-between h-full">
+                                        <div className="flex flex-col gap-2 mx-4 h-full">
+                                          <div className="flex justify-center h-full">
+                                            <Badge variant={getStatusBadgeVariant(s.status)} className={`flex items-center gap-1 w-fit ${getStatusClass(s.status)}`}>
+                                              {getStatusIcon(s.status)}
+                                              {s.status.toUpperCase()}
+                                            </Badge>
+                                          </div>
+                                          <div className="flex justify-end h-full items-end">  
+                                            <p className="text-slate-400 text-lg mt-1">
+                                              {new Date(s.created_at).toLocaleDateString()}
+                                            </p>
+                                          </div>
+                                        </div>
                                       </CardContent>
                                     </Card>
                                   </div>
@@ -676,7 +720,9 @@ export default function VisualizacaoSolicitacoes() {
                                       <CardTitle className="text-white">Motivo da Devolução</CardTitle>
                                     </CardHeader>
                                     <CardContent>
-                                      <p className="text-slate-300">{s.motivo_devolucao}</p>
+                                      <div className="mx-8">
+                                        <p className="text-slate-300">{s.motivo_devolucao}</p>
+                                      </div>
                                     </CardContent>
                                   </Card>
                                   
@@ -802,7 +848,7 @@ export default function VisualizacaoSolicitacoes() {
                               <Button
                                 variant="outline"
                                 size="sm"
-                                className="bg-blue-500/20 border-blue-500/30 text-blue-400 hover:bg-blue-500/30"
+                                className="bg-blue-500/20 border-blue-500/30 text-blue-400 hover:text-blue-400 hover:bg-blue-500/30 cursor-pointer"
                               >
                                 <Download className="h-4 w-4" />
                               </Button>
