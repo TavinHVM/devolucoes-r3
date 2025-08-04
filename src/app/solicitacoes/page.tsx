@@ -563,7 +563,7 @@ export default function VisualizacaoSolicitacoes() {
                           </div>
                         </TableCell>
                         <TableCell>
-                          <Badge variant="secondary" className={`text-white capitalize ${ s.tipo_devolucao.toUpperCase() === "PARCIAL" ? "bg-amber-500 hover:bg-amber-500" : "bg-emerald-500 hover:bg-emerald-500"}`}>
+                          <Badge variant="secondary" className={`text-white flex justify-center py-2 w-full max-w-16 text-sm capitalize ${ s.tipo_devolucao.toUpperCase() === "PARCIAL" ? "bg-amber-500 hover:bg-amber-500" : "bg-emerald-500 hover:bg-emerald-500"}`}>
                             {s.tipo_devolucao}
                           </Badge>
                         </TableCell>
