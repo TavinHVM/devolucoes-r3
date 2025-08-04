@@ -46,7 +46,7 @@ export async function POST(request: Request) {
         },
         data: {
             status: "RECUSADA",
-            rejeitada_at: new Date(),
+            recusada_at: new Date(),
             motivo_recusa: motivo_recusa
         },
         });
