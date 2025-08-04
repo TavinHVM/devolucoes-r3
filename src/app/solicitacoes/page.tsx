@@ -875,6 +875,7 @@ export default function VisualizacaoSolicitacoes() {
                   <PaginationContent>
                     <PaginationItem>
                       <PaginationPrevious
+                        namePrevious="Primeira Página"
                         href="#"
                         onClick={() => setCurrentPage(1)}
                         className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
@@ -882,27 +883,20 @@ export default function VisualizacaoSolicitacoes() {
                     </PaginationItem>
                     <PaginationItem>
                       <PaginationPrevious
+                        namePrevious="Anterior"
                         href="#"
                         onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                         className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
                       />
                     </PaginationItem>
-                    {[...Array(Math.min(10, totalPages))].map((_, i) => {
-                      const pageNumber = startPage + i;
-                      return (
-                        <PaginationItem key={pageNumber}>
-                          <PaginationLink
-                            href="#"
-                            onClick={() => setCurrentPage(pageNumber)}
-                            className={currentPage === pageNumber ? "bg-slate-600 text-white" : ""}
-                          >
-                            {pageNumber}
-                          </PaginationLink>
+                    {[...Array(endPage - startPage + 1)].map((_, i) => (
+                        <PaginationItem key={i + startPage}>
+                            <PaginationLink className={currentPage === i + startPage ? "bg-slate-400" : ""} href="#" onClick={() => setCurrentPage(i + startPage)}>{i + startPage}</PaginationLink>
                         </PaginationItem>
-                      );
-                    })}
+                    ))}
                     <PaginationItem>
                       <PaginationNext
+                        nameNext="Próxima"
                         href="#"
                         onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
                         className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
@@ -910,6 +904,7 @@ export default function VisualizacaoSolicitacoes() {
                     </PaginationItem>
                     <PaginationItem>
                       <PaginationNext
+                        nameNext="Última Página"
                         href="#"
                         onClick={() => setCurrentPage(totalPages)}
                         className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
