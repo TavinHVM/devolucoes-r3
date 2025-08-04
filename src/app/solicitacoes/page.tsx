@@ -89,6 +89,7 @@ type Solicitacao = {
   created_at: string;
   arquivo_url?: string;
   products_list: JSON;
+  motivo_recusa: string;
 };
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -739,6 +740,20 @@ export default function VisualizacaoSolicitacoes() {
                                       </div>
                                     </CardContent>
                                   </Card>
+
+                                  {/* Motivo da Recusa */}
+                                  {Boolean(s.motivo_recusa && s.motivo_recusa.trim()) && (
+                                    <Card className="bg-slate-700/50 border-slate-600">
+                                      <CardHeader>
+                                        <CardTitle className="text-white">Motivo da Recusa</CardTitle>
+                                      </CardHeader>
+                                      <CardContent>
+                                        <div className="mx-8">
+                                          <p className="text-slate-300">{s.motivo_recusa}</p>
+                                        </div>
+                                      </CardContent>
+                                    </Card>
+                                  )}
                                   
                                   {/* Produtos */}
                                   <Card className="bg-slate-700/50 border-slate-600">
