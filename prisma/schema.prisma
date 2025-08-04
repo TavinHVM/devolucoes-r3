@@ -36,8 +36,6 @@ model solicitacoes {
   rca                       Int
   cgent                     String?
   motivo_devolucao          String
-  products_list             Json
-  products_list_returned    Json?
   tipo_devolucao            String
   arquivo_url               Bytes?
   created_at                DateTime  @default(now())
@@ -52,6 +50,24 @@ model solicitacoes {
   abatida_at                DateTime?
   finalizada_at             DateTime?
   updated_at                DateTime?  @default(now())
+}
+
+model products {
+  id                        Int @id @default(autoincrement())
+  numeronf                  String
+  cod_prod                  String
+  descricao                 String
+  quantidade                String
+  created_at                DateTime  @default(now())
+}
+
+model returned_products {
+  id                        Int @id @default(autoincrement())
+  numeronf                  String
+  cod_prod                  String
+  descricao                 String
+  quantidade                String
+  created_at                DateTime  @default(now())
 }
 
 

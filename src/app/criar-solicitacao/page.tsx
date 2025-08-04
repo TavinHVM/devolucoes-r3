@@ -58,18 +58,16 @@ import {
 } from "@/components/ui/select";
 
 const formSchema = z.object({
-  nome: z.string().min(1, { message: "" }).max(14, { message: "" }),
+  nome: z.string().min(1, { message: "" }),
   filial: z.string().min(1, { message: "" }),
   numero_nf: z.string().min(1, { message: "" }),
   carga: z.string().min(1, { message: "" }),
   codigo_cobranca: z.string().min(1, { message: "" }),
   rca: z.string().min(1, { message: "" }),
   motivo_devolucao: z.string().min(1, { message: "" }),
-  codigo_produto: z.string().min(1, { message: "" }),
   codigo_cliente: z.string().min(1, { message: "" }),
   tipo_devolucao: z.string().min(1, { message: "" }),
   lista_produtos: z.string().min(1, { message: "" }),
-  quantidade: z.string().min(1, { message: "" }),
 });
 
 // Toast Component
@@ -197,10 +195,8 @@ export default function Solicitacao() {
       codigo_cobranca: "",
       rca: "",
       motivo_devolucao: "",
-      codigo_produto: "",
       codigo_cliente: "",
       tipo_devolucao: "",
-      quantidade: "",
     },
   });
 
@@ -302,7 +298,6 @@ export default function Solicitacao() {
       formData.append("filial", data.filial);
       formData.append("codigo_cliente", data.codigo_cliente);
       formData.append("codigo_cobranca", data.codigo_cobranca);
-      formData.append("codigo_produto", data.codigo_produto);
       formData.append("motivo_devolucao", data.motivo_devolucao);
       formData.append("rca", data.rca);
       formData.append("tipo_devolucao", data.tipo_devolucao);
