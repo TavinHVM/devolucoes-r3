@@ -176,6 +176,8 @@ export default function Solicitacao() {
   const [statusCobranca1, setstatusCobranca1] = useState<string>("hidden");
   const [statusCobranca2, setstatusCobranca2] = useState<string>("display");
   const [tipoDevolucao, setTipoDevolucao] = useState<string>("");
+  // const [identificador, setIdentificador] = useState<string>("02869783183");
+  const [identificador, setIdentificador] = useState<string>("10641901000116");
   const [produtosSelecionados, setProdutosSelecionados] = useState<Set<string>>(
     new Set()
   );
@@ -278,6 +280,20 @@ export default function Solicitacao() {
     setstatusCobranca2("hidden");
   }
 
+  function checkIdentificador(identificador: string): string {
+    // Remove qualquer caractere que não seja número
+    const cleaned = identificador.replace(/\D/g, '');
+  
+    if (cleaned.length > 11) {
+      // Formata como CNPJ: 00.000.000/0000-00
+      return cleaned.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/, '$1.$2.$3/$4-$5');
+    } else {
+      // Formata como CPF: 000.000.000-00
+      return cleaned.replace(/^(\d{3})(\d{3})(\d{3})(\d{2})$/, '$1.$2.$3-$4');
+    }
+  }
+  
+
   // Função nova para salvar no banco, adptar ela em relação à antiga
 
   async function onSubmit(data: z.infer<typeof formSchema>) {
@@ -371,7 +387,7 @@ export default function Solicitacao() {
         {/* Etapa 1: Informações da NF */}
         {statusCobranca1 === "display" && (
           <div className="max-w-4xl mx-auto">
-            <Card className="bg-slate-800/50 border-slate-700">
+            <Card className="bg-slate-800/50 border-slate-700 p-4">
               <CardHeader>
                 <CardTitle className="text-white flex items-center gap-2">
                   <Search className="h-5 w-5" />
@@ -396,7 +412,7 @@ export default function Solicitacao() {
                                 <Input
                                   type="text"
                                   {...field}
-                                  placeholder="Digite o número da NF (6 dígitos)"
+                                  placeholder="Digite o número da NF (6 dígitos) ou (4 dígitos)"
                                   value={numeroNF}
                                   maxLength={6}
                                   onChange={(e) => {
@@ -423,7 +439,7 @@ export default function Solicitacao() {
                             Informações do Cliente
                           </CardTitle>
                         </CardHeader>
-                        <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4 mx-4">
                           <div>
                             <label className="text-sm font-medium text-slate-300">Nome do Cliente</label>
                             <div className="mt-1 p-3 bg-slate-600 rounded-lg border border-slate-500">
@@ -451,7 +467,7 @@ export default function Solicitacao() {
                             Informações da Carga
                           </CardTitle>
                         </CardHeader>
-                        <CardContent className="space-y-4">
+                        <CardContent className="space-y-4 mx-4">
                           <div>
                             <label className="text-sm font-medium text-slate-300">Número da Carga</label>
                             <div className="mt-1 p-3 bg-slate-600 rounded-lg border border-slate-500">
@@ -486,7 +502,7 @@ export default function Solicitacao() {
                             Informações de Cobrança
                           </CardTitle>
                         </CardHeader>
-                        <CardContent className="space-y-4">
+                        <CardContent className="space-y-4 px-4">
                           <div>
                             <label className="text-sm font-medium text-slate-300">Código da Cobrança</label>
                             <div className="mt-1 p-3 bg-slate-600 rounded-lg border border-slate-500">
@@ -500,6 +516,14 @@ export default function Solicitacao() {
                             <div className="mt-1 p-3 bg-slate-600 rounded-lg border border-slate-500">
                               <span className="text-white">
                                 {nomeCodigoCobranca || "COBRANÇA NÃO ENCONTRADA"}
+                              </span>
+                            </div>
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium text-slate-300">Identificador da Cobrança</label>
+                            <div className="mt-1 p-3 bg-slate-600 rounded-lg border border-slate-500">
+                              <span className="text-white">
+                                {checkIdentificador(identificador) || "IDENTIFICADOR NÃO ENCONTRADO"}
                               </span>
                             </div>
                           </div>
@@ -574,7 +598,7 @@ export default function Solicitacao() {
                   Tipo de Devolução
                 </CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="mx-6">
                 <Select value={tipoDevolucao} onValueChange={setTipoDevolucao}>
                   <SelectTrigger className="bg-slate-700 border-slate-600 text-white">
                     <SelectValue placeholder="Selecione o tipo de devolução" />
