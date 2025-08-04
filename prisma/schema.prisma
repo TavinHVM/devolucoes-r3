@@ -59,6 +59,7 @@ model products {
   cod_prod                  String
   descricao                 String
   quantidade                String
+  punit                     String
   created_at                DateTime  @default(now())
 }
 
@@ -68,6 +69,7 @@ model returned_products {
   cod_prod                  String
   descricao                 String
   quantidade                String
+  punit                     String
   created_at                DateTime  @default(now())
 }
 
