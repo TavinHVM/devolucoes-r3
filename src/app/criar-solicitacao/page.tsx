@@ -218,6 +218,19 @@ export default function Solicitacao() {
     console.log("Estado dos produtos atualizado:", produtos);
   }, [produtos]);
 
+  // Controlar automaticamente o tipo de devolução baseado na seleção
+  useEffect(() => {
+    if (produtos.length > 0) {
+      if (produtosSelecionados.size === produtos.length && produtosSelecionados.size > 0) {
+        setTipoDevolucao("total");
+      } else if (produtosSelecionados.size > 0) {
+        setTipoDevolucao("parcial");
+      } else {
+        setTipoDevolucao("");
+      }
+    }
+  }, [produtosSelecionados, produtos]);
+
   useEffect(() => {
     const fetchInfosNota = async () => {
       if (numeroNF.length == 6) {
@@ -601,10 +614,10 @@ export default function Solicitacao() {
                   Tipo de Devolução
                 </CardTitle>
               </CardHeader>
-              <CardContent className="mx-6">
-                <Select value={tipoDevolucao} onValueChange={setTipoDevolucao}>
-                  <SelectTrigger className="bg-slate-700 border-slate-600 text-white">
-                    <SelectValue placeholder="Selecione o tipo de devolução" />
+              <CardContent className="mx-6 min-h-[120px]">
+                <Select value={tipoDevolucao} disabled>
+                  <SelectTrigger className="bg-slate-700 border-slate-600 text-white opacity-100 cursor-not-allowed">
+                    <SelectValue placeholder="Selecione produtos para determinar o tipo" />
                   </SelectTrigger>
                   <SelectContent className="bg-slate-700 border-slate-600">
                     <SelectItem value="total" className="text-white">
@@ -621,6 +634,15 @@ export default function Solicitacao() {
                     </SelectItem>
                   </SelectContent>
                 </Select>
+                <div className="mt-2 h-6 flex items-center">
+                  {tipoDevolucao && (
+                    <p className="text-sm text-slate-400">
+                      {tipoDevolucao === "total" 
+                        ? "Todos os produtos foram selecionados para devolução" 
+                        : "Alguns produtos foram selecionados para devolução"}
+                    </p>
+                  )}
+                </div>
               </CardContent>
             </Card>
 
@@ -647,9 +669,15 @@ export default function Solicitacao() {
                         setProdutosSelecionados(new Set(produtos.map((p) => p.codigo)));
                       }
                     }}
-                    className="bg-slate-700 border-slate-600 text-slate-300 hover:bg-slate-600"
+                    className={`border-slate-600 hover:bg-slate-600 transition-colors ${
+                      produtosSelecionados.size === produtos.length && produtos.length > 0
+                        ? "bg-green-600/20 text-green-400 border-green-500/50 hover:bg-green-600/30"
+                        : produtosSelecionados.size > 0
+                        ? "bg-yellow-600/20 text-yellow-400 border-yellow-500/50 hover:bg-yellow-600/30"
+                        : "bg-slate-700 text-slate-300"
+                    }`}
                   >
-                    {produtosSelecionados.size === produtos.length
+                    {produtosSelecionados.size === produtos.length && produtos.length > 0
                       ? "Desselecionar Todos"
                       : "Selecionar Todos"}
                   </Button>
@@ -697,6 +725,11 @@ export default function Solicitacao() {
                                   setProdutosSelecionados(newSelecionados);
                                 }}
                                 onClick={(e) => e.stopPropagation()} // Previne duplo toggle quando clica na checkbox
+                                className={`h-4 w-4 ${
+                                  produtos.length > 0 && produtosSelecionados.size === produtos.length && produtosSelecionados.size > 0
+                                    ? "data-[state=checked]:bg-green-500 data-[state=checked]:border-green-500"
+                                    : "data-[state=checked]:bg-yellow-500 data-[state=checked]:border-yellow-500"
+                                }`}
                               />
                             </div>
                           </TableCell>
