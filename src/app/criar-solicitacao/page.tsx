@@ -686,6 +686,7 @@ export default function Solicitacao() {
                           <TableCell>
                             <div className="flex items-center justify-center">
                               <Checkbox
+                                className="data-[state=checked]:bg-amber-400 border-slate-500"
                                 checked={produtosSelecionados.has(p.codigo)}
                                 onCheckedChange={(checked) => {
                                   const newSelecionados = new Set(produtosSelecionados);
