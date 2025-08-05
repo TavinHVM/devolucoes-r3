@@ -556,9 +556,8 @@ export default function VisualizacaoSolicitacoes() {
                   className="bg-blue-600 hover:bg-blue-700 text-white h-10 cursor-pointer"
                 >
                   <RefreshCw
-                    className={`h-4 w-4 mr-2 ${
-                      refreshing ? "animate-spin" : ""
-                    }`}
+                    className={`h-4 w-4 mr-2 ${refreshing ? "animate-spin" : ""
+                      }`}
                   />
                   {refreshing ? "Atualizando..." : "Atualizar"}
                 </Button>
@@ -686,11 +685,10 @@ export default function VisualizacaoSolicitacoes() {
                         <TableCell>
                           <Badge
                             variant="secondary"
-                            className={`text-white flex justify-center py-2 w-full max-w-16 text-sm capitalize ${
-                              s.tipo_devolucao.toUpperCase() === "PARCIAL"
+                            className={`text-white flex justify-center py-2 w-full max-w-16 text-sm capitalize ${s.tipo_devolucao.toUpperCase() === "PARCIAL"
                                 ? "bg-amber-500 hover:bg-amber-500"
                                 : "bg-emerald-500 hover:bg-emerald-500"
-                            }`}
+                              }`}
                           >
                             {s.tipo_devolucao}
                           </Badge>
@@ -883,12 +881,11 @@ export default function VisualizacaoSolicitacoes() {
                                             </p>
                                             <Badge
                                               variant="secondary"
-                                              className={`text-white text-md w-fit capitalize ${
-                                                s.tipo_devolucao.toUpperCase() ===
-                                                "PARCIAL"
+                                              className={`text-white text-md w-fit capitalize ${s.tipo_devolucao.toUpperCase() ===
+                                                  "PARCIAL"
                                                   ? "bg-amber-500 hover:bg-amber-500"
                                                   : "bg-emerald-500 hover:bg-emerald-500"
-                                              }`}
+                                                }`}
                                             >
                                               {s.tipo_devolucao}
                                             </Badge>
@@ -900,13 +897,12 @@ export default function VisualizacaoSolicitacoes() {
                                               </p>
                                               <Badge
                                                 variant="secondary"
-                                                className={`text-white text-md w-fit capitalize ${
-                                                  (
+                                                className={`text-white text-md w-fit capitalize ${(
                                                     s.vale as string
                                                   ).toUpperCase() === "SIM"
                                                     ? "bg-green-500 hover:bg-green-500"
                                                     : "bg-red-800 hover:bg-red-800"
-                                                }`}
+                                                  }`}
                                               >
                                                 {s.vale}
                                               </Badge>
@@ -953,21 +949,21 @@ export default function VisualizacaoSolicitacoes() {
                                   {Boolean(
                                     s.motivo_recusa && s.motivo_recusa.trim()
                                   ) && (
-                                    <Card className="bg-slate-700/50 border-slate-600">
-                                      <CardHeader>
-                                        <CardTitle className="text-white">
-                                          Motivo da Recusa
-                                        </CardTitle>
-                                      </CardHeader>
-                                      <CardContent>
-                                        <div className="mx-8">
-                                          <p className="text-slate-300">
-                                            {s.motivo_recusa}
-                                          </p>
-                                        </div>
-                                      </CardContent>
-                                    </Card>
-                                  )}
+                                      <Card className="bg-slate-700/50 border-slate-600">
+                                        <CardHeader>
+                                          <CardTitle className="text-white">
+                                            Motivo da Recusa
+                                          </CardTitle>
+                                        </CardHeader>
+                                        <CardContent>
+                                          <div className="mx-8">
+                                            <p className="text-slate-300">
+                                              {s.motivo_recusa}
+                                            </p>
+                                          </div>
+                                        </CardContent>
+                                      </Card>
+                                    )}
 
                                   {/* Produtos */}
                                   <Card className="bg-slate-700/50 border-slate-600">
@@ -995,7 +991,7 @@ export default function VisualizacaoSolicitacoes() {
                                           </TableHeader>
                                           <TableBody>
                                             {Array.isArray(s.products_list) &&
-                                            s.products_list.length > 0 ? (
+                                              s.products_list.length > 0 ? (
                                               s.products_list.map(
                                                 (
                                                   p: {
@@ -1068,7 +1064,7 @@ export default function VisualizacaoSolicitacoes() {
                                           </TableHeader>
                                           <TableBody>
                                             {Array.isArray(s.products_list) &&
-                                            s.products_list.length > 0 ? (
+                                              s.products_list.length > 0 ? (
                                               s.products_list.map(
                                                 (
                                                   p: {
@@ -1115,24 +1111,70 @@ export default function VisualizacaoSolicitacoes() {
                                     </CardContent>
                                   </Card>
 
-                                  {/* Botões de Ação */}
-                                  <div className="flex gap-2 justify-center">
+                                  {/* Botões de Ação - Centralizados */}
+                                  <div className="flex justify-center gap-4 mt-6">
                                     {s.status.toUpperCase() === "PENDENTE" && (
                                       <>
                                         {userPermissions.canAprovar && (
-                                          <Button
-                                            className="bg-green-600 hover:bg-green-700"
-                                            onClick={() =>
-                                              AprovarSolicitacao(s.id)
-                                            }
-                                          >
-                                            <CheckCircle2 className="h-4 w-4 mr-2" />
-                                            Aprovar
-                                          </Button>
+                                          <Dialog>
+                                            <DialogTrigger className="flex items-center justify-center text-sm font-semibold gap-1 bg-green-600 hover:bg-green-700 cursor-pointer py-2 px-4 rounded-md">
+                                              <CheckCircle2 className="h-4 w-4 mr-2" />
+                                              <span>Aprovar</span>
+                                            </DialogTrigger>
+                                            <DialogContent>
+                                              <Card className="bg-slate-800 border-slate-600 rounded-lg p-6 border-none shadow-none">
+                                                <CardHeader>
+                                                  <span className="text-lg font-bold text-green-400 flex items-center gap-2">
+                                                    <CheckCircle2 className="h-5 w-5" />
+                                                    Aprovar Solicitação
+                                                  </span>
+                                                </CardHeader>
+                                                <CardContent>
+                                                  <form
+                                                    onSubmit={(e) => {
+                                                      e.preventDefault();
+                                                      if (
+                                                        selectedFiles.nfDevolucao &&
+                                                        selectedFiles.recibo
+                                                      ) {
+                                                        AprovarSolicitacao(
+                                                          s.id,
+                                                          selectedFiles.nfDevolucao,
+                                                          selectedFiles.recibo
+                                                        );
+                                                      }
+                                                    }}
+                                                  >
+                                                    <FileUpload
+                                                      onFilesChange={(files) =>
+                                                        setSelectedFiles(files)
+                                                      }
+                                                      onValidationChange={(
+                                                        isValid
+                                                      ) => setFilesValid(isValid)}
+                                                    />
+                                                    <Button
+                                                      type="submit"
+                                                      className={`w-full font-bold mt-4 ${filesValid
+                                                          ? "bg-green-600 hover:bg-green-700 text-white"
+                                                          : "bg-slate-600 text-slate-400 cursor-not-allowed"
+                                                        }`}
+                                                      disabled={!filesValid}
+                                                    >
+                                                      {filesValid
+                                                        ? "Aprovar Solicitação"
+                                                        : "Selecione ambos os arquivos para aprovar"}
+                                                    </Button>
+                                                  </form>
+                                                </CardContent>
+                                              </Card>
+                                            </DialogContent>
+                                          </Dialog>
                                         )}
+                                        
                                         {userPermissions.canRecusar && (
                                           <Dialog>
-                                            <DialogTrigger className="flex items-center justify-center text-sm font-semibold gap-1 bg-red-600 hover:bg-red-700 cursor-pointer px-4 rounded-md">
+                                            <DialogTrigger className="flex items-center justify-center text-sm font-semibold gap-1 bg-red-600 hover:bg-red-700 cursor-pointer py-2 px-4 rounded-md">
                                               <XCircle className="h-4 w-4 mr-2" />
                                               <span>Recusar</span>
                                             </DialogTrigger>
@@ -1178,107 +1220,6 @@ export default function VisualizacaoSolicitacoes() {
                                             </DialogContent>
                                           </Dialog>
                                         )}
-                                        <Dialog>
-                                          <DialogTrigger className="flex items-center justify-center text-sm font-semibold gap-1 bg-green-600 hover:bg-green-700 cursor-pointer py-[8px] px-4 rounded-md">
-                                            <CheckCircle2 className="h-4 w-4 mr-2" />
-                                            <span>Aprovar</span>
-                                          </DialogTrigger>
-                                          <DialogContent>
-                                            <Card className="bg-slate-800 border-slate-600 rounded-lg p-6 border-none shadow-none">
-                                              <CardHeader>
-                                                <span className="text-lg font-bold text-green-400 flex items-center gap-2">
-                                                  <CheckCircle2 className="h-5 w-5" />
-                                                  Aprovar Solicitação
-                                                </span>
-                                              </CardHeader>
-                                              <CardContent>
-                                                <form
-                                                  onSubmit={(e) => {
-                                                    e.preventDefault();
-                                                    if (
-                                                      selectedFiles.nfDevolucao &&
-                                                      selectedFiles.recibo
-                                                    ) {
-                                                      AprovarSolicitacao(
-                                                        s.id,
-                                                        selectedFiles.nfDevolucao,
-                                                        selectedFiles.recibo
-                                                      );
-                                                    }
-                                                  }}
-                                                >
-                                                  <FileUpload
-                                                    onFilesChange={(files) =>
-                                                      setSelectedFiles(files)
-                                                    }
-                                                    onValidationChange={(
-                                                      isValid
-                                                    ) => setFilesValid(isValid)}
-                                                  />
-                                                  <Button
-                                                    type="submit"
-                                                    className={`w-full font-bold mt-4 ${
-                                                      filesValid
-                                                        ? "bg-green-600 hover:bg-green-700 text-white"
-                                                        : "bg-slate-600 text-slate-400 cursor-not-allowed"
-                                                    }`}
-                                                    disabled={!filesValid}
-                                                  >
-                                                    {filesValid
-                                                      ? "Aprovar Solicitação"
-                                                      : "Selecione ambos os arquivos para aprovar"}
-                                                  </Button>
-                                                </form>
-                                              </CardContent>
-                                            </Card>
-                                          </DialogContent>
-                                        </Dialog>
-                                        <Dialog>
-                                          <DialogTrigger className="flex items-center justify-center text-sm font-semibold gap-1 bg-red-600 hover:bg-red-700 cursor-pointer px-4 rounded-md">
-                                            <XCircle className="h-4 w-4 mr-2" />
-                                            <span>Recusar</span>
-                                          </DialogTrigger>
-                                          <DialogContent>
-                                            <Card className="bg-slate-800 border-slate-600 rounded-lg p-6 border-none shadow-none">
-                                              <CardHeader>
-                                                <span className="text-lg font-bold text-red-400 flex items-center gap-2">
-                                                  <XCircle className="h-5 w-5" />
-                                                  Motivo da Recusa
-                                                </span>
-                                              </CardHeader>
-                                              <CardContent>
-                                                <Label className="text-slate-300 mb-2 block">
-                                                  Digite o Motivo da Recusa:
-                                                </Label>
-                                                <Input
-                                                  className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-400 mb-4"
-                                                  placeholder="Descreva o motivo..."
-                                                  value={motivoRecusa}
-                                                  onChange={(e) =>
-                                                    setMotivoRecusa(
-                                                      e.target.value
-                                                    )
-                                                  }
-                                                />
-                                                <Button
-                                                  className="bg-red-600 hover:bg-red-700 text-white font-bold w-full mt-2"
-                                                  onClick={() =>
-                                                    RecusarSolicitacao(
-                                                      s.id,
-                                                      motivoRecusa
-                                                    )
-                                                  }
-                                                  disabled={
-                                                    motivoRecusa.trim() === ""
-                                                  }
-                                                >
-                                                  <XCircle className="h-4 w-4 mr-2" />
-                                                  Recusar
-                                                </Button>
-                                              </CardContent>
-                                            </Card>
-                                          </DialogContent>
-                                        </Dialog>
                                       </>
                                     )}
 
@@ -1353,98 +1294,98 @@ export default function VisualizacaoSolicitacoes() {
                           </div>
                         </TableCell>
                       </TableRow>
-                    ))
-                  ) : (
-                    <TableRow>
-                      <TableCell
-                        colSpan={8}
-                        className="text-center py-8 text-slate-400"
-                      >
-                        Nenhuma solicitação encontrada
-                      </TableCell>
-                    </TableRow>
+            ))
+            ) : (
+            <TableRow>
+              <TableCell
+                colSpan={8}
+                className="text-center py-8 text-slate-400"
+              >
+                Nenhuma solicitação encontrada
+              </TableCell>
+            </TableRow>
                   )}
-                </TableBody>
-              </Table>
-            </div>
+          </TableBody>
+        </Table>
+      </div>
 
-            {/* Pagination */}
-            {totalPages > 1 && (
-              <div className="mt-6">
-                <Pagination>
-                  <PaginationContent>
-                    <PaginationItem>
-                      <PaginationPrevious
-                        namePrevious="Primeira Página"
-                        href="#"
-                        onClick={() => setCurrentPage(1)}
-                        className={
-                          currentPage === 1
-                            ? "pointer-events-none opacity-50"
-                            : ""
-                        }
-                      />
-                    </PaginationItem>
-                    <PaginationItem>
-                      <PaginationPrevious
-                        namePrevious="Anterior"
-                        href="#"
-                        onClick={() =>
-                          setCurrentPage((prev) => Math.max(prev - 1, 1))
-                        }
-                        className={
-                          currentPage === 1
-                            ? "pointer-events-none opacity-50"
-                            : ""
-                        }
-                      />
-                    </PaginationItem>
-                    {[...Array(endPage - startPage + 1)].map((_, i) => (
-                      <PaginationItem key={i + startPage}>
-                        <PaginationLink
-                          className={
-                            currentPage === i + startPage ? "bg-slate-400" : ""
-                          }
-                          href="#"
-                          onClick={() => setCurrentPage(i + startPage)}
-                        >
-                          {i + startPage}
-                        </PaginationLink>
-                      </PaginationItem>
-                    ))}
-                    <PaginationItem>
-                      <PaginationNext
-                        nameNext="Próxima"
-                        href="#"
-                        onClick={() =>
-                          setCurrentPage((prev) =>
-                            Math.min(prev + 1, totalPages)
-                          )
-                        }
-                        className={
-                          currentPage === totalPages
-                            ? "pointer-events-none opacity-50"
-                            : ""
-                        }
-                      />
-                    </PaginationItem>
-                    <PaginationItem>
-                      <PaginationNext
-                        nameNext="Última Página"
-                        href="#"
-                        onClick={() => setCurrentPage(totalPages)}
-                        className={
-                          currentPage === totalPages
-                            ? "pointer-events-none opacity-50"
-                            : ""
-                        }
-                      />
-                    </PaginationItem>
-                  </PaginationContent>
-                </Pagination>
-              </div>
-            )}
-          </CardContent>
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="mt-6">
+          <Pagination>
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious
+                  namePrevious="Primeira Página"
+                  href="#"
+                  onClick={() => setCurrentPage(1)}
+                  className={
+                    currentPage === 1
+                      ? "pointer-events-none opacity-50"
+                      : ""
+                  }
+                />
+              </PaginationItem>
+              <PaginationItem>
+                <PaginationPrevious
+                  namePrevious="Anterior"
+                  href="#"
+                  onClick={() =>
+                    setCurrentPage((prev) => Math.max(prev - 1, 1))
+                  }
+                  className={
+                    currentPage === 1
+                      ? "pointer-events-none opacity-50"
+                      : ""
+                  }
+                />
+              </PaginationItem>
+              {[...Array(endPage - startPage + 1)].map((_, i) => (
+                <PaginationItem key={i + startPage}>
+                  <PaginationLink
+                    className={
+                      currentPage === i + startPage ? "bg-slate-400" : ""
+                    }
+                    href="#"
+                    onClick={() => setCurrentPage(i + startPage)}
+                  >
+                    {i + startPage}
+                  </PaginationLink>
+                </PaginationItem>
+              ))}
+              <PaginationItem>
+                <PaginationNext
+                  nameNext="Próxima"
+                  href="#"
+                  onClick={() =>
+                    setCurrentPage((prev) =>
+                      Math.min(prev + 1, totalPages)
+                    )
+                  }
+                  className={
+                    currentPage === totalPages
+                      ? "pointer-events-none opacity-50"
+                      : ""
+                  }
+                />
+              </PaginationItem>
+              <PaginationItem>
+                <PaginationNext
+                  nameNext="Última Página"
+                  href="#"
+                  onClick={() => setCurrentPage(totalPages)}
+                  className={
+                    currentPage === totalPages
+                      ? "pointer-events-none opacity-50"
+                      : ""
+                  }
+                />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
+        </div>
+      )}
+    </CardContent>
         </Card>
       </div>
     </div>
