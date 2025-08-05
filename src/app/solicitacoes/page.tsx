@@ -78,6 +78,7 @@ import {
   FinalizarSolicitacao,
 } from "@/utils/solicitacoes/botoesSolicitacoes";
 import { Label } from "@/components/ui/label";
+import { FileUpload } from "@/components/fileUpload_NFDev_Recibo";
 
 type Solicitacao = {
   id: number;
@@ -119,6 +120,11 @@ export default function VisualizacaoSolicitacoes() {
     { column: string; direction: "asc" | "desc" }[]
   >([]);
   const [motivoRecusa, setMotivoRecusa] = useState("");
+  const [selectedFiles, setSelectedFiles] = useState<{
+    nfDevolucao: File | null;
+    recibo: File | null;
+  }>({ nfDevolucao: null, recibo: null });
+  const [filesValid, setFilesValid] = useState(false);
 
   // Função para obter ícone do status
   const getStatusIcon = (status: string) => {
@@ -1086,15 +1092,61 @@ export default function VisualizacaoSolicitacoes() {
                                   <div className="flex gap-2 justify-center">
                                     {s.status.toUpperCase() === "PENDENTE" && (
                                       <>
-                                        <Button
-                                          className="bg-green-600 hover:bg-green-700"
-                                          onClick={() =>
-                                            AprovarSolicitacao(s.id)
-                                          }
-                                        >
-                                          <CheckCircle2 className="h-4 w-4 mr-2" />
-                                          Aprovar
-                                        </Button>
+                                        <Dialog>
+                                          <DialogTrigger className="flex items-center justify-center text-sm font-semibold gap-1 bg-green-600 hover:bg-green-700 cursor-pointer py-[8px] px-4 rounded-md">
+                                            <CheckCircle2 className="h-4 w-4 mr-2" />
+                                            <span>Aprovar</span>
+                                          </DialogTrigger>
+                                          <DialogContent>
+                                            <Card className="bg-slate-800 border-slate-600 rounded-lg p-6 border-none shadow-none">
+                                              <CardHeader>
+                                                <span className="text-lg font-bold text-green-400 flex items-center gap-2">
+                                                  <CheckCircle2 className="h-5 w-5" />
+                                                  Aprovar Solicitação
+                                                </span>
+                                              </CardHeader>
+                                              <CardContent>
+                                                <form
+                                                  onSubmit={(e) => {
+                                                    e.preventDefault();
+                                                    if (
+                                                      selectedFiles.nfDevolucao &&
+                                                      selectedFiles.recibo
+                                                    ) {
+                                                      AprovarSolicitacao(
+                                                        s.id,
+                                                        selectedFiles.nfDevolucao,
+                                                        selectedFiles.recibo
+                                                      );
+                                                    }
+                                                  }}
+                                                >
+                                                  <FileUpload
+                                                    onFilesChange={(files) =>
+                                                      setSelectedFiles(files)
+                                                    }
+                                                    onValidationChange={(
+                                                      isValid
+                                                    ) => setFilesValid(isValid)}
+                                                  />
+                                                  <Button
+                                                    type="submit"
+                                                    className={`w-full font-bold mt-4 ${
+                                                      filesValid
+                                                        ? "bg-green-600 hover:bg-green-700 text-white"
+                                                        : "bg-slate-600 text-slate-400 cursor-not-allowed"
+                                                    }`}
+                                                    disabled={!filesValid}
+                                                  >
+                                                    {filesValid
+                                                      ? "Aprovar Solicitação"
+                                                      : "Selecione ambos os arquivos para aprovar"}
+                                                  </Button>
+                                                </form>
+                                              </CardContent>
+                                            </Card>
+                                          </DialogContent>
+                                        </Dialog>
                                         <Dialog>
                                           <DialogTrigger className="flex items-center justify-center text-sm font-semibold gap-1 bg-red-600 hover:bg-red-700 cursor-pointer px-4 rounded-md">
                                             <XCircle className="h-4 w-4 mr-2" />
