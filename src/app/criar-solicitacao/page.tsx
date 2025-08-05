@@ -172,8 +172,8 @@ export default function Solicitacao() {
   const [nomeCodigoCobranca, setNomeCodigoCobranca] = useState<string>("");
   const [numeroCodigoCobranca, setNumeroCodigoCobranca] = useState<string>("");
   const [numeroCodigoCliente, setNumeroCodigoCliente] = useState<string>("");
-  const [statusCobranca1, setstatusCobranca1] = useState<string>("hidden");
-  const [statusCobranca2, setstatusCobranca2] = useState<string>("display");
+  const [statusCobranca1, setstatusCobranca1] = useState<string>("display");
+  const [statusCobranca2, setstatusCobranca2] = useState<string>("hidden");
   const [tipoDevolucao, setTipoDevolucao] = useState<string>("");
   const [identificador, setIdentificador] = useState<string>("");
   const [arquivoNF, setArquivoNF] = useState<File | null>(null);
@@ -290,7 +290,45 @@ export default function Solicitacao() {
     form,
   ]);
 
+  useEffect(() => {
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [form.watch("motivo_devolucao"), arquivoNF]);
+
+  const isButtonEnabled = () => {
+    const motivoDevolucao = form.getValues("motivo_devolucao");
+    return (
+      numeroNF &&
+      numeroNF.length === 6 &&
+      motivoDevolucao &&
+      motivoDevolucao.trim() !== "" &&
+      arquivoNF
+    );
+  };
+
   async function avancarPagina() {
+    // Validar se o motivo da devolução está preenchido
+    const motivoDevolucao = form.getValues("motivo_devolucao");
+    if (!motivoDevolucao || motivoDevolucao.trim() === "") {
+      console.log("Motivo da devolução não preenchido");
+      setToast({
+        message:
+          "Por favor, preencha o motivo da devolução antes de continuar.",
+        type: "error",
+      });
+      return;
+    }
+
+    // Validar se o arquivo da nota fiscal foi selecionado
+    if (!arquivoNF) {
+      console.log("Arquivo da nota fiscal não selecionado");
+      setToast({
+        message:
+          "Por favor, selecione o arquivo da nota fiscal antes de continuar.",
+        type: "error",
+      });
+      return;
+    }
+
     if (numeroNF) {
       try {
         console.log("Buscando produtos para NF:", numeroNF);
@@ -717,8 +755,12 @@ export default function Solicitacao() {
                       <Button
                         type="button"
                         onClick={avancarPagina}
-                        disabled={!numeroNF || numeroNF.length !== 6}
-                        className="bg-blue-600 hover:bg-blue-700 text-white px-8 cursor-pointer"
+                        disabled={!isButtonEnabled()}
+                        className={`px-8 ${
+                          !isButtonEnabled()
+                            ? "bg-slate-600 text-slate-400 cursor-not-allowed"
+                            : "bg-blue-600 hover:bg-blue-700 text-white cursor-pointer"
+                        }`}
                       >
                         Avançar
                         <ArrowRight className="ml-2 h-4 w-4" />
