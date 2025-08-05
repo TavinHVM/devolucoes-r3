@@ -78,6 +78,8 @@ import {
   FinalizarSolicitacao,
 } from "@/utils/solicitacoes/botoesSolicitacoes";
 import { Label } from "@/components/ui/label";
+import { useAuth } from "@/lib/useAuth";
+import { getUserPermissions } from "@/utils/permissions/userPermissions";
 
 type Solicitacao = {
   id: number;
@@ -119,6 +121,17 @@ export default function VisualizacaoSolicitacoes() {
     { column: string; direction: "asc" | "desc" }[]
   >([]);
   const [motivoRecusa, setMotivoRecusa] = useState("");
+
+  // Authentication and permissions
+  const { user, isAuthenticated, isLoading } = useAuth();
+  const userPermissions = getUserPermissions(user);
+
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      window.location.href = '/login';
+    }
+  }, [isAuthenticated, isLoading]);
 
   // Função para obter ícone do status
   const getStatusIcon = (status: string) => {
@@ -287,6 +300,20 @@ export default function VisualizacaoSolicitacoes() {
   const totalPages = Math.ceil(finalSolicitacoes.length / itemsPerPage);
   const startPage = Math.max(1, currentPage - 7); // Começa 7 páginas antes do número atual
   const endPage = Math.min(totalPages, startPage + 14); // Termina 15 páginas após o início
+
+  // Show loading state while checking authentication
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
+        <div className="text-white text-xl">Carregando...</div>
+      </div>
+    );
+  }
+
+  // Don't render if not authenticated (will redirect)
+  if (!isAuthenticated) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
@@ -1086,65 +1113,69 @@ export default function VisualizacaoSolicitacoes() {
                                   <div className="flex gap-2 justify-center">
                                     {s.status.toUpperCase() === "PENDENTE" && (
                                       <>
-                                        <Button
-                                          className="bg-green-600 hover:bg-green-700"
-                                          onClick={() =>
-                                            AprovarSolicitacao(s.id)
-                                          }
-                                        >
-                                          <CheckCircle2 className="h-4 w-4 mr-2" />
-                                          Aprovar
-                                        </Button>
-                                        <Dialog>
-                                          <DialogTrigger className="flex items-center justify-center text-sm font-semibold gap-1 bg-red-600 hover:bg-red-700 cursor-pointer px-4 rounded-md">
-                                            <XCircle className="h-4 w-4 mr-2" />
-                                            <span>Recusar</span>
-                                          </DialogTrigger>
-                                          <DialogContent>
-                                            <Card className="bg-slate-800 border-slate-600 rounded-lg p-6 border-none shadow-none">
-                                              <CardHeader>
-                                                <span className="text-lg font-bold text-red-400 flex items-center gap-2">
-                                                  <XCircle className="h-5 w-5" />
-                                                  Motivo da Recusa
-                                                </span>
-                                              </CardHeader>
-                                              <CardContent>
-                                                <Label className="text-slate-300 mb-2 block">
-                                                  Digite o Motivo da Recusa:
-                                                </Label>
-                                                <Input
-                                                  className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-400 mb-4"
-                                                  placeholder="Descreva o motivo..."
-                                                  value={motivoRecusa}
-                                                  onChange={(e) =>
-                                                    setMotivoRecusa(
-                                                      e.target.value
-                                                    )
-                                                  }
-                                                />
-                                                <Button
-                                                  className="bg-red-600 hover:bg-red-700 text-white font-bold w-full mt-2"
-                                                  onClick={() =>
-                                                    RecusarSolicitacao(
-                                                      s.id,
-                                                      motivoRecusa
-                                                    )
-                                                  }
-                                                  disabled={
-                                                    motivoRecusa.trim() === ""
-                                                  }
-                                                >
-                                                  <XCircle className="h-4 w-4 mr-2" />
-                                                  Recusar
-                                                </Button>
-                                              </CardContent>
-                                            </Card>
-                                          </DialogContent>
-                                        </Dialog>
+                                        {userPermissions.canAprovar && (
+                                          <Button
+                                            className="bg-green-600 hover:bg-green-700"
+                                            onClick={() =>
+                                              AprovarSolicitacao(s.id)
+                                            }
+                                          >
+                                            <CheckCircle2 className="h-4 w-4 mr-2" />
+                                            Aprovar
+                                          </Button>
+                                        )}
+                                        {userPermissions.canRecusar && (
+                                          <Dialog>
+                                            <DialogTrigger className="flex items-center justify-center text-sm font-semibold gap-1 bg-red-600 hover:bg-red-700 cursor-pointer px-4 rounded-md">
+                                              <XCircle className="h-4 w-4 mr-2" />
+                                              <span>Recusar</span>
+                                            </DialogTrigger>
+                                            <DialogContent>
+                                              <Card className="bg-slate-800 border-slate-600 rounded-lg p-6 border-none shadow-none">
+                                                <CardHeader>
+                                                  <span className="text-lg font-bold text-red-400 flex items-center gap-2">
+                                                    <XCircle className="h-5 w-5" />
+                                                    Motivo da Recusa
+                                                  </span>
+                                                </CardHeader>
+                                                <CardContent>
+                                                  <Label className="text-slate-300 mb-2 block">
+                                                    Digite o Motivo da Recusa:
+                                                  </Label>
+                                                  <Input
+                                                    className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-400 mb-4"
+                                                    placeholder="Descreva o motivo..."
+                                                    value={motivoRecusa}
+                                                    onChange={(e) =>
+                                                      setMotivoRecusa(
+                                                        e.target.value
+                                                      )
+                                                    }
+                                                  />
+                                                  <Button
+                                                    className="bg-red-600 hover:bg-red-700 text-white font-bold w-full mt-2"
+                                                    onClick={() =>
+                                                      RecusarSolicitacao(
+                                                        s.id,
+                                                        motivoRecusa
+                                                      )
+                                                    }
+                                                    disabled={
+                                                      motivoRecusa.trim() === ""
+                                                    }
+                                                  >
+                                                    <XCircle className="h-4 w-4 mr-2" />
+                                                    Recusar
+                                                  </Button>
+                                                </CardContent>
+                                              </Card>
+                                            </DialogContent>
+                                          </Dialog>
+                                        )}
                                       </>
                                     )}
 
-                                    {s.status.toUpperCase() === "APROVADA" && (
+                                    {s.status.toUpperCase() === "APROVADA" && userPermissions.canDesdobrar && (
                                       <Button
                                         className="bg-blue-600 hover:bg-blue-700"
                                         onClick={() =>
@@ -1156,8 +1187,7 @@ export default function VisualizacaoSolicitacoes() {
                                       </Button>
                                     )}
 
-                                    {s.status.toUpperCase() ===
-                                      "DESDOBRADA" && (
+                                    {s.status.toUpperCase() === "DESDOBRADA" && userPermissions.canAbater && (
                                       <Button
                                         className="bg-yellow-600 hover:bg-yellow-700"
                                         onClick={() => AbaterSolicitacao(s.id)}
@@ -1167,7 +1197,7 @@ export default function VisualizacaoSolicitacoes() {
                                       </Button>
                                     )}
 
-                                    {s.status.toUpperCase() === "ABATIDA" && (
+                                    {s.status.toUpperCase() === "ABATIDA" && userPermissions.canFinalizar && (
                                       <Button
                                         className="bg-lime-600 hover:bg-lime-700"
                                         onClick={() =>
@@ -1179,7 +1209,7 @@ export default function VisualizacaoSolicitacoes() {
                                       </Button>
                                     )}
 
-                                    {s.status.toUpperCase() === "RECUSADA" && (
+                                    {s.status.toUpperCase() === "RECUSADA" && userPermissions.canReenviar && (
                                       <Button
                                         className="bg-orange-600 hover:bg-orange-700"
                                         onClick={() =>

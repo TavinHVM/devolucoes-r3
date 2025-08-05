@@ -5,7 +5,7 @@ import { Input } from '../../components/ui/input';
 import { Button } from '../../components/ui/button';
 import { Label } from '../../components/ui/label';
 import { useForm, SubmitHandler, Controller } from 'react-hook-form';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 interface LoginForm {
   email: string;

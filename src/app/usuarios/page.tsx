@@ -285,21 +285,25 @@ export default function Usuarios() {
           <CardContent>
             <div className="flex flex-col md:flex-row gap-4 items-end">
               <div className="flex-1">
-                <Label htmlFor="search" className="text-slate-300">Buscar usuários</Label>
+                <div className="relative ml-4 mb-2">
+                  <Label htmlFor="search" className="text-slate-300">Buscar usuários</Label>
+                </div>
                 <div className="relative">
-                  <Search className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
+                  <Search className="absolute left-3 top-3 h-4 w-4 text-slate-400 ml-4" />
                   <Input
                     id="search"
                     placeholder="Nome, email, cargo..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10 bg-slate-700 border-slate-600 text-white placeholder:text-slate-400"
+                    className="pl-10 bg-slate-700 border-slate-600 text-white placeholder:text-slate-400 ml-4"
                   />
                 </div>
               </div>
               
-              <div className="w-full md:w-48">
-                <Label className="text-slate-300">Filtrar por nível</Label>
+              <div className="w-full md:w-48 ml-4">
+                <div className='mb-2'>
+                  <Label className="text-slate-300">Filtrar por nível</Label>
+                </div>
                 <CustomSelect value={selectedLevel} onValueChange={setSelectedLevel}>
                   <SelectTrigger className="bg-slate-700 border-slate-600 text-white">
                     <SelectValue placeholder="Todos os níveis" />
@@ -314,13 +318,15 @@ export default function Usuarios() {
                 </CustomSelect>
               </div>
               
-              <Button 
-                onClick={() => setShowModal(true)} 
-                className="bg-blue-600 hover:bg-blue-700 text-white h-10 px-6"
-              >
-                <UserPlus className="h-4 w-4 mr-2" />
-                Novo Usuário
-              </Button>
+              <div className="mr-4">
+                <Button 
+                  onClick={() => setShowModal(true)} 
+                  className="bg-blue-600 hover:bg-blue-700 text-white h-10 px-6"
+                >
+                  <UserPlus className="h-4 w-4 mr-2" />
+                  Novo Usuário
+                </Button>
+              </div>
             </div>
           </CardContent>
         </Card>

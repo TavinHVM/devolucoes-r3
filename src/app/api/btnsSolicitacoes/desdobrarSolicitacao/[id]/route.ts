@@ -2,8 +2,19 @@ export const fetchCache = "force-no-store";
 
 import { NextResponse } from "next/server";
 import db from "@/lib/db";
+import { validateUserPermission } from "@/utils/permissions/serverPermissions";
 
 export async function POST(request: Request) {
+    // Validate user permissions
+    const permissionCheck = validateUserPermission(request as unknown as import('next/server').NextRequest, 'desdobrar');
+    
+    if (!permissionCheck.success) {
+        return NextResponse.json(
+            { error: permissionCheck.error },
+            { status: 403 }
+        );
+    }
+
     const url = new URL(request.url);
     try {
         const id: number = parseInt(url.pathname.split("/").pop() || "0", 10);
