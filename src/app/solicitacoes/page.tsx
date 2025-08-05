@@ -80,7 +80,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/lib/useAuth";
 import { getUserPermissions } from "@/utils/permissions/userPermissions";
-import { FileUpload } from "@/components/fileUpload_NFDev_Recibo";
+import { FileUploadNFDevRecibo } from "@/components/fileUpload_NFDev_Recibo";
 
 type Solicitacao = {
   id: number;
@@ -1146,7 +1146,7 @@ export default function VisualizacaoSolicitacoes() {
                                                       }
                                                     }}
                                                   >
-                                                    <FileUpload
+                                                    <FileUploadNFDevRecibo
                                                       onFilesChange={(files) =>
                                                         setSelectedFiles(files)
                                                       }
@@ -1203,6 +1203,14 @@ export default function VisualizacaoSolicitacoes() {
                                                         e.target.value
                                                       )
                                                     }
+                                                  />
+                                                  <FileUploadNFDevRecibo
+                                                    onFilesChange={(files) =>
+                                                      setSelectedFiles(files)
+                                                    }
+                                                    onValidationChange={(
+                                                      isValid
+                                                    ) => setFilesValid(isValid)}
                                                   />
                                                   <Button
                                                     className="bg-red-600 hover:bg-red-700 text-white font-bold w-full mt-2"
