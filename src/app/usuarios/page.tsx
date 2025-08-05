@@ -165,20 +165,97 @@ export default function Usuarios() {
     return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
   };
 
-  // Função para obter a cor do badge baseada no nível
-  const getLevelBadgeVariant = (level: string) => {
-    switch (level.toLowerCase()) {
-      case 'adm':
-        return 'destructive';
-      case 'vendas':
-        return 'default';
-      case 'financeiro':
-        return 'secondary';
-      case 'logistica':
-        return 'outline';
-      default:
-        return 'secondary';
+  const levelBadgeConfig = {
+    adm: {
+      bgColor: '#dc2626',     // Vermelho hexadecimal
+      textColor: '#ffffff'    // Branco hexadecimal
+    },
+    vendas: {
+      bgColor: '#3b82f6',     // Azul hexadecimal
+      textColor: '#ffffff'    // Branco hexadecimal
+    },
+    financeiro: {
+      bgColor: '#059669',     // Verde hexadecimal
+      textColor: 'text-white' // Branco Tailwind (mixed)
+    },
+    logistica: {
+      bgColor: '#f97316',     // Laranja hexadecimal
+      textColor: '#ffffff'    // Branco hexadecimal
+    },
+    default: {
+      bgColor: '#6b7280',     // Cinza hexadecimal
+      textColor: '#ffffff'    // Branco hexadecimal
     }
+  };
+
+  // Função para obter classes customizadas do badge baseada no nível
+  const getLevelBadgeClass = (level: string) => {
+    const config = levelBadgeConfig[level.toLowerCase() as keyof typeof levelBadgeConfig] || levelBadgeConfig.default;
+    
+    let classes = [];
+    
+    // Adiciona bgColor se for classe Tailwind
+    if (!config.bgColor.startsWith('#')) {
+      classes.push(config.bgColor);
+    }
+    
+    // Adiciona textColor se for classe Tailwind
+    if (!config.textColor.startsWith('#')) {
+      classes.push(config.textColor);
+    }
+    
+    // Remove border e adiciona classes padrão para badges customizados
+    classes.push('border-0');
+    
+    // Força remoção de qualquer hover effect
+    classes.push('hover:bg-current', 'hover:text-current', 'transition-none');
+    
+    return classes.join(' ');
+  };
+
+  // Função para obter o estilo inline quando usar cores hexadecimais
+  const getLevelBadgeStyle = (level: string) => {
+    const config = levelBadgeConfig[level.toLowerCase() as keyof typeof levelBadgeConfig] || levelBadgeConfig.default;
+    
+    // Sempre aplica estilos para desabilitar hover, independente do tipo de cor
+    const baseStyle: React.CSSProperties = {
+      border: 'none',
+      transition: 'none',
+      cursor: 'default'
+    };
+    
+    // Se bgColor ou textColor for hexadecimal, usa inline styles
+    const needsInlineStyle = config.bgColor.startsWith('#') || config.textColor.startsWith('#');
+    
+    if (needsInlineStyle) {
+      let backgroundColor = config.bgColor;
+      let textColor = config.textColor;
+      
+      // Converte bgColor se for Tailwind para a cor correspondente
+      if (!backgroundColor.startsWith('#')) {
+        // Mantém a classe Tailwind se não for hex
+        backgroundColor = '';
+      }
+      
+      // Converte textColor se necessário
+      if (textColor.includes('white')) {
+        textColor = '#ffffff';
+      } else if (textColor.includes('black')) {
+        textColor = '#000000';
+      } else if (!textColor.startsWith('#')) {
+        textColor = '#ffffff'; // fallback
+      }
+      
+      if (backgroundColor) {
+        baseStyle.backgroundColor = backgroundColor;
+      }
+      
+      if (textColor) {
+        baseStyle.color = textColor;
+      }
+    }
+    
+    return baseStyle;
   };
 
   // Filtrar usuários baseado na busca e nível selecionado
@@ -378,16 +455,19 @@ export default function Usuarios() {
                         </div>
                       </TableCell>
                       <TableCell>
-                        <div className="flex items-center gap-2 text-slate-300">
+                        <div className="flex items-center gap-2">
                           <Mail className="h-4 w-4 text-slate-400" />
-                          {usuario.email}
+                          <span className="text-slate-300">{usuario.email}</span>
                         </div>
                       </TableCell>
                       <TableCell>
                         <p className="text-slate-300">{usuario.role}</p>
                       </TableCell>
                       <TableCell>
-                        <Badge variant={getLevelBadgeVariant(usuario.user_level)} className="capitalize">
+                        <Badge 
+                          className={`capitalize ${getLevelBadgeClass(usuario.user_level)} !hover:bg-current !hover:text-current !hover:opacity-100 hover:shadow-none cursor-default select-none`}
+                          style={getLevelBadgeStyle(usuario.user_level)}
+                        >
                           {usuario.user_level}
                         </Badge>
                       </TableCell>
