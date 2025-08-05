@@ -1,7 +1,13 @@
 "use client";
 import { useEffect, useState } from "react";
 import { truncateText } from "../../utils/truncateText";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "../../components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "../../components/ui/card";
 import { Input } from "../../components/ui/input";
 import { Badge } from "../../components/ui/badge";
 import {
@@ -38,16 +44,16 @@ import {
   TableRow,
 } from "../../components/ui/table";
 import OrderBtn from "@/components/orderBtn";
-import { 
-  // X, 
-  RefreshCw, 
-  Search, 
-  Filter, 
-  Download, 
-  FileText, 
-  Eye, 
-  Calendar, 
-  Package, 
+import {
+  // X,
+  RefreshCw,
+  Search,
+  Filter,
+  Download,
+  FileText,
+  Eye,
+  Calendar,
+  Package,
   User,
   CheckCircle2,
   XCircle,
@@ -57,7 +63,7 @@ import {
   Zap,
   Target,
   Handshake,
-  Wallet
+  Wallet,
 } from "lucide-react";
 // import { DialogClose } from "@radix-ui/react-dialog";
 import { filterTableHeader } from "@/utils/filters/filterTableHeader";
@@ -147,7 +153,7 @@ export default function VisualizacaoSolicitacoes() {
         return "default";
       case "PENDENTE":
         return "default";
-        case "REENVIADA":
+      case "REENVIADA":
         return "default";
       case "ABATIDA":
         return "default";
@@ -285,7 +291,7 @@ export default function VisualizacaoSolicitacoes() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
       <Header />
-      
+
       <div className="container mx-auto px-4 py-8">
         {/* Header Section */}
         <div className="mb-8">
@@ -294,8 +300,12 @@ export default function VisualizacaoSolicitacoes() {
               <FileText className="h-8 w-8 text-blue-400" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-white">Painel de Solicitações</h1>
-              <p className="text-slate-400">Gerencie todas as solicitações de devolução</p>
+              <h1 className="text-3xl font-bold text-white">
+                Painel de Solicitações
+              </h1>
+              <p className="text-slate-400">
+                Gerencie todas as solicitações de devolução
+              </p>
             </div>
           </div>
         </div>
@@ -310,12 +320,14 @@ export default function VisualizacaoSolicitacoes() {
                 </div>
                 <div>
                   <p className="text-sm text-slate-400">Total</p>
-                  <p className="text-2xl font-bold text-white">{solicitacoes.length}</p>
+                  <p className="text-2xl font-bold text-white">
+                    {solicitacoes.length}
+                  </p>
                 </div>
               </div>
             </CardContent>
           </Card>
-          
+
           <Card className="bg-slate-800/50 border-slate-700">
             <CardContent className="p-4">
               <div className="flex items-center gap-3">
@@ -324,12 +336,18 @@ export default function VisualizacaoSolicitacoes() {
                 </div>
                 <div>
                   <p className="text-sm text-slate-400">Pendentes</p>
-                  <p className="text-2xl font-bold text-white">{solicitacoes.filter(s => s.status.toUpperCase() === 'PENDENTE').length}</p>
+                  <p className="text-2xl font-bold text-white">
+                    {
+                      solicitacoes.filter(
+                        (s) => s.status.toUpperCase() === "PENDENTE"
+                      ).length
+                    }
+                  </p>
                 </div>
               </div>
             </CardContent>
           </Card>
-          
+
           <Card className="bg-slate-800/50 border-slate-700">
             <CardContent className="p-4">
               <div className="flex items-center gap-3">
@@ -338,12 +356,18 @@ export default function VisualizacaoSolicitacoes() {
                 </div>
                 <div>
                   <p className="text-sm text-slate-400">Aprovadas</p>
-                  <p className="text-2xl font-bold text-white">{solicitacoes.filter(s => s.status.toUpperCase() === 'APROVADA').length}</p>
+                  <p className="text-2xl font-bold text-white">
+                    {
+                      solicitacoes.filter(
+                        (s) => s.status.toUpperCase() === "APROVADA"
+                      ).length
+                    }
+                  </p>
                 </div>
               </div>
             </CardContent>
           </Card>
-          
+
           <Card className="bg-slate-800/50 border-slate-700">
             <CardContent className="p-4">
               <div className="flex items-center gap-3">
@@ -352,12 +376,18 @@ export default function VisualizacaoSolicitacoes() {
                 </div>
                 <div>
                   <p className="text-sm text-slate-400">Recusadas</p>
-                  <p className="text-2xl font-bold text-white">{solicitacoes.filter(s => s.status.toUpperCase() === 'RECUSADA').length}</p>
+                  <p className="text-2xl font-bold text-white">
+                    {
+                      solicitacoes.filter(
+                        (s) => s.status.toUpperCase() === "RECUSADA"
+                      ).length
+                    }
+                  </p>
                 </div>
               </div>
             </CardContent>
           </Card>
-          
+
           <Card className="bg-slate-800/50 border-slate-700">
             <CardContent className="p-4">
               <div className="flex items-center gap-3">
@@ -366,12 +396,18 @@ export default function VisualizacaoSolicitacoes() {
                 </div>
                 <div>
                   <p className="text-sm text-slate-400">Reenviadas</p>
-                  <p className="text-2xl font-bold text-white">{solicitacoes.filter(s => s.status.toUpperCase() === 'REENVIADA').length}</p>
+                  <p className="text-2xl font-bold text-white">
+                    {
+                      solicitacoes.filter(
+                        (s) => s.status.toUpperCase() === "REENVIADA"
+                      ).length
+                    }
+                  </p>
                 </div>
               </div>
             </CardContent>
           </Card>
-          
+
           <Card className="bg-slate-800/50 border-slate-700">
             <CardContent className="p-4">
               <div className="flex items-center gap-3">
@@ -380,12 +416,18 @@ export default function VisualizacaoSolicitacoes() {
                 </div>
                 <div>
                   <p className="text-sm text-slate-400">Desdobradas</p>
-                  <p className="text-2xl font-bold text-white">{solicitacoes.filter(s => s.status.toUpperCase() === 'DESDOBRADA').length}</p>
+                  <p className="text-2xl font-bold text-white">
+                    {
+                      solicitacoes.filter(
+                        (s) => s.status.toUpperCase() === "DESDOBRADA"
+                      ).length
+                    }
+                  </p>
                 </div>
               </div>
             </CardContent>
           </Card>
-          
+
           <Card className="bg-slate-800/50 border-slate-700">
             <CardContent className="p-4">
               <div className="flex items-center gap-3">
@@ -394,7 +436,13 @@ export default function VisualizacaoSolicitacoes() {
                 </div>
                 <div>
                   <p className="text-sm text-slate-400">Finalizadas</p>
-                  <p className="text-2xl font-bold text-white">{solicitacoes.filter(s => s.status.toUpperCase() === 'FINALIZADA').length}</p>
+                  <p className="text-2xl font-bold text-white">
+                    {
+                      solicitacoes.filter(
+                        (s) => s.status.toUpperCase() === "FINALIZADA"
+                      ).length
+                    }
+                  </p>
                 </div>
               </div>
             </CardContent>
@@ -412,7 +460,9 @@ export default function VisualizacaoSolicitacoes() {
           <CardContent>
             <div className="flex flex-col lg:flex-row gap-4 items-end pl-4">
               <div className="flex-1">
-                <label className="text-slate-300 text-sm font-medium">Buscar solicitações</label>
+                <label className="text-slate-300 text-sm font-medium">
+                  Buscar solicitações
+                </label>
                 <div className="relative mt-1">
                   <Search className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
                   <Input
@@ -423,26 +473,47 @@ export default function VisualizacaoSolicitacoes() {
                   />
                 </div>
               </div>
-              
+
               <div className="w-full lg:w-48">
-                <label className="text-slate-300 text-sm font-medium">Status</label>
-                <Select value={status} onValueChange={(v) => setStatus(v || "Todos")}>
+                <label className="text-slate-300 text-sm font-medium">
+                  Status
+                </label>
+                <Select
+                  value={status}
+                  onValueChange={(v) => setStatus(v || "Todos")}
+                >
                   <SelectTrigger className="mt-1 bg-slate-700 border-slate-600 text-white w-full">
                     <SelectValue placeholder="Todos os status" />
                   </SelectTrigger>
                   <SelectContent className="bg-slate-700 border-slate-600">
-                    <SelectItem value="Todos" className="text-white">Todos</SelectItem>
-                    <SelectItem value="PENDENTE" className="text-white">Pendente</SelectItem>
-                    <SelectItem value="APROVADA" className="text-white">Aprovada</SelectItem>
-                    <SelectItem value="RECUSADA" className="text-white">Recusada</SelectItem>
-                    <SelectItem value="DESDOBRADA" className="text-white">Desdobrada</SelectItem>
-                    <SelectItem value="REENVIADA" className="text-white">Reenviada</SelectItem>
-                    <SelectItem value="ABATIDA" className="text-white">Abatida</SelectItem>
-                    <SelectItem value="FINALIZADA" className="text-white">Finalizada</SelectItem>
+                    <SelectItem value="Todos" className="text-white">
+                      Todos
+                    </SelectItem>
+                    <SelectItem value="PENDENTE" className="text-white">
+                      Pendente
+                    </SelectItem>
+                    <SelectItem value="APROVADA" className="text-white">
+                      Aprovada
+                    </SelectItem>
+                    <SelectItem value="RECUSADA" className="text-white">
+                      Recusada
+                    </SelectItem>
+                    <SelectItem value="DESDOBRADA" className="text-white">
+                      Desdobrada
+                    </SelectItem>
+                    <SelectItem value="REENVIADA" className="text-white">
+                      Reenviada
+                    </SelectItem>
+                    <SelectItem value="ABATIDA" className="text-white">
+                      Abatida
+                    </SelectItem>
+                    <SelectItem value="FINALIZADA" className="text-white">
+                      Finalizada
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
-              
+
               <div className="flex gap-2 pr-4">
                 <Button
                   onClick={() => {
@@ -451,10 +522,14 @@ export default function VisualizacaoSolicitacoes() {
                   disabled={refreshing}
                   className="bg-blue-600 hover:bg-blue-700 text-white h-10 cursor-pointer"
                 >
-                  <RefreshCw className={`h-4 w-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
+                  <RefreshCw
+                    className={`h-4 w-4 mr-2 ${
+                      refreshing ? "animate-spin" : ""
+                    }`}
+                  />
                   {refreshing ? "Atualizando..." : "Atualizar"}
                 </Button>
-                
+
                 <Button className="bg-green-600 hover:bg-green-700 text-white h-10 cursor-pointer">
                   <Download className="h-4 w-4 mr-2" />
                   Relatório
@@ -532,9 +607,15 @@ export default function VisualizacaoSolicitacoes() {
                 <TableBody>
                   {currentItems.length > 0 ? (
                     currentItems.map((s) => (
-                      <TableRow key={s.id} className="border-slate-700 hover:bg-slate-700/30">
+                      <TableRow
+                        key={s.id}
+                        className="border-slate-700 hover:bg-slate-700/30"
+                      >
                         <TableCell>
-                          <Badge variant="outline" className="text-slate-300 border-slate-600">
+                          <Badge
+                            variant="outline"
+                            className="text-slate-300 border-slate-600"
+                          >
                             #{s.id}
                           </Badge>
                         </TableCell>
@@ -542,8 +623,12 @@ export default function VisualizacaoSolicitacoes() {
                           <div className="flex items-center gap-2">
                             <User className="h-4 w-4 text-slate-400" />
                             <div>
-                              <p className="font-medium text-white">{truncateText(s.nome, 20)}</p>
-                              <p className="text-sm text-slate-400">Filial: {s.filial}</p>
+                              <p className="font-medium text-white">
+                                {truncateText(s.nome, 20)}
+                              </p>
+                              <p className="text-sm text-slate-400">
+                                Filial: {s.filial}
+                              </p>
                             </div>
                           </div>
                         </TableCell>
@@ -566,18 +651,32 @@ export default function VisualizacaoSolicitacoes() {
                           </div>
                         </TableCell>
                         <TableCell>
-                          <Badge variant="secondary" className={`text-white flex justify-center py-2 w-full max-w-16 text-sm capitalize ${ s.tipo_devolucao.toUpperCase() === "PARCIAL" ? "bg-amber-500 hover:bg-amber-500" : "bg-emerald-500 hover:bg-emerald-500"}`}>
+                          <Badge
+                            variant="secondary"
+                            className={`text-white flex justify-center py-2 w-full max-w-16 text-sm capitalize ${
+                              s.tipo_devolucao.toUpperCase() === "PARCIAL"
+                                ? "bg-amber-500 hover:bg-amber-500"
+                                : "bg-emerald-500 hover:bg-emerald-500"
+                            }`}
+                          >
                             {s.tipo_devolucao}
                           </Badge>
                         </TableCell>
                         <TableCell>
                           <div className="flex items-center gap-2">
                             <Calendar className="h-4 w-4 text-slate-400" />
-                            <span className="text-white">{new Date(s.created_at).toLocaleDateString()}</span>
+                            <span className="text-white">
+                              {new Date(s.created_at).toLocaleDateString()}
+                            </span>
                           </div>
                         </TableCell>
                         <TableCell>
-                          <Badge variant={getStatusBadgeVariant(s.status)} className={`flex items-center gap-1 ${getStatusClass(s.status)}`}>
+                          <Badge
+                            variant={getStatusBadgeVariant(s.status)}
+                            className={`flex items-center gap-1 ${getStatusClass(
+                              s.status
+                            )}`}
+                          >
                             {getStatusIcon(s.status)}
                             {s.status.toUpperCase()}
                           </Badge>
@@ -585,7 +684,10 @@ export default function VisualizacaoSolicitacoes() {
                         <TableCell className="text-right">
                           <div className="flex items-center gap-2">
                             <Dialog>
-                              <DialogTrigger asChild className="cursor-pointer hover:text-white">
+                              <DialogTrigger
+                                asChild
+                                className="cursor-pointer hover:text-white"
+                              >
                                 <Button
                                   variant="outline"
                                   size="sm"
@@ -607,33 +709,37 @@ export default function VisualizacaoSolicitacoes() {
                                         <span className="text-md text-white flex items-center gap-2 font-bold">
                                           {getStatusIcon(s.status)}
                                         </span>
-                                        <span>
-                                          Status
-                                        </span>
+                                        <span>Status</span>
                                       </div>
                                       <div className="flex flex-col justify-between h-full">
                                         <div className="flex gap-2 mx-4 h-full">
                                           <div className="flex justify-center h-full">
-                                            <Badge variant={getStatusBadgeVariant(s.status)} className={`flex items-center gap-1 w-fit ${getStatusClass(s.status)}`}>
+                                            <Badge
+                                              variant={getStatusBadgeVariant(
+                                                s.status
+                                              )}
+                                              className={`flex items-center gap-1 w-fit ${getStatusClass(
+                                                s.status
+                                              )}`}
+                                            >
                                               {getStatusIcon(s.status)}
                                               {s.status.toUpperCase()}
                                             </Badge>
                                           </div>
                                           <div className="flex text-slate-400 justify-end text-sm items-center gap-1">
+                                            <span>Criada em:</span>
                                             <span>
-                                              Criada em: 
-                                            </span> 
-                                            <span>
-                                              {new Date(s.created_at).toLocaleDateString()}
+                                              {new Date(
+                                                s.created_at
+                                              ).toLocaleDateString()}
                                             </span>
                                           </div>
                                         </div>
                                       </div>
                                     </div>
-
                                   </DialogTitle>
                                 </DialogHeader>
-                                
+
                                 <div className="space-y-6">
                                   {/* Informações Gerais */}
                                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
@@ -647,25 +753,43 @@ export default function VisualizacaoSolicitacoes() {
                                       <CardContent>
                                         <div className="flex flex-col gap-2 mx-4">
                                           <div className="flex gap-2 items-center">
-                                            <p className="text-slate-400 text-sm">Código do cliente:</p>
-                                            <p className="text-white font-medium">{s.cod_cliente}</p>
+                                            <p className="text-slate-400 text-sm">
+                                              Código do cliente:
+                                            </p>
+                                            <p className="text-white font-medium">
+                                              {s.cod_cliente}
+                                            </p>
                                           </div>
                                           <div className="flex gap-2 items-center">
-                                            <p className="text-slate-400 text-sm">Nome do cliente:</p>
-                                            <p className="text-white font-medium">{s.nome}</p>
+                                            <p className="text-slate-400 text-sm">
+                                              Nome do cliente:
+                                            </p>
+                                            <p className="text-white font-medium">
+                                              {s.nome}
+                                            </p>
                                           </div>
                                           <div className="flex gap-2 items-center">
-                                            <p className="text-slate-400 text-sm">Identificador do Cliente:</p>
-                                            <p className="text-white font-medium">{"10.641.901/0001-16"}</p>
+                                            <p className="text-slate-400 text-sm">
+                                              Identificador do Cliente:
+                                            </p>
+                                            <p className="text-white font-medium">
+                                              {"10.641.901/0001-16"}
+                                            </p>
                                           </div>
                                           <div className="flex gap-2 items-center">
-                                            <p className="text-slate-400 text-sm">Filial:</p>
-                                            <p className="text-white font-medium">{s.filial === "1" ? "1 - CD APARECIDA" : "5 - LOJA RIO VERDE"}</p>
+                                            <p className="text-slate-400 text-sm">
+                                              Filial:
+                                            </p>
+                                            <p className="text-white font-medium">
+                                              {s.filial === "1"
+                                                ? "1 - CD APARECIDA"
+                                                : "5 - LOJA RIO VERDE"}
+                                            </p>
                                           </div>
                                         </div>
                                       </CardContent>
                                     </Card>
-                                    
+
                                     <Card className="bg-slate-700/50 border-slate-600">
                                       <CardHeader className="pb-2">
                                         <CardTitle className="text-md text-white flex items-center gap-2">
@@ -674,27 +798,43 @@ export default function VisualizacaoSolicitacoes() {
                                         </CardTitle>
                                       </CardHeader>
                                       <CardContent>
-                                      <div className="flex flex-col gap-2 mx-4">
-                                        <div className="flex gap-2 items-center">
-                                          <p className="text-slate-400 text-sm">Carga:</p>
-                                          <p className="text-white font-medium">{s.carga}</p>
+                                        <div className="flex flex-col gap-2 mx-4">
+                                          <div className="flex gap-2 items-center">
+                                            <p className="text-slate-400 text-sm">
+                                              Carga:
+                                            </p>
+                                            <p className="text-white font-medium">
+                                              {s.carga}
+                                            </p>
+                                          </div>
+                                          <div className="flex gap-2 items-center">
+                                            <p className="text-slate-400 text-sm">
+                                              NF:
+                                            </p>
+                                            <p className="text-white font-medium">
+                                              {s.numero_nf}
+                                            </p>
+                                          </div>
+                                          <div className="flex gap-2 items-center">
+                                            <p className="text-slate-400 text-sm">
+                                              Cód:
+                                            </p>
+                                            <p className="text-white font-medium">
+                                              {s.cod_cliente}
+                                            </p>
+                                          </div>
+                                          <div className="flex gap-2 items-center">
+                                            <p className="text-slate-400 text-sm">
+                                              RCA:
+                                            </p>
+                                            <p className="text-white font-medium">
+                                              {s.rca}
+                                            </p>
+                                          </div>
                                         </div>
-                                        <div className="flex gap-2 items-center">
-                                          <p className="text-slate-400 text-sm">NF:</p>
-                                          <p className="text-white font-medium">{s.numero_nf}</p>
-                                        </div>
-                                        <div className="flex gap-2 items-center">
-                                          <p className="text-slate-400 text-sm">Cód:</p>
-                                          <p className="text-white font-medium">{s.cod_cliente}</p>
-                                        </div>
-                                        <div className="flex gap-2 items-center">
-                                          <p className="text-slate-400 text-sm">RCA:</p>
-                                          <p className="text-white font-medium">{s.rca}</p>
-                                        </div>
-                                      </div>
                                       </CardContent>
                                     </Card>
-                                    
+
                                     <Card className="bg-slate-700/50 border-slate-600">
                                       <CardHeader className="pb-2">
                                         <CardTitle className="text-md text-white flex items-center gap-2">
@@ -705,56 +845,97 @@ export default function VisualizacaoSolicitacoes() {
                                       <CardContent>
                                         <div className="flex flex-col gap-2 mx-4">
                                           <div className="flex gap-2 items-center">
-                                            <p className="text-slate-400 text-sm">Tipo de Devolução:</p>
-                                            <Badge variant="secondary" className={`text-white text-md w-fit capitalize ${ s.tipo_devolucao.toUpperCase() === "PARCIAL" ? "bg-amber-500 hover:bg-amber-500" : "bg-emerald-500 hover:bg-emerald-500"}`}>
+                                            <p className="text-slate-400 text-sm">
+                                              Tipo de Devolução:
+                                            </p>
+                                            <Badge
+                                              variant="secondary"
+                                              className={`text-white text-md w-fit capitalize ${
+                                                s.tipo_devolucao.toUpperCase() ===
+                                                "PARCIAL"
+                                                  ? "bg-amber-500 hover:bg-amber-500"
+                                                  : "bg-emerald-500 hover:bg-emerald-500"
+                                              }`}
+                                            >
                                               {s.tipo_devolucao}
                                             </Badge>
                                           </div>
+                                          {s.vale && (
+                                            <div className="flex gap-2 items-center">
+                                              <p className="text-slate-400 text-sm">
+                                                Vale:
+                                              </p>
+                                              <Badge
+                                                variant="secondary"
+                                                className={`text-white text-md w-fit capitalize ${
+                                                  (
+                                                    s.vale as string
+                                                  ).toUpperCase() === "SIM"
+                                                    ? "bg-green-500 hover:bg-green-500"
+                                                    : "bg-red-800 hover:bg-red-800"
+                                                }`}
+                                              >
+                                                {s.vale}
+                                              </Badge>
+                                            </div>
+                                          )}
                                           <div className="flex gap-2 items-center">
-                                            <p className="text-slate-400 text-sm">Vale:</p>
-                                            <Badge variant="secondary" className={`text-white text-md w-fit capitalize ${ (s.vale as string).toUpperCase() === "SIM" ? "bg-green-500 hover:bg-green-500" : "bg-red-800 hover:bg-red-800"}`}>
-                                              {s.vale || 'N/A'}
-                                            </Badge>
+                                            <p className="text-slate-400 text-sm">
+                                              Código Cobrança:
+                                            </p>
+                                            <p className="text-white font-medium">
+                                              {s.cod_cobranca}
+                                            </p>
                                           </div>
                                           <div className="flex gap-2 items-center">
-                                            <p className="text-slate-400 text-sm">Código Cobrança:</p>
-                                            <p className="text-white font-medium">{s.cod_cobranca}</p>
-                                          </div>
-                                          <div className="flex gap-2 items-center">
-                                            <p className="text-slate-400 text-sm">Nome Cobrança:</p>
-                                            <p className="text-white font-medium">{s.cod_cobranca}</p>
+                                            <p className="text-slate-400 text-sm">
+                                              Nome Cobrança:
+                                            </p>
+                                            <p className="text-white font-medium">
+                                              {s.cod_cobranca}
+                                            </p>
                                           </div>
                                         </div>
                                       </CardContent>
                                     </Card>
                                   </div>
-                                  
+
                                   {/* Motivo da Devolução */}
                                   <Card className="bg-slate-700/50 border-slate-600">
                                     <CardHeader>
-                                      <CardTitle className="text-white">Motivo da Devolução</CardTitle>
+                                      <CardTitle className="text-white">
+                                        Motivo da Devolução
+                                      </CardTitle>
                                     </CardHeader>
                                     <CardContent>
                                       <div className="mx-8">
-                                        <p className="text-slate-300">{s.motivo_devolucao}</p>
+                                        <p className="text-slate-300">
+                                          {s.motivo_devolucao}
+                                        </p>
                                       </div>
                                     </CardContent>
                                   </Card>
 
                                   {/* Motivo da Recusa */}
-                                  {Boolean(s.motivo_recusa && s.motivo_recusa.trim()) && (
+                                  {Boolean(
+                                    s.motivo_recusa && s.motivo_recusa.trim()
+                                  ) && (
                                     <Card className="bg-slate-700/50 border-slate-600">
                                       <CardHeader>
-                                        <CardTitle className="text-white">Motivo da Recusa</CardTitle>
+                                        <CardTitle className="text-white">
+                                          Motivo da Recusa
+                                        </CardTitle>
                                       </CardHeader>
                                       <CardContent>
                                         <div className="mx-8">
-                                          <p className="text-slate-300">{s.motivo_recusa}</p>
+                                          <p className="text-slate-300">
+                                            {s.motivo_recusa}
+                                          </p>
                                         </div>
                                       </CardContent>
                                     </Card>
                                   )}
-                                  
+
                                   {/* Produtos */}
                                   <Card className="bg-slate-700/50 border-slate-600">
                                     <CardHeader>
@@ -768,27 +949,56 @@ export default function VisualizacaoSolicitacoes() {
                                         <Table>
                                           <TableHeader>
                                             <TableRow className="border-slate-600">
-                                              <TableHead className="text-slate-300">Código</TableHead>
-                                              <TableHead className="text-slate-300">Descrição</TableHead>
-                                              <TableHead className="text-slate-300 text-center">Quantidade</TableHead>
+                                              <TableHead className="text-slate-300">
+                                                Código
+                                              </TableHead>
+                                              <TableHead className="text-slate-300">
+                                                Descrição
+                                              </TableHead>
+                                              <TableHead className="text-slate-300 text-center">
+                                                Quantidade
+                                              </TableHead>
                                             </TableRow>
                                           </TableHeader>
                                           <TableBody>
-                                            {Array.isArray(s.products_list) && s.products_list.length > 0 ? (
-                                              s.products_list.map((p: { codigo: number; descricao: string; quantidade: number }, idx: number) => (
-                                                <TableRow key={idx} className="border-slate-600">
-                                                  <TableCell>
-                                                    <Badge variant="outline" className="text-slate-300 border-slate-500">
-                                                      {p.codigo}
-                                                    </Badge>
-                                                  </TableCell>
-                                                  <TableCell className="text-white">{p.descricao}</TableCell>
-                                                  <TableCell className="text-center text-slate-300">{p.quantidade}</TableCell>
-                                                </TableRow>
-                                              ))
+                                            {Array.isArray(s.products_list) &&
+                                            s.products_list.length > 0 ? (
+                                              s.products_list.map(
+                                                (
+                                                  p: {
+                                                    codigo: number;
+                                                    descricao: string;
+                                                    quantidade: number;
+                                                  },
+                                                  idx: number
+                                                ) => (
+                                                  <TableRow
+                                                    key={idx}
+                                                    className="border-slate-600"
+                                                  >
+                                                    <TableCell>
+                                                      <Badge
+                                                        variant="outline"
+                                                        className="text-slate-300 border-slate-500"
+                                                      >
+                                                        {p.codigo}
+                                                      </Badge>
+                                                    </TableCell>
+                                                    <TableCell className="text-white">
+                                                      {p.descricao}
+                                                    </TableCell>
+                                                    <TableCell className="text-center text-slate-300">
+                                                      {p.quantidade}
+                                                    </TableCell>
+                                                  </TableRow>
+                                                )
+                                              )
                                             ) : (
                                               <TableRow>
-                                                <TableCell colSpan={3} className="text-center text-slate-400 py-4">
+                                                <TableCell
+                                                  colSpan={3}
+                                                  className="text-center text-slate-400 py-4"
+                                                >
                                                   Nenhum produto encontrado
                                                 </TableCell>
                                               </TableRow>
@@ -812,27 +1022,56 @@ export default function VisualizacaoSolicitacoes() {
                                         <Table>
                                           <TableHeader>
                                             <TableRow className="border-slate-600">
-                                              <TableHead className="text-slate-300">Código</TableHead>
-                                              <TableHead className="text-slate-300">Descrição</TableHead>
-                                              <TableHead className="text-slate-300 text-center">Quantidade</TableHead>
+                                              <TableHead className="text-slate-300">
+                                                Código
+                                              </TableHead>
+                                              <TableHead className="text-slate-300">
+                                                Descrição
+                                              </TableHead>
+                                              <TableHead className="text-slate-300 text-center">
+                                                Quantidade
+                                              </TableHead>
                                             </TableRow>
                                           </TableHeader>
                                           <TableBody>
-                                            {Array.isArray(s.products_list) && s.products_list.length > 0 ? (
-                                              s.products_list.map((p: { codigo: number; descricao: string; quantidade: number }, idx: number) => (
-                                                <TableRow key={idx} className="border-slate-600">
-                                                  <TableCell>
-                                                    <Badge variant="outline" className="text-slate-300 border-slate-500">
-                                                      {p.codigo}
-                                                    </Badge>
-                                                  </TableCell>
-                                                  <TableCell className="text-white">{p.descricao}</TableCell>
-                                                  <TableCell className="text-center text-slate-300">{p.quantidade}</TableCell>
-                                                </TableRow>
-                                              ))
+                                            {Array.isArray(s.products_list) &&
+                                            s.products_list.length > 0 ? (
+                                              s.products_list.map(
+                                                (
+                                                  p: {
+                                                    codigo: number;
+                                                    descricao: string;
+                                                    quantidade: number;
+                                                  },
+                                                  idx: number
+                                                ) => (
+                                                  <TableRow
+                                                    key={idx}
+                                                    className="border-slate-600"
+                                                  >
+                                                    <TableCell>
+                                                      <Badge
+                                                        variant="outline"
+                                                        className="text-slate-300 border-slate-500"
+                                                      >
+                                                        {p.codigo}
+                                                      </Badge>
+                                                    </TableCell>
+                                                    <TableCell className="text-white">
+                                                      {p.descricao}
+                                                    </TableCell>
+                                                    <TableCell className="text-center text-slate-300">
+                                                      {p.quantidade}
+                                                    </TableCell>
+                                                  </TableRow>
+                                                )
+                                              )
                                             ) : (
                                               <TableRow>
-                                                <TableCell colSpan={3} className="text-center text-slate-400 py-4">
+                                                <TableCell
+                                                  colSpan={3}
+                                                  className="text-center text-slate-400 py-4"
+                                                >
                                                   Nenhum produto encontrado
                                                 </TableCell>
                                               </TableRow>
@@ -842,14 +1081,16 @@ export default function VisualizacaoSolicitacoes() {
                                       </div>
                                     </CardContent>
                                   </Card>
-                                  
+
                                   {/* Botões de Ação */}
                                   <div className="flex gap-2 justify-center">
                                     {s.status.toUpperCase() === "PENDENTE" && (
                                       <>
                                         <Button
                                           className="bg-green-600 hover:bg-green-700"
-                                          onClick={() => AprovarSolicitacao(s.id)}
+                                          onClick={() =>
+                                            AprovarSolicitacao(s.id)
+                                          }
                                         >
                                           <CheckCircle2 className="h-4 w-4 mr-2" />
                                           Aprovar
@@ -868,17 +1109,30 @@ export default function VisualizacaoSolicitacoes() {
                                                 </span>
                                               </CardHeader>
                                               <CardContent>
-                                                <Label className="text-slate-300 mb-2 block">Digite o Motivo da Recusa:</Label>
+                                                <Label className="text-slate-300 mb-2 block">
+                                                  Digite o Motivo da Recusa:
+                                                </Label>
                                                 <Input
                                                   className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-400 mb-4"
                                                   placeholder="Descreva o motivo..."
                                                   value={motivoRecusa}
-                                                  onChange={e => setMotivoRecusa(e.target.value)}
+                                                  onChange={(e) =>
+                                                    setMotivoRecusa(
+                                                      e.target.value
+                                                    )
+                                                  }
                                                 />
                                                 <Button
                                                   className="bg-red-600 hover:bg-red-700 text-white font-bold w-full mt-2"
-                                                  onClick={() => RecusarSolicitacao(s.id, motivoRecusa)}
-                                                  disabled={motivoRecusa.trim() === ""}
+                                                  onClick={() =>
+                                                    RecusarSolicitacao(
+                                                      s.id,
+                                                      motivoRecusa
+                                                    )
+                                                  }
+                                                  disabled={
+                                                    motivoRecusa.trim() === ""
+                                                  }
                                                 >
                                                   <XCircle className="h-4 w-4 mr-2" />
                                                   Recusar
@@ -893,14 +1147,17 @@ export default function VisualizacaoSolicitacoes() {
                                     {s.status.toUpperCase() === "APROVADA" && (
                                       <Button
                                         className="bg-blue-600 hover:bg-blue-700"
-                                        onClick={() => DesdobrarSolicitacao(s.id)}
+                                        onClick={() =>
+                                          DesdobrarSolicitacao(s.id)
+                                        }
                                       >
                                         <Target className="h-4 w-4 mr-2" />
                                         Desdobrar
                                       </Button>
                                     )}
-                                    
-                                    {s.status.toUpperCase() === "DESDOBRADA" && (
+
+                                    {s.status.toUpperCase() ===
+                                      "DESDOBRADA" && (
                                       <Button
                                         className="bg-yellow-600 hover:bg-yellow-700"
                                         onClick={() => AbaterSolicitacao(s.id)}
@@ -909,21 +1166,25 @@ export default function VisualizacaoSolicitacoes() {
                                         Abater
                                       </Button>
                                     )}
-                                    
+
                                     {s.status.toUpperCase() === "ABATIDA" && (
                                       <Button
                                         className="bg-lime-600 hover:bg-lime-700"
-                                        onClick={() => FinalizarSolicitacao(s.id)}
+                                        onClick={() =>
+                                          FinalizarSolicitacao(s.id)
+                                        }
                                       >
                                         <Zap className="h-4 w-4 mr-2" />
                                         Finalizar
                                       </Button>
                                     )}
-                                    
+
                                     {s.status.toUpperCase() === "RECUSADA" && (
                                       <Button
                                         className="bg-orange-600 hover:bg-orange-700"
-                                        onClick={() => ReenviarSolicitacao(s.id)}
+                                        onClick={() =>
+                                          ReenviarSolicitacao(s.id)
+                                        }
                                       >
                                         <RotateCcw className="h-4 w-4 mr-2" />
                                         Reenviar
@@ -931,7 +1192,7 @@ export default function VisualizacaoSolicitacoes() {
                                     )}
                                   </div>
                                 </div>
-                                
+
                                 <DialogFooter>
                                   {s.arquivo_url && (
                                     <Button className="bg-blue-600 hover:bg-blue-700">
@@ -942,7 +1203,7 @@ export default function VisualizacaoSolicitacoes() {
                                 </DialogFooter>
                               </DialogContent>
                             </Dialog>
-                            
+
                             {s.arquivo_url && (
                               <Button
                                 variant="outline"
@@ -958,7 +1219,10 @@ export default function VisualizacaoSolicitacoes() {
                     ))
                   ) : (
                     <TableRow>
-                      <TableCell colSpan={8} className="text-center py-8 text-slate-400">
+                      <TableCell
+                        colSpan={8}
+                        className="text-center py-8 text-slate-400"
+                      >
                         Nenhuma solicitação encontrada
                       </TableCell>
                     </TableRow>
@@ -966,7 +1230,7 @@ export default function VisualizacaoSolicitacoes() {
                 </TableBody>
               </Table>
             </div>
-            
+
             {/* Pagination */}
             {totalPages > 1 && (
               <div className="mt-6">
@@ -977,28 +1241,54 @@ export default function VisualizacaoSolicitacoes() {
                         namePrevious="Primeira Página"
                         href="#"
                         onClick={() => setCurrentPage(1)}
-                        className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
+                        className={
+                          currentPage === 1
+                            ? "pointer-events-none opacity-50"
+                            : ""
+                        }
                       />
                     </PaginationItem>
                     <PaginationItem>
                       <PaginationPrevious
                         namePrevious="Anterior"
                         href="#"
-                        onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                        className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
+                        onClick={() =>
+                          setCurrentPage((prev) => Math.max(prev - 1, 1))
+                        }
+                        className={
+                          currentPage === 1
+                            ? "pointer-events-none opacity-50"
+                            : ""
+                        }
                       />
                     </PaginationItem>
                     {[...Array(endPage - startPage + 1)].map((_, i) => (
-                        <PaginationItem key={i + startPage}>
-                            <PaginationLink className={currentPage === i + startPage ? "bg-slate-400" : ""} href="#" onClick={() => setCurrentPage(i + startPage)}>{i + startPage}</PaginationLink>
-                        </PaginationItem>
+                      <PaginationItem key={i + startPage}>
+                        <PaginationLink
+                          className={
+                            currentPage === i + startPage ? "bg-slate-400" : ""
+                          }
+                          href="#"
+                          onClick={() => setCurrentPage(i + startPage)}
+                        >
+                          {i + startPage}
+                        </PaginationLink>
+                      </PaginationItem>
                     ))}
                     <PaginationItem>
                       <PaginationNext
                         nameNext="Próxima"
                         href="#"
-                        onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-                        className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
+                        onClick={() =>
+                          setCurrentPage((prev) =>
+                            Math.min(prev + 1, totalPages)
+                          )
+                        }
+                        className={
+                          currentPage === totalPages
+                            ? "pointer-events-none opacity-50"
+                            : ""
+                        }
                       />
                     </PaginationItem>
                     <PaginationItem>
@@ -1006,7 +1296,11 @@ export default function VisualizacaoSolicitacoes() {
                         nameNext="Última Página"
                         href="#"
                         onClick={() => setCurrentPage(totalPages)}
-                        className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
+                        className={
+                          currentPage === totalPages
+                            ? "pointer-events-none opacity-50"
+                            : ""
+                        }
                       />
                     </PaginationItem>
                   </PaginationContent>

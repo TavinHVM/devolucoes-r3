@@ -45,7 +45,7 @@ import {
   XCircle,
   AlertCircle,
   ShoppingCart,
-  Calculator
+  Calculator,
 } from "lucide-react";
 import { formatPrice } from "../../utils/formatPrice";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -62,12 +62,13 @@ const formSchema = z.object({
   filial: z.string().min(1, { message: "" }),
   numero_nf: z.string().min(1, { message: "" }),
   carga: z.string().min(1, { message: "" }),
-  codigo_cobranca: z.string().min(1, { message: "" }),
+  nome_cobranca: z.string().min(1, { message: "" }),
+  cod_cobranca: z.string().min(1, { message: "" }),
   rca: z.string().min(1, { message: "" }),
+  cgent: z.string().min(1, { message: "" }),
   motivo_devolucao: z.string().min(1, { message: "" }),
-  codigo_cliente: z.string().min(1, { message: "" }),
   tipo_devolucao: z.string().min(1, { message: "" }),
-  lista_produtos: z.string().min(1, { message: "" }),
+  cod_cliente: z.string().min(1, { message: "" }),
 });
 
 // Toast Component
@@ -82,8 +83,9 @@ function Toast({
 }) {
   return (
     <div
-      className={`fixed z-50 bottom-6 right-6 min-w-[220px] max-w-xs px-4 py-3 rounded shadow-lg text-white font-bold transition-all animate-fade-in-up ${type === "success" ? "bg-green-600" : "bg-red-500"
-        }`}
+      className={`fixed z-50 bottom-6 right-6 min-w-[220px] max-w-xs px-4 py-3 rounded shadow-lg text-white font-bold transition-all animate-fade-in-up ${
+        type === "success" ? "bg-green-600" : "bg-red-500"
+      }`}
       role="alert"
     >
       <div className="flex items-center justify-between gap-2">
@@ -173,6 +175,7 @@ export default function Solicitacao() {
   const [statusCobranca2, setstatusCobranca2] = useState<string>("display");
   const [tipoDevolucao, setTipoDevolucao] = useState<string>("");
   const [identificador, setIdentificador] = useState<string>("");
+
   const [produtosSelecionados, setProdutosSelecionados] = useState<Set<string>>(
     new Set()
   );
@@ -188,15 +191,17 @@ export default function Solicitacao() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      nome: "",
-      filial: "",
-      numero_nf: "",
-      carga: "",
-      codigo_cobranca: "",
-      rca: "",
+      nome: nomeClient,
+      filial: codigoFilial,
+      numero_nf: numeroNF,
+      carga: numeroCarga,
+      nome_cobranca: nomeCodigoCobranca,
+      cod_cobranca: numeroCodigoCobranca,
+      rca: codigoRca,
+      cgent: identificador,
       motivo_devolucao: "",
-      codigo_cliente: "",
-      tipo_devolucao: "",
+      tipo_devolucao: tipoDevolucao,
+      cod_cliente: numeroCodigoCliente,
     },
   });
 
@@ -221,7 +226,10 @@ export default function Solicitacao() {
   // Controlar automaticamente o tipo de devolução baseado na seleção
   useEffect(() => {
     if (produtos.length > 0) {
-      if (produtosSelecionados.size === produtos.length && produtosSelecionados.size > 0) {
+      if (
+        produtosSelecionados.size === produtos.length &&
+        produtosSelecionados.size > 0
+      ) {
         setTipoDevolucao("total");
       } else if (produtosSelecionados.size > 0) {
         setTipoDevolucao("parcial");
@@ -243,7 +251,7 @@ export default function Solicitacao() {
           setNumeroCarga(infos_nota.numcar);
           setNomeCodigoCobranca(infos_nota.cobranca);
           setCodigoFilial(infos_nota.codfilial);
-          setIdentificador(infos_nota.cgcent)
+          setIdentificador(infos_nota.cgcent);
         } else {
           setNomeClient("");
         }
@@ -254,8 +262,33 @@ export default function Solicitacao() {
     fetchInfosNota();
   }, [numeroNF]);
 
+  // Atualizar valores do formulário quando os estados mudarem
+  useEffect(() => {
+    form.setValue("nome", nomeClient || "Solicitação de Devolução");
+    form.setValue("filial", codigoFilial);
+    form.setValue("numero_nf", numeroNF);
+    form.setValue("carga", numeroCarga);
+    form.setValue("nome_cobranca", nomeCodigoCobranca);
+    form.setValue("cod_cobranca", numeroCodigoCobranca);
+    form.setValue("rca", codigoRca);
+    form.setValue("cgent", identificador);
+    form.setValue("tipo_devolucao", tipoDevolucao);
+    form.setValue("cod_cliente", numeroCodigoCliente);
+  }, [
+    nomeClient,
+    codigoFilial,
+    numeroNF,
+    numeroCarga,
+    nomeCodigoCobranca,
+    numeroCodigoCobranca,
+    codigoRca,
+    identificador,
+    tipoDevolucao,
+    numeroCodigoCliente,
+    form,
+  ]);
+
   async function avancarPagina() {
-    // Buscar produtos da NF
     if (numeroNF) {
       try {
         console.log("Buscando produtos para NF:", numeroNF);
@@ -288,18 +321,19 @@ export default function Solicitacao() {
   }
 
   function checkIdentificador(identificador: string): string {
-    // Remove qualquer caractere que não seja número
-    const cleaned = identificador.replace(/\D/g, '');
+    const cleaned = identificador.replace(/\D/g, "");
 
     if (cleaned.length > 11) {
       // Formata como CNPJ: 00.000.000/0000-00
-      return cleaned.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/, '$1.$2.$3/$4-$5');
+      return cleaned.replace(
+        /^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/,
+        "$1.$2.$3/$4-$5"
+      );
     } else {
       // Formata como CPF: 000.000.000-00
-      return cleaned.replace(/^(\d{3})(\d{3})(\d{3})(\d{2})$/, '$1.$2.$3-$4');
+      return cleaned.replace(/^(\d{3})(\d{3})(\d{3})(\d{2})$/, "$1.$2.$3-$4");
     }
   }
-
 
   // Função nova para salvar no banco, adptar ela em relação à antiga
 
@@ -307,18 +341,45 @@ export default function Solicitacao() {
     console.log("onSubmit chamado com os dados:", data); // Debug
     try {
       const formData = new FormData();
-      formData.append("nome", data.nome);
-      formData.append("filial", data.filial);
-      formData.append("codigo_cliente", data.codigo_cliente);
-      formData.append("codigo_cobranca", data.codigo_cobranca);
-      formData.append("motivo_devolucao", data.motivo_devolucao);
-      formData.append("rca", data.rca);
-      formData.append("tipo_devolucao", data.tipo_devolucao);
-      formData.append("carga", data.carga);
-      formData.append("numero_nf", data.numero_nf);
-      formData.append("numero_nf", data.lista_produtos);
 
-      const response = await fetch("/api/registerAdm", {
+      // Usar dados do formulário ou valores dos estados se disponíveis
+      formData.append("nome", data.nome || "Solicitação de Devolução");
+      formData.append("filial", data.filial || codigoFilial);
+      formData.append("numero_nf", data.numero_nf || numeroNF);
+      formData.append("carga", data.carga || numeroCarga);
+      formData.append(
+        "nome_cobranca",
+        data.nome_cobranca || nomeCodigoCobranca
+      );
+      formData.append(
+        "cod_cobranca",
+        data.cod_cobranca || numeroCodigoCobranca
+      );
+      formData.append("rca", data.rca || codigoRca);
+      formData.append("cgent", data.cgent || identificador);
+      formData.append(
+        "motivo_devolucao",
+        data.motivo_devolucao || "Devolução solicitada"
+      );
+      formData.append("tipo_devolucao", data.tipo_devolucao || tipoDevolucao);
+      formData.append("cod_cliente", data.cod_cliente || numeroCodigoCliente);
+
+      // Adicionar dados dos produtos
+      formData.append("produtos", JSON.stringify(produtos));
+      formData.append(
+        "produtosSelecionados",
+        JSON.stringify(Array.from(produtosSelecionados))
+      );
+
+      console.log("Dados sendo enviados:", {
+        nome: formData.get("nome"),
+        filial: formData.get("filial"),
+        numero_nf: formData.get("numero_nf"),
+        produtos: formData.get("produtos"),
+        produtosSelecionados: formData.get("produtosSelecionados"),
+      });
+
+      const response = await fetch("/api/registerSolicitacao", {
         method: "POST",
         body: formData,
         headers: {
@@ -330,13 +391,30 @@ export default function Solicitacao() {
       console.log("Resposta do servidor:", response);
 
       if (!response.ok) {
-        throw new Error("Erro ao criar registro.");
+        const errorText = await response.text();
+        console.error("Erro na resposta:", errorText);
+        throw new Error(`Erro ao criar registro: ${response.status}`);
       }
 
       const result = await response.json();
       console.log("Registro realizado com sucesso:", result);
+
+      // Mostrar toast de sucesso
+      setToast({
+        message: `Solicitação criada com sucesso! ${result.produtosSalvos} produtos salvos, ${result.produtosRetornados} para devolução.`,
+        type: "success",
+      });
+
+      // Redirecionar ou limpar formulário
+      // window.location.href = "/solicitacoes";
     } catch (error) {
       console.error("Erro ao criar registro:", error);
+      setToast({
+        message: `Erro ao criar solicitação: ${
+          error instanceof Error ? error.message : "Erro desconhecido"
+        }`,
+        type: "error",
+      });
     }
   }
 
@@ -361,8 +439,12 @@ export default function Solicitacao() {
               <FileText className="h-8 w-8 text-blue-400" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-white">Nova Solicitação de Devolução</h1>
-              <p className="text-slate-400">Crie uma nova solicitação de devolução de produtos</p>
+              <h1 className="text-3xl font-bold text-white">
+                Nova Solicitação de Devolução
+              </h1>
+              <p className="text-slate-400">
+                Crie uma nova solicitação de devolução de produtos
+              </p>
             </div>
           </div>
         </div>
@@ -371,21 +453,34 @@ export default function Solicitacao() {
         <div className="mb-8">
           <div className="flex items-center justify-center gap-4">
             <div
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg cursor-pointer transition-all hover:bg-blue-500/10 ${statusCobranca1 === "display" ? "bg-blue-500/20 text-blue-400" : "bg-slate-700 text-slate-400 hover:text-slate-300"
-                }`}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg cursor-pointer transition-all hover:bg-blue-500/10 ${
+                statusCobranca1 === "display"
+                  ? "bg-blue-500/20 text-blue-400"
+                  : "bg-slate-700 text-slate-400 hover:text-slate-300"
+              }`}
               onClick={() => {
                 setstatusCobranca1("display");
                 setstatusCobranca2("hidden");
               }}
             >
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${statusCobranca1 === "display" ? "bg-blue-500 text-white" : "bg-slate-600 text-slate-400"
-                }`}>1</div>
+              <div
+                className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                  statusCobranca1 === "display"
+                    ? "bg-blue-500 text-white"
+                    : "bg-slate-600 text-slate-400"
+                }`}
+              >
+                1
+              </div>
               <span className="font-medium">Informações da NF</span>
             </div>
             <ArrowRight className="h-5 w-5 text-slate-400" />
             <div
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg cursor-pointer transition-all hover:bg-blue-500/10 ${statusCobranca2 === "display" ? "bg-blue-500/20 text-blue-400" : "bg-slate-700 text-slate-400 hover:text-slate-300"
-                }`}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg cursor-pointer transition-all hover:bg-blue-500/10 ${
+                statusCobranca2 === "display"
+                  ? "bg-blue-500/20 text-blue-400"
+                  : "bg-slate-700 text-slate-400 hover:text-slate-300"
+              }`}
               onClick={() => {
                 // Só permite avançar se tiver NF válida
                 if (numeroNF && numeroNF.length === 6) {
@@ -393,8 +488,15 @@ export default function Solicitacao() {
                 }
               }}
             >
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${statusCobranca2 === "display" ? "bg-blue-500 text-white" : "bg-slate-600 text-slate-400"
-                }`}>2</div>
+              <div
+                className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                  statusCobranca2 === "display"
+                    ? "bg-blue-500 text-white"
+                    : "bg-slate-600 text-slate-400"
+                }`}
+              >
+                2
+              </div>
               <span className="font-medium">Seleção de Produtos</span>
             </div>
           </div>
@@ -415,7 +517,10 @@ export default function Solicitacao() {
               </CardHeader>
               <CardContent>
                 <Form {...form}>
-                  <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                  <form
+                    onSubmit={form.handleSubmit(onSubmit)}
+                    className="space-y-6"
+                  >
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div className="md:col-span-2">
                         <FormField
@@ -423,7 +528,9 @@ export default function Solicitacao() {
                           name="numero_nf"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="text-slate-300">Número da Nota Fiscal</FormLabel>
+                              <FormLabel className="text-slate-300">
+                                Número da Nota Fiscal
+                              </FormLabel>
                               <FormControl>
                                 <Input
                                   type="text"
@@ -457,7 +564,9 @@ export default function Solicitacao() {
                         </CardHeader>
                         <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4 mx-4">
                           <div>
-                            <label className="text-sm font-medium text-slate-300">Nome do Cliente</label>
+                            <label className="text-sm font-medium text-slate-300">
+                              Nome do Cliente
+                            </label>
                             <div className="mt-1 p-3 bg-slate-600 rounded-lg border border-slate-500">
                               <span className="text-white">
                                 {nomeClient || "CLIENTE NÃO ENCONTRADO"}
@@ -465,7 +574,9 @@ export default function Solicitacao() {
                             </div>
                           </div>
                           <div>
-                            <label className="text-sm font-medium text-slate-300">Código do Cliente</label>
+                            <label className="text-sm font-medium text-slate-300">
+                              Código do Cliente
+                            </label>
                             <div className="mt-1 p-3 bg-slate-600 rounded-lg border border-slate-500">
                               <span className="text-white">
                                 {numeroCodigoCliente || "CÓDIGO NÃO ENCONTRADO"}
@@ -485,7 +596,9 @@ export default function Solicitacao() {
                         </CardHeader>
                         <CardContent className="space-y-4 mx-4">
                           <div>
-                            <label className="text-sm font-medium text-slate-300">Número da Carga</label>
+                            <label className="text-sm font-medium text-slate-300">
+                              Número da Carga
+                            </label>
                             <div className="mt-1 p-3 bg-slate-600 rounded-lg border border-slate-500">
                               <span className="text-white">
                                 {numeroCarga || "CARGA NÃO ENCONTRADA"}
@@ -493,7 +606,9 @@ export default function Solicitacao() {
                             </div>
                           </div>
                           <div>
-                            <label className="text-sm font-medium text-slate-300">Código RCA</label>
+                            <label className="text-sm font-medium text-slate-300">
+                              Código RCA
+                            </label>
                             <div className="mt-1 p-3 bg-slate-600 rounded-lg border border-slate-500">
                               <span className="text-white">
                                 {codigoRca || "RCA NÃO ENCONTRADO"}
@@ -501,7 +616,9 @@ export default function Solicitacao() {
                             </div>
                           </div>
                           <div>
-                            <label className="text-sm font-medium text-slate-300">Código Filial</label>
+                            <label className="text-sm font-medium text-slate-300">
+                              Código Filial
+                            </label>
                             <div className="mt-1 p-3 bg-slate-600 rounded-lg border border-slate-500">
                               <span className="text-white">
                                 {codigoFilial || "FILIAL NÃO ENCONTRADA"}
@@ -520,26 +637,35 @@ export default function Solicitacao() {
                         </CardHeader>
                         <CardContent className="space-y-4 px-4">
                           <div>
-                            <label className="text-sm font-medium text-slate-300">Código da Cobrança</label>
+                            <label className="text-sm font-medium text-slate-300">
+                              Código da Cobrança
+                            </label>
                             <div className="mt-1 p-3 bg-slate-600 rounded-lg border border-slate-500">
                               <span className="text-white">
-                                {numeroCodigoCobranca || "CÓDIGO NÃO ENCONTRADO"}
+                                {numeroCodigoCobranca ||
+                                  "CÓDIGO NÃO ENCONTRADO"}
                               </span>
                             </div>
                           </div>
                           <div>
-                            <label className="text-sm font-medium text-slate-300">Nome da Cobrança</label>
+                            <label className="text-sm font-medium text-slate-300">
+                              Nome da Cobrança
+                            </label>
                             <div className="mt-1 p-3 bg-slate-600 rounded-lg border border-slate-500">
                               <span className="text-white">
-                                {nomeCodigoCobranca || "COBRANÇA NÃO ENCONTRADA"}
+                                {nomeCodigoCobranca ||
+                                  "COBRANÇA NÃO ENCONTRADA"}
                               </span>
                             </div>
                           </div>
                           <div>
-                            <label className="text-sm font-medium text-slate-300">Identificador da Cobrança</label>
+                            <label className="text-sm font-medium text-slate-300">
+                              Identificador da Cobrança
+                            </label>
                             <div className="mt-1 p-3 bg-slate-600 rounded-lg border border-slate-500">
                               <span className="text-white">
-                                {checkIdentificador(identificador) || "IDENTIFICADOR NÃO ENCONTRADO"}
+                                {checkIdentificador(identificador) ||
+                                  "IDENTIFICADOR NÃO ENCONTRADO"}
                               </span>
                             </div>
                           </div>
@@ -552,7 +678,9 @@ export default function Solicitacao() {
                           name="motivo_devolucao"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel className="text-slate-300">Motivo da Devolução</FormLabel>
+                              <FormLabel className="text-slate-300">
+                                Motivo da Devolução
+                              </FormLabel>
                               <FormControl>
                                 <Textarea
                                   {...field}
@@ -598,10 +726,16 @@ export default function Solicitacao() {
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Voltar
               </Button>
-              <Badge variant="outline" className="text-slate-300 border-slate-600">
+              <Badge
+                variant="outline"
+                className="text-slate-300 border-slate-600"
+              >
                 NF: {numeroNF}
               </Badge>
-              <Badge variant="outline" className="text-slate-300 border-slate-600">
+              <Badge
+                variant="outline"
+                className="text-slate-300 border-slate-600"
+              >
                 Cliente: {nomeClient}
               </Badge>
             </div>
@@ -637,8 +771,8 @@ export default function Solicitacao() {
                 <div className="mt-2 h-6 flex items-center">
                   {tipoDevolucao && (
                     <p className="text-sm text-slate-400">
-                      {tipoDevolucao === "total" 
-                        ? "Todos os produtos foram selecionados para devolução" 
+                      {tipoDevolucao === "total"
+                        ? "Todos os produtos foram selecionados para devolução"
                         : "Alguns produtos foram selecionados para devolução"}
                     </p>
                   )}
@@ -666,18 +800,22 @@ export default function Solicitacao() {
                       if (produtosSelecionados.size === produtos.length) {
                         setProdutosSelecionados(new Set());
                       } else {
-                        setProdutosSelecionados(new Set(produtos.map((p) => p.codigo)));
+                        setProdutosSelecionados(
+                          new Set(produtos.map((p) => p.codigo))
+                        );
                       }
                     }}
                     className={`border-slate-600 hover:bg-slate-600 transition-colors hover:text-slate-200 cursor-pointer ${
-                      produtosSelecionados.size === produtos.length && produtos.length > 0
+                      produtosSelecionados.size === produtos.length &&
+                      produtos.length > 0
                         ? "bg-green-600/20 text-green-400 border-green-500/50 hover:bg-green-600/30"
                         : produtosSelecionados.size > 0
                         ? "bg-yellow-600/20 text-yellow-400 border-yellow-500/50 hover:bg-yellow-600/30"
                         : "bg-slate-700 text-slate-300"
                     }`}
                   >
-                    {produtosSelecionados.size === produtos.length && produtos.length > 0
+                    {produtosSelecionados.size === produtos.length &&
+                    produtos.length > 0
                       ? "Desselecionar Todos"
                       : "Selecionar Todos"}
                   </Button>
@@ -687,12 +825,20 @@ export default function Solicitacao() {
                 <Table>
                   <TableHeader>
                     <TableRow className="border-slate-700 hover:bg-slate-700/50">
-                      <TableHead className="text-slate-300">Selecionar</TableHead>
+                      <TableHead className="text-slate-300">
+                        Selecionar
+                      </TableHead>
                       <TableHead className="text-slate-300">Código</TableHead>
                       <TableHead className="text-slate-300">Produto</TableHead>
-                      <TableHead className="text-slate-300 text-center">Quantidade</TableHead>
-                      <TableHead className="text-slate-300 text-center">Preço Unit.</TableHead>
-                      <TableHead className="text-slate-300 text-center">Valor Total</TableHead>
+                      <TableHead className="text-slate-300 text-center">
+                        Quantidade
+                      </TableHead>
+                      <TableHead className="text-slate-300 text-center">
+                        Preço Unit.
+                      </TableHead>
+                      <TableHead className="text-slate-300 text-center">
+                        Valor Total
+                      </TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -702,7 +848,9 @@ export default function Solicitacao() {
                           key={p.codigo}
                           className="border-slate-700 hover:bg-slate-700/50 cursor-pointer transition-colors"
                           onClick={() => {
-                            const newSelecionados = new Set(produtosSelecionados);
+                            const newSelecionados = new Set(
+                              produtosSelecionados
+                            );
                             if (produtosSelecionados.has(p.codigo)) {
                               newSelecionados.delete(p.codigo);
                             } else {
@@ -716,7 +864,9 @@ export default function Solicitacao() {
                               <Checkbox
                                 checked={produtosSelecionados.has(p.codigo)}
                                 onCheckedChange={(checked) => {
-                                  const newSelecionados = new Set(produtosSelecionados);
+                                  const newSelecionados = new Set(
+                                    produtosSelecionados
+                                  );
                                   if (checked) {
                                     newSelecionados.add(p.codigo);
                                   } else {
@@ -726,7 +876,10 @@ export default function Solicitacao() {
                                 }}
                                 onClick={(e) => e.stopPropagation()} // Previne duplo toggle quando clica na checkbox
                                 className={`h-4 w-4 ${
-                                  produtos.length > 0 && produtosSelecionados.size === produtos.length && produtosSelecionados.size > 0
+                                  produtos.length > 0 &&
+                                  produtosSelecionados.size ===
+                                    produtos.length &&
+                                  produtosSelecionados.size > 0
                                     ? "data-[state=checked]:bg-green-500 data-[state=checked]:border-green-500"
                                     : "data-[state=checked]:bg-yellow-500 data-[state=checked]:border-yellow-500"
                                 }`}
@@ -734,23 +887,35 @@ export default function Solicitacao() {
                             </div>
                           </TableCell>
                           <TableCell>
-                            <Badge variant="outline" className="text-slate-300 border-slate-600">
+                            <Badge
+                              variant="outline"
+                              className="text-slate-300 border-slate-600"
+                            >
                               {p.codigo}
                             </Badge>
                           </TableCell>
-                          <TableCell className="text-white font-medium">{p.descricao}</TableCell>
-                          <TableCell className="text-center text-slate-300">{p.quantidade}</TableCell>
+                          <TableCell className="text-white font-medium">
+                            {p.descricao}
+                          </TableCell>
+                          <TableCell className="text-center text-slate-300">
+                            {p.quantidade}
+                          </TableCell>
                           <TableCell className="text-center text-slate-300">
                             {formatPrice(Number(p.punit))}
                           </TableCell>
                           <TableCell className="text-center text-white font-medium">
-                            {formatPrice(Number(p.punit) * Number(p.quantidade))}
+                            {formatPrice(
+                              Number(p.punit) * Number(p.quantidade)
+                            )}
                           </TableCell>
                         </TableRow>
                       ))
                     ) : (
                       <TableRow className="hover:bg-slate-700/50">
-                        <TableCell colSpan={6} className="text-center py-8 text-slate-400">
+                        <TableCell
+                          colSpan={6}
+                          className="text-center py-8 text-slate-400"
+                        >
                           Nenhum produto encontrado
                         </TableCell>
                       </TableRow>
@@ -761,7 +926,9 @@ export default function Solicitacao() {
                       <TableCell colSpan={5} className="text-right">
                         <div className="flex items-center justify-end gap-2">
                           <Calculator className="h-4 w-4 text-slate-400" />
-                          <span className="text-white font-bold">Total Selecionado:</span>
+                          <span className="text-white font-bold">
+                            Total Selecionado:
+                          </span>
                         </div>
                       </TableCell>
                       <TableCell className="text-center w-[20%]">
@@ -769,7 +936,11 @@ export default function Solicitacao() {
                           {formatPrice(
                             produtos
                               .filter((p) => produtosSelecionados.has(p.codigo))
-                              .reduce((acc, p) => acc + Number(p.punit) * Number(p.quantidade), 0)
+                              .reduce(
+                                (acc, p) =>
+                                  acc + Number(p.punit) * Number(p.quantidade),
+                                0
+                              )
                           )}
                         </span>
                       </TableCell>
@@ -784,6 +955,97 @@ export default function Solicitacao() {
               <Button
                 type="button"
                 disabled={produtosSelecionados.size === 0 || !tipoDevolucao}
+                onClick={async () => {
+                  console.log("Botão clicado!");
+                  console.log(
+                    "produtosSelecionados.size:",
+                    produtosSelecionados.size
+                  );
+                  console.log("tipoDevolucao:", tipoDevolucao);
+                  console.log("produtos:", produtos);
+
+                  // Verificar erros do formulário
+                  const formErrors = form.formState.errors;
+                  console.log("Erros do formulário:", formErrors);
+                  console.log("Formulário válido:", form.formState.isValid);
+
+                  // Verificar se o formulário é válido antes de tentar
+                  if (!form.formState.isValid) {
+                    console.log(
+                      "Formulário inválido, executando método alternativo diretamente..."
+                    );
+                  } else {
+                    // Tentar primeiro com o formulário
+                    try {
+                      console.log("Tentando executar form.handleSubmit...");
+                      const result = await form.handleSubmit(onSubmit)();
+                      console.log("Resultado do handleSubmit:", result);
+                      return; // Se chegou aqui, deu certo
+                    } catch (error) {
+                      console.log(
+                        "Erro no formulário, tentando método alternativo:",
+                        error
+                      );
+                    }
+                  }
+
+                  // Método alternativo sem validação do formulário
+                  try {
+                    console.log("Executando método alternativo...");
+                    const formData = new FormData();
+                    formData.append("nome", "Solicitação de Devolução");
+                    formData.append("filial", codigoFilial);
+                    formData.append("numero_nf", numeroNF);
+                    formData.append("carga", numeroCarga);
+                    formData.append("nome_cobranca", nomeCodigoCobranca);
+                    formData.append("cod_cobranca", numeroCodigoCobranca);
+                    formData.append("rca", codigoRca);
+                    formData.append("cgent", identificador);
+                    formData.append("motivo_devolucao",form.getValues("motivo_devolucao"));
+                    formData.append("tipo_devolucao", tipoDevolucao);
+                    formData.append("cod_cliente", numeroCodigoCliente);
+                    formData.append("produtos", JSON.stringify(produtos));
+                    formData.append(
+                      "produtosSelecionados",
+                      JSON.stringify(Array.from(produtosSelecionados))
+                    );
+
+                    console.log("Fazendo requisição para API...");
+                    const response = await fetch("/api/registerSolicitacao", {
+                      method: "POST",
+                      body: formData,
+                    });
+
+                    console.log(
+                      "Resposta da API:",
+                      response.status,
+                      response.statusText
+                    );
+
+                    if (!response.ok) {
+                      const errorText = await response.text();
+                      console.error("Erro na resposta:", errorText);
+                      throw new Error(`Erro ${response.status}: ${errorText}`);
+                    }
+
+                    const result = await response.json();
+                    console.log("Resultado da API:", result);
+                    setToast({
+                      message: `Solicitação criada com sucesso! ${result.produtosSalvos} produtos salvos, ${result.produtosRetornados} para devolução.`,
+                      type: "success",
+                    });
+                  } catch (altError) {
+                    console.error("Erro no método alternativo:", altError);
+                    setToast({
+                      message: `Erro ao criar solicitação: ${
+                        altError instanceof Error
+                          ? altError.message
+                          : "Erro desconhecido"
+                      }`,
+                      type: "error",
+                    });
+                  }
+                }}
                 className="bg-green-600 hover:bg-green-700 text-white px-8"
               >
                 Finalizar Solicitação
