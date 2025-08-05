@@ -99,18 +99,6 @@ function Toast({
   );
 }
 
-export async function fetchNameProd(cod: string): Promise<string> {
-  const res = await fetch(`/api/produto/${cod}`);
-  const data = await res.json();
-  return data.nameProd || "";
-}
-
-export async function fetchNameClient(cod: string): Promise<string> {
-  const res = await fetch(`/api/nomeCliente/${cod}`);
-  const data = await res.json();
-  return data.nameClient || "";
-}
-
 interface Produto {
   codprod: string;
   descricao: string;
@@ -266,7 +254,7 @@ export default function Solicitacao() {
 
   // Atualizar valores do formulário quando os estados mudarem
   useEffect(() => {
-    form.setValue("nome", nomeClient || "Solicitação de Devolução");
+    form.setValue("nome", nomeClient);
     form.setValue("filial", codigoFilial);
     form.setValue("numero_nf", numeroNF);
     form.setValue("carga", numeroCarga);
