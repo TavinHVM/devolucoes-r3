@@ -1117,6 +1117,7 @@ export default function VisualizacaoSolicitacoes() {
                                       <>
                                         {userPermissions.canAprovar && (
                                           <Dialog>
+                                            <DialogTitle></DialogTitle>
                                             <DialogTrigger className="flex items-center justify-center text-sm font-semibold gap-1 bg-green-600 hover:bg-green-700 cursor-pointer py-2 px-4 rounded-md">
                                               <CheckCircle2 className="h-4 w-4 mr-2" />
                                               <span>Aprovar</span>
@@ -1178,6 +1179,9 @@ export default function VisualizacaoSolicitacoes() {
                                               <XCircle className="h-4 w-4 mr-2" />
                                               <span>Recusar</span>
                                             </DialogTrigger>
+                                            <DialogHeader>
+                                              <DialogTitle></DialogTitle>
+                                            </DialogHeader>
                                             <DialogContent>
                                               <Card className="bg-slate-800 border-slate-600 rounded-lg p-6 border-none shadow-none">
                                                 <CardHeader>
