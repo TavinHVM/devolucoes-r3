@@ -12,7 +12,7 @@ interface FileUploadProps {
   onValidationChange?: (isValid: boolean) => void;
 }
 
-export function FileUpload({
+export function FileUploadNFDevRecibo({
   onFilesChange,
   onValidationChange,
 }: FileUploadProps) {
