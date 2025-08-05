@@ -15,6 +15,15 @@ export async function POST(request: Request) {
     try {
         const body = await request.formData();
 
+        // Processar arquivo da nota fiscal se existir
+        const arquivoNF = body.get("arquivo_nf") as File | null;
+        let arquivoNFBuffer: Buffer | null = null;
+
+        if (arquivoNF) {
+            const arrayBuffer = await arquivoNF.arrayBuffer();
+            arquivoNFBuffer = Buffer.from(arrayBuffer);
+        }
+
         // Dados da solicitação
         const solicitacaoToCreate = {
         nome: body.get("nome") as string,
@@ -29,6 +38,7 @@ export async function POST(request: Request) {
         tipo_devolucao: body.get("tipo_devolucao") as string,
         cod_cliente: parseInt(body.get("cod_cliente") as string),
         status: "PENDENTE",
+        arquivo_nf: arquivoNFBuffer,
         };
 
     // Dados dos produtos (JSON string)

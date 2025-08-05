@@ -78,7 +78,7 @@ import {
   FinalizarSolicitacao,
 } from "@/utils/solicitacoes/botoesSolicitacoes";
 import { Label } from "@/components/ui/label";
-import { FileUpload } from "@/components/fileUpload_NFDev_Recibo";
+import { FileUploadNFDevRecibo } from "@/components/fileUpload_NFDev_Recibo";
 
 type Solicitacao = {
   id: number;
@@ -1121,7 +1121,7 @@ export default function VisualizacaoSolicitacoes() {
                                                     }
                                                   }}
                                                 >
-                                                  <FileUpload
+                                                  <FileUploadNFDevRecibo
                                                     onFilesChange={(files) =>
                                                       setSelectedFiles(files)
                                                     }

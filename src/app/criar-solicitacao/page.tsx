@@ -56,6 +56,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { FileUploadNF } from "@/components/fileUploadNF";
 
 const formSchema = z.object({
   nome: z.string().min(1, { message: "" }),
@@ -175,6 +176,7 @@ export default function Solicitacao() {
   const [statusCobranca2, setstatusCobranca2] = useState<string>("display");
   const [tipoDevolucao, setTipoDevolucao] = useState<string>("");
   const [identificador, setIdentificador] = useState<string>("");
+  const [arquivoNF, setArquivoNF] = useState<File | null>(null);
 
   const [produtosSelecionados, setProdutosSelecionados] = useState<Set<string>>(
     new Set()
@@ -370,6 +372,11 @@ export default function Solicitacao() {
         "produtosSelecionados",
         JSON.stringify(Array.from(produtosSelecionados))
       );
+
+      // Adicionar arquivo da nota fiscal se existir
+      if (arquivoNF) {
+        formData.append("arquivo_nf", arquivoNF);
+      }
 
       console.log("Dados sendo enviados:", {
         nome: formData.get("nome"),
@@ -695,6 +702,17 @@ export default function Solicitacao() {
                       </div>
                     </div>
 
+                    {/* Upload da Nota Fiscal */}
+                    <div className="mt-6">
+                      <FileUploadNF
+                        onFileChange={(file) => setArquivoNF(file)}
+                        onValidationChange={(isValid) => {
+                          // Opcional: você pode usar esta validação se quiser
+                          console.log("Arquivo NF válido:", isValid);
+                        }}
+                      />
+                    </div>
+
                     <div className="flex justify-end">
                       <Button
                         type="button"
@@ -1001,7 +1019,10 @@ export default function Solicitacao() {
                     formData.append("cod_cobranca", numeroCodigoCobranca);
                     formData.append("rca", codigoRca);
                     formData.append("cgent", identificador);
-                    formData.append("motivo_devolucao",form.getValues("motivo_devolucao"));
+                    formData.append(
+                      "motivo_devolucao",
+                      form.getValues("motivo_devolucao")
+                    );
                     formData.append("tipo_devolucao", tipoDevolucao);
                     formData.append("cod_cliente", numeroCodigoCliente);
                     formData.append("produtos", JSON.stringify(produtos));
@@ -1009,6 +1030,11 @@ export default function Solicitacao() {
                       "produtosSelecionados",
                       JSON.stringify(Array.from(produtosSelecionados))
                     );
+
+                    // Adicionar arquivo da nota fiscal se existir
+                    if (arquivoNF) {
+                      formData.append("arquivo_nf", arquivoNF);
+                    }
 
                     console.log("Fazendo requisição para API...");
                     const response = await fetch("/api/registerSolicitacao", {
