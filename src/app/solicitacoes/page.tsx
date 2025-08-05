@@ -81,6 +81,7 @@ import { Label } from "@/components/ui/label";
 import { useAuth } from "@/lib/useAuth";
 import { getUserPermissions } from "@/utils/permissions/userPermissions";
 import { FileUploadNFDevRecibo } from "@/components/fileUpload_NFDev_Recibo";
+import { ProdutosCard } from "@/components/solicitacoesComponent/produtos";
 
 type Solicitacao = {
   id: number;
@@ -135,7 +136,7 @@ export default function VisualizacaoSolicitacoes() {
   // Redirect to login if not authenticated
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
-      window.location.href = '/login';
+      window.location.href = "/login";
     }
   }, [isAuthenticated, isLoading]);
 
@@ -556,8 +557,9 @@ export default function VisualizacaoSolicitacoes() {
                   className="bg-blue-600 hover:bg-blue-700 text-white h-10 cursor-pointer"
                 >
                   <RefreshCw
-                    className={`h-4 w-4 mr-2 ${refreshing ? "animate-spin" : ""
-                      }`}
+                    className={`h-4 w-4 mr-2 ${
+                      refreshing ? "animate-spin" : ""
+                    }`}
                   />
                   {refreshing ? "Atualizando..." : "Atualizar"}
                 </Button>
@@ -685,10 +687,11 @@ export default function VisualizacaoSolicitacoes() {
                         <TableCell>
                           <Badge
                             variant="secondary"
-                            className={`text-white flex justify-center py-2 w-full max-w-16 text-sm capitalize ${s.tipo_devolucao.toUpperCase() === "PARCIAL"
+                            className={`text-white flex justify-center py-2 w-full max-w-16 text-sm capitalize ${
+                              s.tipo_devolucao.toUpperCase() === "PARCIAL"
                                 ? "bg-amber-500 hover:bg-amber-500"
                                 : "bg-emerald-500 hover:bg-emerald-500"
-                              }`}
+                            }`}
                           >
                             {s.tipo_devolucao}
                           </Badge>
@@ -881,11 +884,12 @@ export default function VisualizacaoSolicitacoes() {
                                             </p>
                                             <Badge
                                               variant="secondary"
-                                              className={`text-white text-md w-fit capitalize ${s.tipo_devolucao.toUpperCase() ===
-                                                  "PARCIAL"
+                                              className={`text-white text-md w-fit capitalize ${
+                                                s.tipo_devolucao.toUpperCase() ===
+                                                "PARCIAL"
                                                   ? "bg-amber-500 hover:bg-amber-500"
                                                   : "bg-emerald-500 hover:bg-emerald-500"
-                                                }`}
+                                              }`}
                                             >
                                               {s.tipo_devolucao}
                                             </Badge>
@@ -897,12 +901,13 @@ export default function VisualizacaoSolicitacoes() {
                                               </p>
                                               <Badge
                                                 variant="secondary"
-                                                className={`text-white text-md w-fit capitalize ${(
+                                                className={`text-white text-md w-fit capitalize ${
+                                                  (
                                                     s.vale as string
                                                   ).toUpperCase() === "SIM"
                                                     ? "bg-green-500 hover:bg-green-500"
                                                     : "bg-red-800 hover:bg-red-800"
-                                                  }`}
+                                                }`}
                                               >
                                                 {s.vale}
                                               </Badge>
@@ -949,167 +954,24 @@ export default function VisualizacaoSolicitacoes() {
                                   {Boolean(
                                     s.motivo_recusa && s.motivo_recusa.trim()
                                   ) && (
-                                      <Card className="bg-slate-700/50 border-slate-600">
-                                        <CardHeader>
-                                          <CardTitle className="text-white">
-                                            Motivo da Recusa
-                                          </CardTitle>
-                                        </CardHeader>
-                                        <CardContent>
-                                          <div className="mx-8">
-                                            <p className="text-slate-300">
-                                              {s.motivo_recusa}
-                                            </p>
-                                          </div>
-                                        </CardContent>
-                                      </Card>
-                                    )}
+                                    <Card className="bg-slate-700/50 border-slate-600">
+                                      <CardHeader>
+                                        <CardTitle className="text-white">
+                                          Motivo da Recusa
+                                        </CardTitle>
+                                      </CardHeader>
+                                      <CardContent>
+                                        <div className="mx-8">
+                                          <p className="text-slate-300">
+                                            {s.motivo_recusa}
+                                          </p>
+                                        </div>
+                                      </CardContent>
+                                    </Card>
+                                  )}
 
                                   {/* Produtos */}
-                                  <Card className="bg-slate-700/50 border-slate-600">
-                                    <CardHeader>
-                                      <CardTitle className="text-white flex items-center gap-2">
-                                        <Package className="h-5 w-5" />
-                                        Produtos
-                                      </CardTitle>
-                                    </CardHeader>
-                                    <CardContent>
-                                      <div className="overflow-x-auto">
-                                        <Table>
-                                          <TableHeader>
-                                            <TableRow className="border-slate-600">
-                                              <TableHead className="text-slate-300">
-                                                Código
-                                              </TableHead>
-                                              <TableHead className="text-slate-300">
-                                                Descrição
-                                              </TableHead>
-                                              <TableHead className="text-slate-300 text-center">
-                                                Quantidade
-                                              </TableHead>
-                                            </TableRow>
-                                          </TableHeader>
-                                          <TableBody>
-                                            {Array.isArray(s.products_list) &&
-                                              s.products_list.length > 0 ? (
-                                              s.products_list.map(
-                                                (
-                                                  p: {
-                                                    codigo: number;
-                                                    descricao: string;
-                                                    quantidade: number;
-                                                  },
-                                                  idx: number
-                                                ) => (
-                                                  <TableRow
-                                                    key={idx}
-                                                    className="border-slate-600"
-                                                  >
-                                                    <TableCell>
-                                                      <Badge
-                                                        variant="outline"
-                                                        className="text-slate-300 border-slate-500"
-                                                      >
-                                                        {p.codigo}
-                                                      </Badge>
-                                                    </TableCell>
-                                                    <TableCell className="text-white">
-                                                      {p.descricao}
-                                                    </TableCell>
-                                                    <TableCell className="text-center text-slate-300">
-                                                      {p.quantidade}
-                                                    </TableCell>
-                                                  </TableRow>
-                                                )
-                                              )
-                                            ) : (
-                                              <TableRow>
-                                                <TableCell
-                                                  colSpan={3}
-                                                  className="text-center text-slate-400 py-4"
-                                                >
-                                                  Nenhum produto encontrado
-                                                </TableCell>
-                                              </TableRow>
-                                            )}
-                                          </TableBody>
-                                        </Table>
-                                      </div>
-                                    </CardContent>
-                                  </Card>
-
-                                  {/* Produtos Devolvidos*/}
-                                  <Card className="bg-slate-700/50 border-slate-600">
-                                    <CardHeader>
-                                      <CardTitle className="text-white flex items-center gap-2">
-                                        <Package className="h-5 w-5" />
-                                        Produtos Devolvidos
-                                      </CardTitle>
-                                    </CardHeader>
-                                    <CardContent>
-                                      <div className="overflow-x-auto">
-                                        <Table>
-                                          <TableHeader>
-                                            <TableRow className="border-slate-600">
-                                              <TableHead className="text-slate-300">
-                                                Código
-                                              </TableHead>
-                                              <TableHead className="text-slate-300">
-                                                Descrição
-                                              </TableHead>
-                                              <TableHead className="text-slate-300 text-center">
-                                                Quantidade
-                                              </TableHead>
-                                            </TableRow>
-                                          </TableHeader>
-                                          <TableBody>
-                                            {Array.isArray(s.products_list) &&
-                                              s.products_list.length > 0 ? (
-                                              s.products_list.map(
-                                                (
-                                                  p: {
-                                                    codigo: number;
-                                                    descricao: string;
-                                                    quantidade: number;
-                                                  },
-                                                  idx: number
-                                                ) => (
-                                                  <TableRow
-                                                    key={idx}
-                                                    className="border-slate-600"
-                                                  >
-                                                    <TableCell>
-                                                      <Badge
-                                                        variant="outline"
-                                                        className="text-slate-300 border-slate-500"
-                                                      >
-                                                        {p.codigo}
-                                                      </Badge>
-                                                    </TableCell>
-                                                    <TableCell className="text-white">
-                                                      {p.descricao}
-                                                    </TableCell>
-                                                    <TableCell className="text-center text-slate-300">
-                                                      {p.quantidade}
-                                                    </TableCell>
-                                                  </TableRow>
-                                                )
-                                              )
-                                            ) : (
-                                              <TableRow>
-                                                <TableCell
-                                                  colSpan={3}
-                                                  className="text-center text-slate-400 py-4"
-                                                >
-                                                  Nenhum produto encontrado
-                                                </TableCell>
-                                              </TableRow>
-                                            )}
-                                          </TableBody>
-                                        </Table>
-                                      </div>
-                                    </CardContent>
-                                  </Card>
+                                  <ProdutosCard numeroNF={s.numero_nf} />
 
                                   {/* Botões de Ação - Centralizados */}
                                   <div className="flex justify-center gap-4 mt-6">
@@ -1152,14 +1014,17 @@ export default function VisualizacaoSolicitacoes() {
                                                       }
                                                       onValidationChange={(
                                                         isValid
-                                                      ) => setFilesValid(isValid)}
+                                                      ) =>
+                                                        setFilesValid(isValid)
+                                                      }
                                                     />
                                                     <Button
                                                       type="submit"
-                                                      className={`w-full font-bold mt-4 ${filesValid
+                                                      className={`w-full font-bold mt-4 ${
+                                                        filesValid
                                                           ? "bg-green-600 hover:bg-green-700 text-white"
                                                           : "bg-slate-600 text-slate-400 cursor-not-allowed"
-                                                        }`}
+                                                      }`}
                                                       disabled={!filesValid}
                                                     >
                                                       {filesValid
@@ -1172,7 +1037,7 @@ export default function VisualizacaoSolicitacoes() {
                                             </DialogContent>
                                           </Dialog>
                                         )}
-                                        
+
                                         {userPermissions.canRecusar && (
                                           <Dialog>
                                             <DialogTrigger className="flex items-center justify-center text-sm font-semibold gap-1 bg-red-600 hover:bg-red-700 cursor-pointer py-2 px-4 rounded-md">
@@ -1235,51 +1100,57 @@ export default function VisualizacaoSolicitacoes() {
                                       </>
                                     )}
 
-                                    {s.status.toUpperCase() === "APROVADA" && userPermissions.canDesdobrar && (
-                                      <Button
-                                        className="bg-blue-600 hover:bg-blue-700"
-                                        onClick={() =>
-                                          DesdobrarSolicitacao(s.id)
-                                        }
-                                      >
-                                        <Target className="h-4 w-4 mr-2" />
-                                        Desdobrar
-                                      </Button>
-                                    )}
+                                    {s.status.toUpperCase() === "APROVADA" &&
+                                      userPermissions.canDesdobrar && (
+                                        <Button
+                                          className="bg-blue-600 hover:bg-blue-700"
+                                          onClick={() =>
+                                            DesdobrarSolicitacao(s.id)
+                                          }
+                                        >
+                                          <Target className="h-4 w-4 mr-2" />
+                                          Desdobrar
+                                        </Button>
+                                      )}
 
-                                    {s.status.toUpperCase() === "DESDOBRADA" && userPermissions.canAbater && (
-                                      <Button
-                                        className="bg-yellow-600 hover:bg-yellow-700"
-                                        onClick={() => AbaterSolicitacao(s.id)}
-                                      >
-                                        <AlertTriangle className="h-4 w-4 mr-2" />
-                                        Abater
-                                      </Button>
-                                    )}
+                                    {s.status.toUpperCase() === "DESDOBRADA" &&
+                                      userPermissions.canAbater && (
+                                        <Button
+                                          className="bg-yellow-600 hover:bg-yellow-700"
+                                          onClick={() =>
+                                            AbaterSolicitacao(s.id)
+                                          }
+                                        >
+                                          <AlertTriangle className="h-4 w-4 mr-2" />
+                                          Abater
+                                        </Button>
+                                      )}
 
-                                    {s.status.toUpperCase() === "ABATIDA" && userPermissions.canFinalizar && (
-                                      <Button
-                                        className="bg-lime-600 hover:bg-lime-700"
-                                        onClick={() =>
-                                          FinalizarSolicitacao(s.id)
-                                        }
-                                      >
-                                        <Zap className="h-4 w-4 mr-2" />
-                                        Finalizar
-                                      </Button>
-                                    )}
+                                    {s.status.toUpperCase() === "ABATIDA" &&
+                                      userPermissions.canFinalizar && (
+                                        <Button
+                                          className="bg-lime-600 hover:bg-lime-700"
+                                          onClick={() =>
+                                            FinalizarSolicitacao(s.id)
+                                          }
+                                        >
+                                          <Zap className="h-4 w-4 mr-2" />
+                                          Finalizar
+                                        </Button>
+                                      )}
 
-                                    {s.status.toUpperCase() === "RECUSADA" && userPermissions.canReenviar && (
-                                      <Button
-                                        className="bg-orange-600 hover:bg-orange-700"
-                                        onClick={() =>
-                                          ReenviarSolicitacao(s.id)
-                                        }
-                                      >
-                                        <RotateCcw className="h-4 w-4 mr-2" />
-                                        Reenviar
-                                      </Button>
-                                    )}
+                                    {s.status.toUpperCase() === "RECUSADA" &&
+                                      userPermissions.canReenviar && (
+                                        <Button
+                                          className="bg-orange-600 hover:bg-orange-700"
+                                          onClick={() =>
+                                            ReenviarSolicitacao(s.id)
+                                          }
+                                        >
+                                          <RotateCcw className="h-4 w-4 mr-2" />
+                                          Reenviar
+                                        </Button>
+                                      )}
                                   </div>
                                 </div>
 
@@ -1306,98 +1177,98 @@ export default function VisualizacaoSolicitacoes() {
                           </div>
                         </TableCell>
                       </TableRow>
-            ))
-            ) : (
-            <TableRow>
-              <TableCell
-                colSpan={8}
-                className="text-center py-8 text-slate-400"
-              >
-                Nenhuma solicitação encontrada
-              </TableCell>
-            </TableRow>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell
+                        colSpan={8}
+                        className="text-center py-8 text-slate-400"
+                      >
+                        Nenhuma solicitação encontrada
+                      </TableCell>
+                    </TableRow>
                   )}
-          </TableBody>
-        </Table>
-      </div>
+                </TableBody>
+              </Table>
+            </div>
 
-      {/* Pagination */}
-      {totalPages > 1 && (
-        <div className="mt-6">
-          <Pagination>
-            <PaginationContent>
-              <PaginationItem>
-                <PaginationPrevious
-                  namePrevious="Primeira Página"
-                  href="#"
-                  onClick={() => setCurrentPage(1)}
-                  className={
-                    currentPage === 1
-                      ? "pointer-events-none opacity-50"
-                      : ""
-                  }
-                />
-              </PaginationItem>
-              <PaginationItem>
-                <PaginationPrevious
-                  namePrevious="Anterior"
-                  href="#"
-                  onClick={() =>
-                    setCurrentPage((prev) => Math.max(prev - 1, 1))
-                  }
-                  className={
-                    currentPage === 1
-                      ? "pointer-events-none opacity-50"
-                      : ""
-                  }
-                />
-              </PaginationItem>
-              {[...Array(endPage - startPage + 1)].map((_, i) => (
-                <PaginationItem key={i + startPage}>
-                  <PaginationLink
-                    className={
-                      currentPage === i + startPage ? "bg-slate-400" : ""
-                    }
-                    href="#"
-                    onClick={() => setCurrentPage(i + startPage)}
-                  >
-                    {i + startPage}
-                  </PaginationLink>
-                </PaginationItem>
-              ))}
-              <PaginationItem>
-                <PaginationNext
-                  nameNext="Próxima"
-                  href="#"
-                  onClick={() =>
-                    setCurrentPage((prev) =>
-                      Math.min(prev + 1, totalPages)
-                    )
-                  }
-                  className={
-                    currentPage === totalPages
-                      ? "pointer-events-none opacity-50"
-                      : ""
-                  }
-                />
-              </PaginationItem>
-              <PaginationItem>
-                <PaginationNext
-                  nameNext="Última Página"
-                  href="#"
-                  onClick={() => setCurrentPage(totalPages)}
-                  className={
-                    currentPage === totalPages
-                      ? "pointer-events-none opacity-50"
-                      : ""
-                  }
-                />
-              </PaginationItem>
-            </PaginationContent>
-          </Pagination>
-        </div>
-      )}
-    </CardContent>
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="mt-6">
+                <Pagination>
+                  <PaginationContent>
+                    <PaginationItem>
+                      <PaginationPrevious
+                        namePrevious="Primeira Página"
+                        href="#"
+                        onClick={() => setCurrentPage(1)}
+                        className={
+                          currentPage === 1
+                            ? "pointer-events-none opacity-50"
+                            : ""
+                        }
+                      />
+                    </PaginationItem>
+                    <PaginationItem>
+                      <PaginationPrevious
+                        namePrevious="Anterior"
+                        href="#"
+                        onClick={() =>
+                          setCurrentPage((prev) => Math.max(prev - 1, 1))
+                        }
+                        className={
+                          currentPage === 1
+                            ? "pointer-events-none opacity-50"
+                            : ""
+                        }
+                      />
+                    </PaginationItem>
+                    {[...Array(endPage - startPage + 1)].map((_, i) => (
+                      <PaginationItem key={i + startPage}>
+                        <PaginationLink
+                          className={
+                            currentPage === i + startPage ? "bg-slate-400" : ""
+                          }
+                          href="#"
+                          onClick={() => setCurrentPage(i + startPage)}
+                        >
+                          {i + startPage}
+                        </PaginationLink>
+                      </PaginationItem>
+                    ))}
+                    <PaginationItem>
+                      <PaginationNext
+                        nameNext="Próxima"
+                        href="#"
+                        onClick={() =>
+                          setCurrentPage((prev) =>
+                            Math.min(prev + 1, totalPages)
+                          )
+                        }
+                        className={
+                          currentPage === totalPages
+                            ? "pointer-events-none opacity-50"
+                            : ""
+                        }
+                      />
+                    </PaginationItem>
+                    <PaginationItem>
+                      <PaginationNext
+                        nameNext="Última Página"
+                        href="#"
+                        onClick={() => setCurrentPage(totalPages)}
+                        className={
+                          currentPage === totalPages
+                            ? "pointer-events-none opacity-50"
+                            : ""
+                        }
+                      />
+                    </PaginationItem>
+                  </PaginationContent>
+                </Pagination>
+              </div>
+            )}
+          </CardContent>
         </Card>
       </div>
     </div>
