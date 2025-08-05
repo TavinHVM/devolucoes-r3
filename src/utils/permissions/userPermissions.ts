@@ -61,8 +61,6 @@ export function getUserPermissions(user: User | null): UserPermissions {
       };
 
     case 'adm':
-    case 'administrador':
-      // Admin has all permissions
       return {
         canAprovar: true,
         canRecusar: true,
