@@ -29,7 +29,6 @@ import {
   User,
   Phone,
   Filter,
-  MoreHorizontal
 } from 'lucide-react';
 
 // Tipo do usuário conforme a tabela user_profiles

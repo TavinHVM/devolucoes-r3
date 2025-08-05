@@ -38,10 +38,12 @@ model solicitacoes {
   motivo_devolucao          String
   motivo_recusa             String?
   tipo_devolucao            String
-  arquivo_url               Bytes?
+  arquivo_nf                Bytes?
+  arquivo_recibo            Bytes?
+  arquivo_nf_devolucao      Bytes?
   cod_cliente               Int
   status                    String
-  vale                      String
+  vale                      String?
   pendente_at               DateTime?
   aprovada_at               DateTime?
   recusada_at               DateTime?
@@ -56,20 +58,20 @@ model solicitacoes {
 model products {
   id                        Int @id @default(autoincrement())
   numeronf                  String
-  cod_prod                  String
+  cod_prod                  Int
   descricao                 String
-  quantidade                String
-  punit                     String
+  quantidade                Int
+  punit                     Int
   created_at                DateTime  @default(now())
 }
 
 model returned_products {
   id                        Int @id @default(autoincrement())
   numeronf                  String
-  cod_prod                  String
+  cod_prod                  Int
   descricao                 String
-  quantidade                String
-  punit                     String
+  quantidade                Int
+  punit                     Int
   created_at                DateTime  @default(now())
 }
 
