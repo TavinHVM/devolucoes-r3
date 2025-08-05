@@ -29,6 +29,8 @@ import {
   User,
   Phone,
   Filter,
+  Warehouse,
+  BadgeCent,
 } from 'lucide-react';
 
 // Tipo do usuário conforme a tabela user_profiles
@@ -293,14 +295,14 @@ export default function Usuarios() {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
           <Card className="bg-slate-800/50 border-slate-700">
             <CardContent className="p-4">
               <div className="flex items-center gap-3">
                 <div className="p-2 bg-blue-500/20 rounded-lg">
                   <Users className="h-5 w-5 text-blue-400" />
                 </div>
-                <div>
+                <div className='mb-4'>
                   <p className="text-sm text-slate-400">Total de Usuários</p>
                   <p className="text-2xl font-bold text-white">{usuarios.length}</p>
                 </div>
@@ -314,7 +316,7 @@ export default function Usuarios() {
                 <div className="p-2 bg-red-500/20 rounded-lg">
                   <Shield className="h-5 w-5 text-red-400" />
                 </div>
-                <div>
+                <div className='mb-4'>
                   <p className="text-sm text-slate-400">Administradores</p>
                   <p className="text-2xl font-bold text-white">{usuarios.filter(u => u.user_level === 'adm').length}</p>
                 </div>
@@ -325,10 +327,10 @@ export default function Usuarios() {
           <Card className="bg-slate-800/50 border-slate-700">
             <CardContent className="p-4">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-green-500/20 rounded-lg">
-                  <User className="h-5 w-5 text-green-400" />
+                <div className="p-2 bg-blue-500/20 rounded-lg">
+                  <User className="h-5 w-5 text-blue-400" />
                 </div>
-                <div>
+                <div className='mb-4'>
                   <p className="text-sm text-slate-400">Vendas</p>
                   <p className="text-2xl font-bold text-white">{usuarios.filter(u => u.user_level === 'vendas').length}</p>
                 </div>
@@ -339,12 +341,25 @@ export default function Usuarios() {
           <Card className="bg-slate-800/50 border-slate-700">
             <CardContent className="p-4">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-purple-500/20 rounded-lg">
-                  <Phone className="h-5 w-5 text-purple-400" />
+                <div className="p-2 bg-green-500/20 rounded-lg">
+                  <BadgeCent className="h-5 w-5 text-green-400" />
                 </div>
-                <div>
-                  <p className="text-sm text-slate-400">Outros</p>
-                  <p className="text-2xl font-bold text-white">{usuarios.filter(u => !['adm', 'vendas'].includes(u.user_level)).length}</p>
+                <div className='mb-4'>
+                  <p className="text-sm text-slate-400">Financeiro</p>
+                  <p className="text-2xl font-bold text-white">{usuarios.filter(u => u.user_level === 'financeiro').length}</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="bg-slate-800/50 border-slate-700">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-orange-500/20 rounded-lg">
+                  <Warehouse className="h-5 w-5 text-orange-500" />
+                </div>
+                <div className='mb-4'>
+                  <p className="text-sm text-slate-400">Logística</p>
+                  <p className="text-2xl font-bold text-white">{usuarios.filter(u => u.user_level === 'logistica').length}</p>
                 </div>
               </div>
             </CardContent>
@@ -422,11 +437,11 @@ export default function Usuarios() {
             <Table>
               <TableHeader>
                 <TableRow className="border-slate-700 hover:bg-slate-700/30">
-                  <TableHead className="text-slate-300">Usuário</TableHead>
+                  <TableHead className="text-slate-300 pl-15">Usuário</TableHead>
                   <TableHead className="text-slate-300">Contato</TableHead>
                   <TableHead className="text-slate-300">Cargo</TableHead>
                   <TableHead className="text-slate-300">Nível</TableHead>
-                  <TableHead className="text-slate-300 text-right">Ações</TableHead>
+                  <TableHead className="text-slate-300 text-right pr-12">Ações</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -471,7 +486,7 @@ export default function Usuarios() {
                           {usuario.user_level}
                         </Badge>
                       </TableCell>
-                      <TableCell className="text-right">
+                      <TableCell className="text-right pr-6">
                         <div className="flex items-center justify-end gap-2">
                           <Button
                             variant="outline"
