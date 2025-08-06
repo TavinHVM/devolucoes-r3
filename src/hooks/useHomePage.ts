@@ -1,0 +1,58 @@
+import { useState, useEffect } from 'react';
+import { getRandomTip, getTimeOfDay } from '../utils/homeUtils';
+
+interface Stats {
+  totalSolicitacoes: number;
+  pendentes: number;
+  aprovadas: number;
+  recusadas: number;
+  loading: boolean;
+}
+
+export const useHomePage = (isAuthenticated: boolean) => {
+  const [stats, setStats] = useState<Stats>({
+    totalSolicitacoes: 0,
+    pendentes: 0,
+    aprovadas: 0,
+    recusadas: 0,
+    loading: true,
+  });
+  const [randomTip] = useState(getRandomTip());
+  const [timeOfDay] = useState(getTimeOfDay());
+
+  // Fetch dashboard stats
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const response = await fetch('/api/getSolicitacoes');
+        if (response.ok) {
+          const data = await response.json();
+          const pendentes = data.filter((s: any) => s.status.toUpperCase() === 'PENDENTE').length;
+          const aprovadas = data.filter((s: any) => s.status.toUpperCase() === 'APROVADA').length;
+          const recusadas = data.filter((s: any) => s.status.toUpperCase() === 'RECUSADA').length;
+          
+          setStats({
+            totalSolicitacoes: data.length,
+            pendentes,
+            aprovadas,
+            recusadas,
+            loading: false,
+          });
+        }
+      } catch (error) {
+        console.error('Erro ao buscar estatísticas:', error);
+        setStats(prev => ({ ...prev, loading: false }));
+      }
+    };
+
+    if (isAuthenticated) {
+      fetchStats();
+    }
+  }, [isAuthenticated]);
+
+  return {
+    stats,
+    randomTip,
+    timeOfDay,
+  };
+};
