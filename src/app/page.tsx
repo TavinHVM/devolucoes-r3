@@ -250,7 +250,7 @@ export default function Home() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 px-4">
                   {quickActions.map((action, index) => {
                     const IconComponent = action.icon;
                     return (
@@ -274,14 +274,14 @@ export default function Home() {
 
             {/* Progress Overview */}
             <Card className="bg-slate-800/50 border-slate-700 mt-6">
-              <CardHeader>
+              <CardHeader className='px-4 ml-1'>
                 <CardTitle className="text-white flex items-center gap-2">
                   <TrendingUp className="h-5 w-5 text-green-400" />
                   Resumo de Performance
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
+                <div className="space-y-4 mx-4">
                   <div>
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-slate-300">Taxa de Aprovação</span>
@@ -339,7 +339,7 @@ export default function Home() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
+                <div className="space-y-4 mx-4">
                   {recentActivity.map((activity) => (
                     <div key={activity.id} className="flex items-start gap-3 p-3 rounded-lg bg-slate-700/30">
                       {getActivityIcon(activity.type)}
@@ -351,15 +351,17 @@ export default function Home() {
                     </div>
                   ))}
                 </div>
-                
-                <Button 
-                  variant="ghost" 
-                  className="w-full mt-4 text-blue-400 hover:text-blue-300 hover:bg-blue-500/10"
-                  onClick={() => router.push('/solicitacoes')}
-                >
-                  Ver todas as atividades
-                  <ArrowRight className="h-4 w-4 ml-2" />
-                </Button>
+
+                <div className='mx-4'>
+                  <Button 
+                    variant="ghost" 
+                    className="w-full mt-4 text-blue-400 hover:text-blue-300 hover:bg-blue-500/10 px-4 bg-blue-500/20"
+                    onClick={() => router.push('/solicitacoes')}
+                  >
+                    Ver todas as atividades
+                    <ArrowRight className="h-4 w-4 ml-2" />
+                  </Button>
+                </div>
               </CardContent>
             </Card>
 
@@ -372,7 +374,7 @@ export default function Home() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-3">
+                <div className="space-y-3 mx-4">
                   <div className="p-3 rounded-lg bg-blue-500/10 border border-blue-500/20">
                     <div className="flex items-center gap-2 mb-1">
                       <Target className="h-4 w-4 text-blue-400" />
@@ -398,14 +400,14 @@ export default function Home() {
 
             {/* System Status */}
             <Card className="bg-slate-800/50 border-slate-700">
-              <CardHeader>
+              <CardHeader className='px-4'>
                 <CardTitle className="text-white flex items-center gap-2">
                   <Calendar className="h-5 w-5 text-purple-400" />
                   Status do Sistema
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-3">
+                <div className="space-y-3 mx-4">
                   <div className="flex items-center justify-between">
                     <span className="text-slate-300 text-sm">Sistema</span>
                     <Badge className="bg-green-500/20 text-green-400 border-green-500/30">
