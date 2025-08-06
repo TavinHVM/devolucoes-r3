@@ -46,16 +46,12 @@ import {
   AlertCircle,
   ShoppingCart,
   Calculator,
+  Plus,
+  Minus,
+  SquareCheck,
+  SquareX,
 } from "lucide-react";
 import { formatPrice } from "../../utils/formatPrice";
-import { Checkbox } from "@/components/ui/checkbox";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { FileUploadNF } from "@/components/fileUploadNF";
 
 const formSchema = z.object({
@@ -152,6 +148,18 @@ export default function Solicitacao() {
     message: string;
     type: "success" | "error";
   } | null>(null);
+  // Exibir toast salvo no localStorage após reload
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const toastMsg = localStorage.getItem("solicitacao-toast-message");
+      const toastType = localStorage.getItem("solicitacao-toast-type");
+      if (toastMsg && toastType) {
+        setToast({ message: toastMsg, type: toastType as "success" | "error" });
+        localStorage.removeItem("solicitacao-toast-message");
+        localStorage.removeItem("solicitacao-toast-type");
+      }
+    }
+  }, []);
   const [numeroNF, setNumeroNF] = useState<string>("");
   const [codigoRca, setCodigoRca] = useState<string>("");
   const [nomeClient, setNomeClient] = useState<string>("");
@@ -166,9 +174,14 @@ export default function Solicitacao() {
   const [identificador, setIdentificador] = useState<string>("");
   const [arquivoNF, setArquivoNF] = useState<File | null>(null);
 
-  const [produtosSelecionados, setProdutosSelecionados] = useState<Set<string>>(
-    new Set()
-  );
+  // Estado para controlar quantidades de devolução por produto
+  const [quantidadesDevolucao, setQuantidadesDevolucao] = useState<
+    Record<string, number>
+  >({});
+
+  // Estado para controlar se todos os produtos estão selecionados
+  const [todosSelecionados, setTodosSelecionados] = useState<boolean>(false);
+
   const [produtos, setProdutos] = useState<
     Array<{
       codigo: string;
@@ -216,18 +229,34 @@ export default function Solicitacao() {
   // Controlar automaticamente o tipo de devolução baseado na seleção
   useEffect(() => {
     if (produtos.length > 0) {
+      const totalQuantidadeDevolucao = Object.values(
+        quantidadesDevolucao
+      ).reduce((acc, qtd) => acc + qtd, 0);
+      const totalQuantidadeNota = produtos.reduce(
+        (acc, p) => acc + Number(p.quantidade),
+        0
+      );
+
+      // Verificar se todos os produtos estão com quantidade máxima selecionada
+      const todosComQuantidadeMaxima = produtos.every(
+        (produto) =>
+          (quantidadesDevolucao[produto.codigo] || 0) ===
+          Number(produto.quantidade)
+      );
+      setTodosSelecionados(todosComQuantidadeMaxima);
+
       if (
-        produtosSelecionados.size === produtos.length &&
-        produtosSelecionados.size > 0
+        totalQuantidadeDevolucao === totalQuantidadeNota &&
+        totalQuantidadeDevolucao > 0
       ) {
         setTipoDevolucao("total");
-      } else if (produtosSelecionados.size > 0) {
+      } else if (totalQuantidadeDevolucao > 0) {
         setTipoDevolucao("parcial");
       } else {
         setTipoDevolucao("");
       }
     }
-  }, [produtosSelecionados, produtos]);
+  }, [quantidadesDevolucao, produtos]);
 
   useEffect(() => {
     const fetchInfosNota = async () => {
@@ -279,7 +308,7 @@ export default function Solicitacao() {
   ]);
 
   useEffect(() => {
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [form.watch("motivo_devolucao"), arquivoNF]);
 
   const isButtonEnabled = () => {
@@ -332,6 +361,14 @@ export default function Solicitacao() {
 
         console.log("Produtos formatados:", produtosFormatados);
         setProdutos(produtosFormatados);
+
+        // Inicializar quantidades de devolução como zero
+        const quantidadesIniciais: Record<string, number> = {};
+        produtosFormatados.forEach((produto) => {
+          quantidadesIniciais[produto.codigo] = 0;
+        });
+        setQuantidadesDevolucao(quantidadesIniciais);
+
         setstatusCobranca1("hidden");
         setstatusCobranca2("display");
       } catch (error) {
@@ -363,7 +400,72 @@ export default function Solicitacao() {
     }
   }
 
-  // Função nova para salvar no banco, adptar ela em relação à antiga
+  // Funções para manipular quantidades de devolução
+  const aumentarQuantidade = (codigoProduto: string) => {
+    const produto = produtos.find((p) => p.codigo === codigoProduto);
+    if (produto) {
+      const quantidadeAtual = quantidadesDevolucao[codigoProduto] || 0;
+      const quantidadeMaxima = Number(produto.quantidade);
+      if (quantidadeAtual < quantidadeMaxima) {
+        setQuantidadesDevolucao((prev) => ({
+          ...prev,
+          [codigoProduto]: quantidadeAtual + 1,
+        }));
+      }
+    }
+  };
+
+  const diminuirQuantidade = (codigoProduto: string) => {
+    const quantidadeAtual = quantidadesDevolucao[codigoProduto] || 0;
+    if (quantidadeAtual > 0) {
+      setQuantidadesDevolucao((prev) => ({
+        ...prev,
+        [codigoProduto]: quantidadeAtual - 1,
+      }));
+    }
+  };
+
+  const alterarQuantidadeInput = (codigoProduto: string, valor: string) => {
+    const produto = produtos.find((p) => p.codigo === codigoProduto);
+    if (produto) {
+      const novaQuantidade = Math.max(
+        0,
+        Math.min(Number(valor) || 0, Number(produto.quantidade))
+      );
+      setQuantidadesDevolucao((prev) => ({
+        ...prev,
+        [codigoProduto]: novaQuantidade,
+      }));
+    }
+  };
+
+  const devolverTudo = (codigoProduto: string) => {
+    const produto = produtos.find((p) => p.codigo === codigoProduto);
+    if (produto) {
+      setQuantidadesDevolucao((prev) => ({
+        ...prev,
+        [codigoProduto]: Number(produto.quantidade),
+      }));
+    }
+  };
+
+  const alternarSelecaoTodos = () => {
+    if (todosSelecionados) {
+      // Desselecionar todos - zerar quantidades
+      const quantidadesZeradas: Record<string, number> = {};
+      produtos.forEach((produto) => {
+        quantidadesZeradas[produto.codigo] = 0;
+      });
+      setQuantidadesDevolucao(quantidadesZeradas);
+    } else {
+      // Selecionar todos - quantidade máxima
+      const novasQuantidades: Record<string, number> = {};
+      produtos.forEach((produto) => {
+        novasQuantidades[produto.codigo] = Number(produto.quantidade);
+      });
+      setQuantidadesDevolucao(novasQuantidades);
+    }
+  };
 
   async function onSubmit(data: z.infer<typeof formSchema>) {
     console.log("onSubmit chamado com os dados:", data); // Debug
@@ -395,8 +497,8 @@ export default function Solicitacao() {
       // Adicionar dados dos produtos
       formData.append("produtos", JSON.stringify(produtos));
       formData.append(
-        "produtosSelecionados",
-        JSON.stringify(Array.from(produtosSelecionados))
+        "quantidadesDevolucao",
+        JSON.stringify(quantidadesDevolucao)
       );
 
       // Adicionar arquivo da nota fiscal se existir
@@ -409,7 +511,7 @@ export default function Solicitacao() {
         filial: formData.get("filial"),
         numero_nf: formData.get("numero_nf"),
         produtos: formData.get("produtos"),
-        produtosSelecionados: formData.get("produtosSelecionados"),
+        quantidadesDevolucao: formData.get("quantidadesDevolucao"),
       });
 
       const response = await fetch("/api/registerSolicitacao", {
@@ -432,14 +534,15 @@ export default function Solicitacao() {
       const result = await response.json();
       console.log("Registro realizado com sucesso:", result);
 
-      // Mostrar toast de sucesso
-      setToast({
-        message: `Solicitação criada com sucesso! ${result.produtosSalvos} produtos salvos, ${result.produtosRetornados} para devolução.`,
-        type: "success",
-      });
-
-      // Redirecionar ou limpar formulário
-      // window.location.href = "/solicitacoes";
+      // Salvar mensagem do toast no localStorage antes do reload
+      if (typeof window !== "undefined") {
+        localStorage.setItem(
+          "solicitacao-toast-message",
+          `Solicitação criada com sucesso! ${result.produtosSalvos} produtos salvos, ${result.produtosRetornados} para devolução.`
+        );
+        localStorage.setItem("solicitacao-toast-type", "success");
+      }
+      window.location.reload();
     } catch (error) {
       console.error("Erro ao criar registro:", error);
       setToast({
@@ -539,7 +642,7 @@ export default function Solicitacao() {
         {statusCobranca1 === "display" && (
           <div className="max-w-4xl mx-auto">
             <Card className="bg-slate-800/50 border-slate-700 p-4">
-              <CardHeader>
+              <CardHeader className="flex flex-col w-full p-0 justify-start">
                 <CardTitle className="text-white flex items-center gap-2">
                   <Search className="h-5 w-5" />
                   Buscar Nota Fiscal
@@ -797,32 +900,51 @@ export default function Solicitacao() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="mx-6 min-h-[120px]">
-                <Select value={tipoDevolucao} disabled>
-                  <SelectTrigger className="bg-slate-700 border-slate-600 text-white opacity-100 cursor-not-allowed">
-                    <SelectValue placeholder="Selecione produtos para determinar o tipo" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-slate-700 border-slate-600">
-                    <SelectItem value="total" className="text-white">
-                      <div className="flex items-center gap-2">
-                        <CheckCircle2 className="h-4 w-4 text-green-400" />
-                        Devolução Total
+                <div
+                  className={`flex items-center gap-3 p-4 rounded-lg border transition-all duration-200 ${
+                    tipoDevolucao === "total"
+                      ? "bg-green-500/20 border-green-500/30"
+                      : tipoDevolucao === "parcial"
+                      ? "bg-orange-500/20 border-orange-500/30"
+                      : "bg-slate-700/50 border-slate-600"
+                  }`}
+                >
+                  {tipoDevolucao === "total" ? (
+                    <>
+                      <CheckCircle2 className="h-5 w-5 text-green-400" />
+                      <div>
+                        <span className="text-white font-medium">
+                          Devolução Total
+                        </span>
+                        <p className="text-sm text-slate-400 mt-1">
+                          Todos os produtos foram selecionados para devolução
+                        </p>
                       </div>
-                    </SelectItem>
-                    <SelectItem value="parcial" className="text-white">
-                      <div className="flex items-center gap-2">
-                        <XCircle className="h-4 w-4 text-orange-400" />
-                        Devolução Parcial
+                    </>
+                  ) : tipoDevolucao === "parcial" ? (
+                    <>
+                      <XCircle className="h-5 w-5 text-orange-400" />
+                      <div>
+                        <span className="text-white font-medium">
+                          Devolução Parcial
+                        </span>
+                        <p className="text-sm text-slate-400 mt-1">
+                          Alguns produtos foram selecionados para devolução
+                        </p>
                       </div>
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-                <div className="mt-2 h-6 flex items-center">
-                  {tipoDevolucao && (
-                    <p className="text-sm text-slate-400">
-                      {tipoDevolucao === "total"
-                        ? "Todos os produtos foram selecionados para devolução"
-                        : "Alguns produtos foram selecionados para devolução"}
-                    </p>
+                    </>
+                  ) : (
+                    <>
+                      <AlertCircle className="h-5 w-5 text-slate-400" />
+                      <div>
+                        <span className="text-slate-400 font-medium">
+                          Nenhum produto selecionado
+                        </span>
+                        <p className="text-sm text-slate-500 mt-1">
+                          Selecione produtos para determinar o tipo de devolução
+                        </p>
+                      </div>
+                    </>
                   )}
                 </div>
               </CardContent>
@@ -838,48 +960,49 @@ export default function Solicitacao() {
                       Produtos da Nota Fiscal
                     </CardTitle>
                     <CardDescription className="text-slate-400">
-                      Selecione os produtos que deseja devolver
+                      Defina as quantidades dos produtos que deseja devolver
                     </CardDescription>
                   </div>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => {
-                      if (produtosSelecionados.size === produtos.length) {
-                        setProdutosSelecionados(new Set());
-                      } else {
-                        setProdutosSelecionados(
-                          new Set(produtos.map((p) => p.codigo))
-                        );
+                  <div className="flex gap-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={alternarSelecaoTodos}
+                      className={
+                        todosSelecionados
+                          ? "text-white/90 hover:text-white/60 border-yellow-500/50 hover:bg-yellow-600/50 bg-yellow-500/50"
+                          : "text-white/90 hover:text-white/60 border-green-500/50 hover:bg-green-600/50 bg-green-500/50"
                       }
-                    }}
-                    className={`border-slate-600 hover:bg-slate-600 transition-colors hover:text-slate-200 cursor-pointer ${
-                      produtosSelecionados.size === produtos.length &&
-                      produtos.length > 0
-                        ? "bg-green-600/20 text-green-400 border-green-500/50 hover:bg-green-600/30"
-                        : produtosSelecionados.size > 0
-                        ? "bg-yellow-600/20 text-yellow-400 border-yellow-500/50 hover:bg-yellow-600/30"
-                        : "bg-slate-700 text-slate-300"
-                    }`}
-                  >
-                    {produtosSelecionados.size === produtos.length &&
-                    produtos.length > 0
-                      ? "Desselecionar Todos"
-                      : "Selecionar Todos"}
-                  </Button>
+                    >
+                      {todosSelecionados ? (
+                        <>
+                          <XCircle className="h-4 w-4 mr-2" />
+                          Desselecionar Tudo
+                        </>
+                      ) : (
+                        <>
+                          <CheckCircle2 className="h-4 w-4 mr-2" />
+                          Selecionar Tudo
+                        </>
+                      )}
+                    </Button>
+                  </div>
                 </div>
               </CardHeader>
               <CardContent>
                 <Table>
                   <TableHeader>
                     <TableRow className="border-slate-700 hover:bg-slate-700/50">
-                      <TableHead className="text-slate-300">
-                        Selecionar
-                      </TableHead>
-                      <TableHead className="text-slate-300">Código</TableHead>
+                      <TableHead className="text-slate-300 text-center">Código</TableHead>
                       <TableHead className="text-slate-300">Produto</TableHead>
                       <TableHead className="text-slate-300 text-center">
-                        Quantidade
+                        Qtd. Total
+                      </TableHead>
+                      <TableHead className="text-slate-300 text-center">
+                        Qtd. a Devolver
+                      </TableHead>
+                      <TableHead className="text-slate-300 text-center">
+                        Ações
                       </TableHead>
                       <TableHead className="text-slate-300 text-center">
                         Preço Unit.
@@ -891,77 +1014,178 @@ export default function Solicitacao() {
                   </TableHeader>
                   <TableBody>
                     {Array.isArray(produtos) && produtos.length > 0 ? (
-                      produtos.map((p) => (
-                        <TableRow
-                          key={p.codigo}
-                          className="border-slate-700 hover:bg-slate-700/50 cursor-pointer transition-colors"
-                          onClick={() => {
-                            const newSelecionados = new Set(
-                              produtosSelecionados
-                            );
-                            if (produtosSelecionados.has(p.codigo)) {
-                              newSelecionados.delete(p.codigo);
-                            } else {
-                              newSelecionados.add(p.codigo);
-                            }
-                            setProdutosSelecionados(newSelecionados);
-                          }}
-                        >
-                          <TableCell>
-                            <div className="flex items-center justify-center">
-                              <Checkbox
-                                checked={produtosSelecionados.has(p.codigo)}
-                                onCheckedChange={(checked) => {
-                                  const newSelecionados = new Set(
-                                    produtosSelecionados
-                                  );
-                                  if (checked) {
-                                    newSelecionados.add(p.codigo);
-                                  } else {
-                                    newSelecionados.delete(p.codigo);
+                      produtos.map((p) => {
+                        const qtdSelecionada =
+                          quantidadesDevolucao[p.codigo] || 0;
+                        const qtdTotal = Number(p.quantidade);
+                        const isCompleto =
+                          qtdSelecionada === qtdTotal && qtdSelecionada > 0;
+                        const isParcial =
+                          qtdSelecionada > 0 && qtdSelecionada < qtdTotal;
+                        const isVazio = qtdSelecionada === 0;
+
+                        return (
+                          <TableRow
+                            key={p.codigo}
+                            className={`border-slate-700 transition-all duration-200 ${
+                              isCompleto
+                                ? "bg-green-500/10 hover:bg-green-500/20 border-green-500/30"
+                                : isParcial
+                                ? "bg-orange-500/10 hover:bg-orange-500/20 border-orange-500/30"
+                                : "hover:bg-slate-700/50"
+                            }`}
+                          >
+                            <TableCell>
+                              <div className="flex items-center gap-2">
+                                {isCompleto && (
+                                  <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+                                )}
+                                {isParcial && (
+                                  <div className="w-2 h-2 bg-orange-400 rounded-full animate-pulse" />
+                                )}
+                                {isVazio && (
+                                  <div className="w-2 h-2 bg-slate-500 rounded-full" />
+                                )}
+                                <Badge
+                                  variant="outline"
+                                  className={`text-slate-300 border-slate-600 ${
+                                    isCompleto
+                                      ? "border-green-500/50 text-green-300"
+                                      : isParcial
+                                      ? "border-orange-500/50 text-orange-300"
+                                      : ""
+                                  }`}
+                                >
+                                  {p.codigo}
+                                </Badge>
+                              </div>
+                            </TableCell>
+                            <TableCell className="text-white font-medium">
+                              {p.descricao}
+                            </TableCell>
+                            <TableCell className="text-center text-slate-300">
+                              <Badge
+                                variant="outline"
+                                className="text-blue-400 border-blue-500/50"
+                              >
+                                {p.quantidade}
+                              </Badge>
+                            </TableCell>
+                            <TableCell className="text-center">
+                              <div className="flex items-center justify-center">
+                                <Button
+                                  type="button"
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => diminuirQuantidade(p.codigo)}
+                                  disabled={qtdSelecionada <= 0}
+                                  className={`h-8 w-8 p-0 rounded-l-lg transition-all duration-200 rounded-r-none ${
+                                    qtdSelecionada <= 0
+                                      ? "border-slate-600 bg-slate-700/50 text-slate-500 cursor-not-allowed"
+                                      : "border-red-500/50 bg-red-500/10 text-red-400 hover:bg-red-500/25 hover:border-red-400/70 hover:text-red-300 active:scale-95"
+                                  }`}
+                                >
+                                  <Minus className="h-4 w-4" />
+                                </Button>
+                                <Input
+                                  type="number"
+                                  min="0"
+                                  max={p.quantidade}
+                                  value={qtdSelecionada}
+                                  onChange={(e) =>
+                                    alterarQuantidadeInput(
+                                      p.codigo,
+                                      e.target.value
+                                    )
                                   }
-                                  setProdutosSelecionados(newSelecionados);
-                                }}
-                                onClick={(e) => e.stopPropagation()} // Previne duplo toggle quando clica na checkbox
-                                className={`h-4 w-4 ${
-                                  produtos.length > 0 &&
-                                  produtosSelecionados.size ===
-                                    produtos.length &&
-                                  produtosSelecionados.size > 0
-                                    ? "data-[state=checked]:bg-green-500 data-[state=checked]:border-green-500"
-                                    : "data-[state=checked]:bg-yellow-500 data-[state=checked]:border-yellow-500"
+                                  className={`w-16 h-8 text-center rounded-none text-white no-spinner font-medium transition-all duration-200 ${
+                                    isCompleto
+                                      ? "bg-green-600/20 border-green-500/50 text-green-200 focus:border-green-400/70 focus:bg-green-600/30"
+                                      : isParcial
+                                      ? "bg-orange-600/20 border-orange-500/50 text-orange-200 focus:border-orange-400/70 focus:bg-orange-600/30"
+                                      : "bg-slate-700 border-slate-600 focus:border-blue-500/50 focus:bg-slate-600"
+                                  }`}
+                                />
+                                <Button
+                                  type="button"
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => aumentarQuantidade(p.codigo)}
+                                  disabled={qtdSelecionada >= qtdTotal}
+                                  className={`h-8 w-8 p-0 rounded-r-lg transition-all duration-200 rounded-l-none ${
+                                    qtdSelecionada >= qtdTotal
+                                      ? "border-slate-600 bg-slate-700/50 text-slate-500 cursor-not-allowed"
+                                      : "border-green-500/50 bg-green-500/10 text-green-400 hover:bg-green-500/25 hover:border-green-400/70 hover:text-green-300 active:scale-95"
+                                  }`}
+                                >
+                                  <Plus className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            </TableCell>
+                            <TableCell className="text-center">
+                              <div className="flex gap-1 justify-center">
+                                <div className="group relative">
+                                  <Button
+                                    type="button"
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={() => devolverTudo(p.codigo)}
+                                    disabled={isCompleto}
+                                    className={`text-xs transition-all duration-200 ${
+                                      isCompleto
+                                        ? "bg-green-600/30 text-green-300 border-green-500/50 cursor-not-allowed opacity-50"
+                                        : "bg-green-600/20 text-green-400 border-green-500/50 hover:bg-green-600/40 hover:text-green-300 hover:border-green-400/70"
+                                    }`}
+                                  >
+                                    <SquareCheck className="h-4 w-4" />
+                                  </Button>
+                                </div>
+                                <div className="group relative">
+                                  <Button
+                                    type="button"
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={() => {
+                                      setQuantidadesDevolucao((prev) => ({
+                                        ...prev,
+                                        [p.codigo]: 0,
+                                      }));
+                                    }}
+                                    disabled={isVazio}
+                                    className={`text-xs transition-all duration-200 ${
+                                      isVazio
+                                        ? "bg-red-600/30 text-red-300 border-red-500/50 cursor-not-allowed opacity-50"
+                                        : "bg-red-600/20 text-red-400 border-red-500/50 hover:bg-red-600/40 hover:text-red-300 hover:border-red-400/70"
+                                    }`}
+                                  >
+                                    <SquareX className="h-4 w-4" />
+                                  </Button>
+                                </div>
+                              </div>
+                            </TableCell>
+                            <TableCell className="text-center text-slate-300">
+                              {formatPrice(Number(p.punit))}
+                            </TableCell>
+                            <TableCell className="text-center">
+                              <span
+                                className={`text-xl font-bold transition-colors duration-200 ${
+                                  isCompleto
+                                    ? "text-green-400"
+                                    : isParcial
+                                    ? "text-orange-400"
+                                    : "text-white"
                                 }`}
-                              />
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <Badge
-                              variant="outline"
-                              className="text-slate-300 border-slate-600"
-                            >
-                              {p.codigo}
-                            </Badge>
-                          </TableCell>
-                          <TableCell className="text-white font-medium">
-                            {p.descricao}
-                          </TableCell>
-                          <TableCell className="text-center text-slate-300">
-                            {p.quantidade}
-                          </TableCell>
-                          <TableCell className="text-center text-slate-300">
-                            {formatPrice(Number(p.punit))}
-                          </TableCell>
-                          <TableCell className="text-center text-white font-medium">
-                            {formatPrice(
-                              Number(p.punit) * Number(p.quantidade)
-                            )}
-                          </TableCell>
-                        </TableRow>
-                      ))
+                              >
+                                {formatPrice(Number(p.punit) * qtdSelecionada)}
+                              </span>
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })
                     ) : (
                       <TableRow className="hover:bg-slate-700/50">
                         <TableCell
-                          colSpan={6}
+                          colSpan={7}
                           className="text-center py-8 text-slate-400"
                         >
                           Nenhum produto encontrado
@@ -971,24 +1195,22 @@ export default function Solicitacao() {
                   </TableBody>
                   <TableFooter>
                     <TableRow className="bg-slate-800 hover:bg-slate-700">
-                      <TableCell colSpan={5} className="text-right">
+                      <TableCell colSpan={6} className="text-right">
                         <div className="flex items-center justify-end gap-2">
                           <Calculator className="h-4 w-4 text-slate-400" />
                           <span className="text-white font-bold">
-                            Total Selecionado:
+                            Total a Devolver:
                           </span>
                         </div>
                       </TableCell>
                       <TableCell className="text-center w-[20%]">
                         <span className="text-xl font-bold text-green-400">
                           {formatPrice(
-                            produtos
-                              .filter((p) => produtosSelecionados.has(p.codigo))
-                              .reduce(
-                                (acc, p) =>
-                                  acc + Number(p.punit) * Number(p.quantidade),
-                                0
-                              )
+                            produtos.reduce((acc, p) => {
+                              const qtdDevolucao =
+                                quantidadesDevolucao[p.codigo] || 0;
+                              return acc + Number(p.punit) * qtdDevolucao;
+                            }, 0)
                           )}
                         </span>
                       </TableCell>
@@ -1002,15 +1224,24 @@ export default function Solicitacao() {
             <div className="flex justify-end mt-6">
               <Button
                 type="button"
-                disabled={produtosSelecionados.size === 0 || !tipoDevolucao}
+                disabled={
+                  Object.values(quantidadesDevolucao).reduce(
+                    (acc, qtd) => acc + qtd,
+                    0
+                  ) === 0 || !tipoDevolucao
+                }
                 onClick={async () => {
                   console.log("Botão clicado!");
                   console.log(
-                    "produtosSelecionados.size:",
-                    produtosSelecionados.size
+                    "Total quantidade devolução:",
+                    Object.values(quantidadesDevolucao).reduce(
+                      (acc, qtd) => acc + qtd,
+                      0
+                    )
                   );
                   console.log("tipoDevolucao:", tipoDevolucao);
                   console.log("produtos:", produtos);
+                  console.log("quantidadesDevolucao:", quantidadesDevolucao);
 
                   // Verificar erros do formulário
                   const formErrors = form.formState.errors;
@@ -1057,8 +1288,8 @@ export default function Solicitacao() {
                     formData.append("cod_cliente", numeroCodigoCliente);
                     formData.append("produtos", JSON.stringify(produtos));
                     formData.append(
-                      "produtosSelecionados",
-                      JSON.stringify(Array.from(produtosSelecionados))
+                      "quantidadesDevolucao",
+                      JSON.stringify(quantidadesDevolucao)
                     );
 
                     // Adicionar arquivo da nota fiscal se existir
@@ -1086,10 +1317,15 @@ export default function Solicitacao() {
 
                     const result = await response.json();
                     console.log("Resultado da API:", result);
-                    setToast({
-                      message: `Solicitação criada com sucesso! ${result.produtosSalvos} produtos salvos, ${result.produtosRetornados} para devolução.`,
-                      type: "success",
-                    });
+                    // Salvar mensagem do toast no localStorage antes do reload
+                    if (typeof window !== "undefined") {
+                      localStorage.setItem(
+                        "solicitacao-toast-message",
+                        `Solicitação criada com sucesso! ${result.produtosSalvos} produtos salvos, ${result.produtosRetornados} para devolução.`
+                      );
+                      localStorage.setItem("solicitacao-toast-type", "success");
+                    }
+                    window.location.reload();
                   } catch (altError) {
                     console.error("Erro no método alternativo:", altError);
                     setToast({
