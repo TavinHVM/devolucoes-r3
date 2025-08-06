@@ -134,14 +134,13 @@ export function ProdutosCard({ numeroNF }: ProdutosCardProps) {
                         </TableCell>
                         <TableCell className="text-center">
                             <Badge
-                            variant={isRetornado ? "default" : "secondary"}
                             className={
                                 isRetornado
-                                ? "bg-red-500/20 text-red-400 border-red-500/50"
-                                : "bg-green-500/20 text-green-400 border-green-500/50"
+                                ? "bg-red-500/20 text-red-400 border-red-500/50 w-[100%]"
+                                : "bg-green-500/20 text-green-400 border-green-500/50 w-[100%]"
                             }
                             >
-                            {isRetornado ? "Para Devolução" : "Normal"}
+                            {isRetornado ? "Devolução" : "Normal"}
                             </Badge>
                         </TableCell>
                         </TableRow>

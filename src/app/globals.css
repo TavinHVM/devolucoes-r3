@@ -155,3 +155,16 @@ html, body, #__next {
   background: #475569;
 }
 
+@layer utilities {
+  .no-spinner {
+    appearance: none;
+    -moz-appearance: textfield;
+  }
+
+  .no-spinner::-webkit-outer-spin-button,
+  .no-spinner::-webkit-inner-spin-button {
+    appearance: none;
+    margin: 0;
+  }
+}
+
