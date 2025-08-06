@@ -26,6 +26,7 @@ export function EditUserModal({ user, onOpenChange, onSubmit }: EditUserModalPro
     role: '',
     user_level: '',
     email: '',
+    password: '', // Opcional para edição
   });
 
   useEffect(() => {
@@ -36,6 +37,7 @@ export function EditUserModal({ user, onOpenChange, onSubmit }: EditUserModalPro
         role: user.role,
         user_level: user.user_level,
         email: user.email,
+        password: '', // Não preencher senha existente por segurança
       });
     }
   }, [user]);
@@ -43,8 +45,14 @@ export function EditUserModal({ user, onOpenChange, onSubmit }: EditUserModalPro
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
-    
-    const success = await onSubmit(Number(user.id), form);
+
+    // Remove password do form se estiver vazia (mantém senha atual)
+    const formData = { ...form };
+    if (!formData.password || formData.password.trim() === '') {
+      delete formData.password;
+    }
+
+    const success = await onSubmit(Number(user.id), formData);
     if (success) {
       onOpenChange(false);
     }
@@ -62,7 +70,7 @@ export function EditUserModal({ user, onOpenChange, onSubmit }: EditUserModalPro
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="edit_first_name" className="text-slate-300">Nome</Label>
+              <Label htmlFor="edit_first_name" className="text-slate-300 mb-1">Nome</Label>
               <Input
                 id="edit_first_name"
                 value={form.first_name}
@@ -72,7 +80,7 @@ export function EditUserModal({ user, onOpenChange, onSubmit }: EditUserModalPro
               />
             </div>
             <div>
-              <Label htmlFor="edit_last_name" className="text-slate-300">Sobrenome</Label>
+              <Label htmlFor="edit_last_name" className="text-slate-300 mb-1">Sobrenome</Label>
               <Input
                 id="edit_last_name"
                 value={form.last_name}
@@ -82,9 +90,9 @@ export function EditUserModal({ user, onOpenChange, onSubmit }: EditUserModalPro
               />
             </div>
           </div>
-          
+
           <div>
-            <Label htmlFor="edit_email" className="text-slate-300">E-mail</Label>
+            <Label htmlFor="edit_email" className="text-slate-300 mb-1">E-mail</Label>
             <Input
               id="edit_email"
               type="email"
@@ -94,9 +102,21 @@ export function EditUserModal({ user, onOpenChange, onSubmit }: EditUserModalPro
               required
             />
           </div>
-          
+
           <div>
-            <Label htmlFor="edit_role" className="text-slate-300">Cargo</Label>
+            <Label htmlFor="edit_password" className="text-slate-300 mb-1">Nova Senha (opcional)</Label>
+            <Input
+              id="edit_password"
+              type="password"
+              value={form.password || ''}
+              onChange={e => setForm(f => ({ ...f, password: e.target.value }))}
+              className="bg-slate-700 border-slate-600 text-white"
+              placeholder="Deixe em branco para manter a senha atual"
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="edit_role" className="text-slate-300 mb-1">Cargo</Label>
             <Input
               id="edit_role"
               value={form.role}
@@ -105,11 +125,11 @@ export function EditUserModal({ user, onOpenChange, onSubmit }: EditUserModalPro
               required
             />
           </div>
-          
+
           <div>
-            <Label className="text-slate-300">Nível de Acesso</Label>
+            <Label className="text-slate-300 mb-1">Nível de Acesso</Label>
             <CustomSelect value={form.user_level} onValueChange={value => setForm(f => ({ ...f, user_level: value }))}>
-              <SelectTrigger className="bg-slate-700 border-slate-600 text-white">
+              <SelectTrigger className="bg-slate-700 border-slate-600 text-white w-full">
                 <SelectValue placeholder="Selecione o nível" />
               </SelectTrigger>
               <SelectContent className="bg-slate-700 border-slate-600">
@@ -120,7 +140,7 @@ export function EditUserModal({ user, onOpenChange, onSubmit }: EditUserModalPro
               </SelectContent>
             </CustomSelect>
           </div>
-          
+
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="bg-slate-700 border-slate-600 text-slate-300">
               Cancelar
