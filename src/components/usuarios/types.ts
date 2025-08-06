@@ -13,7 +13,9 @@ export interface CreateUserForm extends Omit<Usuario, 'id' | 'created_at'> {
   password: string;
 }
 
-export interface EditUserForm extends Omit<Usuario, 'id' | 'created_at'> {}
+export interface EditUserForm extends Omit<Usuario, 'id' | 'created_at'> {
+  password?: string; // Senha opcional para edição
+}
 
 export interface ToastMessage {
   message: string;

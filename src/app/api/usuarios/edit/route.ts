@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
+import bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
 
@@ -16,10 +17,20 @@ export async function PUT(request: Request) {
       );
     }
 
+    // Se uma nova senha foi fornecida, fazer hash dela
+    const updateData = { ...data };
+    if (data.password && data.password.trim() !== '') {
+      const saltRounds = 10;
+      updateData.password = await bcrypt.hash(data.password, saltRounds);
+    } else {
+      // Se não foi fornecida senha, remover do objeto de atualização
+      delete updateData.password;
+    }
+
     const updatedUser = await prisma.user_profiles.update({
       where: { id: Number(id) },
       data: {
-        ...data,
+        ...updateData,
         updated_at: new Date()
       }
     });
