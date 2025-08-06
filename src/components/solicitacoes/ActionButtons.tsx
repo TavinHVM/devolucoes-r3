@@ -135,10 +135,6 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
                     value={motivoRecusa}
                     onChange={(e) => setMotivoRecusa(e.target.value)}
                   />
-                  <FileUploadNFDevRecibo
-                    onFilesChange={(files) => setSelectedFiles(files)}
-                    onValidationChange={(isValid) => setFilesValid(isValid)}
-                  />
                   <Button
                     className="bg-red-600 hover:bg-red-700 text-white font-bold w-full mt-2"
                     onClick={() => RecusarSolicitacao(id, motivoRecusa)}
