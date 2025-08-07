@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { Users } from 'lucide-react';
 import Header from '../../components/header';
+import ProtectedRoute from '../../components/ProtectedRoute';
 import {
   UsuariosStats,
   UsuariosControls,
@@ -16,6 +17,14 @@ import {
 } from '../../components/usuarios';
 
 export default function Usuarios() {
+  return (
+    <ProtectedRoute>
+      <UsuariosContent />
+    </ProtectedRoute>
+  );
+}
+
+function UsuariosContent() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedLevel, setSelectedLevel] = useState<string>('all');
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -58,8 +67,6 @@ export default function Usuarios() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
       <Header />
-      
-      {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
       
       <div className="container mx-auto px-4 py-8">
         {/* Header Section */}
@@ -109,6 +116,8 @@ export default function Usuarios() {
           onConfirm={handleDeleteUser}
         />
       </div>
+      
+      {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
     </div>
   );
 }

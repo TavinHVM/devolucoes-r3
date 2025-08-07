@@ -13,6 +13,7 @@ import { Textarea } from "../../components/ui/textarea";
 import { Badge } from "../../components/ui/badge";
 import { useForm } from "react-hook-form";
 import Header from "../../components/header";
+import ProtectedRoute from "../../components/ProtectedRoute";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -144,6 +145,14 @@ export async function fetchInfosNF(numnota: string): Promise<InfosNF | null> {
 }
 
 export default function Solicitacao() {
+  return (
+    <ProtectedRoute>
+      <SolicitacaoContent />
+    </ProtectedRoute>
+  );
+}
+
+function SolicitacaoContent() {
   const [toast, setToast] = useState<{
     message: string;
     type: "success" | "error";
