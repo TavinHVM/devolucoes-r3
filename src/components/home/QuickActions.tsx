@@ -2,6 +2,8 @@ import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Button } from "../ui/button";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/contexts/AuthContext";
+import { isUserAdmin } from "@/lib/auth";
 import {
   FileText,
   Plus,
@@ -11,6 +13,8 @@ import {
 
 export const QuickActions: React.FC = () => {
   const router = useRouter();
+  const { user } = useAuth();
+  const isAdmin = isUserAdmin(user);
 
   const quickActions = [
     {
@@ -33,8 +37,12 @@ export const QuickActions: React.FC = () => {
       icon: Users,
       href: '/usuarios',
       color: 'bg-purple-500 hover:bg-purple-600',
+      adminOnly: true,
     },
   ];
+
+  // Filter actions based on user level
+  const filteredActions = quickActions.filter(action => !action.adminOnly || isAdmin);
 
   return (
     <Card className="bg-slate-800/50 border-slate-700">
@@ -45,14 +53,14 @@ export const QuickActions: React.FC = () => {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 px-4">
-          {quickActions.map((action, index) => {
+        <div className={`grid grid-cols-1 ${filteredActions.length === 2 ? 'md:grid-cols-2' : 'md:grid-cols-3'} gap-4 px-4`}>
+          {filteredActions.map((action, index) => {
             const IconComponent = action.icon;
             return (
               <Button
                 key={index}
                 variant="ghost"
-                className={`h-auto p-6 flex flex-col items-center gap-3 ${action.color} text-white hover:text-white transition-all duration-200 hover:scale-105`}
+                className={`h-auto p-6 flex flex-col items-center gap-3 ${action.color} text-white hover:text-white transition-all duration-200 hover:scale-105 w-full`}
                 onClick={() => router.push(action.href)}
               >
                 <IconComponent className="h-8 w-8" />
