@@ -54,7 +54,7 @@ export const SystemStatus: React.FC = () => {
               <span className="text-purple-400 font-medium text-sm">Versão</span>
             </div>
             <p className="text-slate-300 text-sm">
-              v2.1.0 - Em constante desenvolvimento
+              v1.0 - Em constante desenvolvimento
             </p>
           </div>
         </div>
