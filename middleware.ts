@@ -14,6 +14,7 @@ interface UserTokenPayload {
 export function middleware(request: NextRequest) {
   const publicPaths = ["/login", "/reset-password", "/debug", "/test-login"];
   const adminOnlyPaths = ["/usuarios"];
+  const createSolicitacaoRestricted = ["/criar-solicitacao"];
   const adminOnlyApiPaths = ["/api/usuarios", "/api/usuarios/create", "/api/usuarios/edit", "/api/usuarios/delete"];
   const pathname = request.nextUrl.pathname;
 
@@ -52,6 +53,7 @@ export function middleware(request: NextRequest) {
     // Verificar se é uma rota/API que requer permissão de admin
     const isAdminOnlyPage = adminOnlyPaths.some(path => pathname.startsWith(path));
     const isAdminOnlyApi = adminOnlyApiPaths.some(path => pathname.startsWith(path));
+    const isCreateSolicitacaoPage = createSolicitacaoRestricted.some(path => pathname.startsWith(path));
     
     if ((isAdminOnlyPage || isAdminOnlyApi) && payload.user_level !== 'adm') {
       console.log("Acesso negado: usuário não é admin");
@@ -60,6 +62,12 @@ export function middleware(request: NextRequest) {
       } else {
         return NextResponse.redirect(new URL("/", request.url));
       }
+    }
+
+    // Verificar se é uma rota que requer permissão para criar solicitações (não pode ser financeiro)
+    if (isCreateSolicitacaoPage && payload.role === 'financeiro') {
+      console.log("Acesso negado: usuário financeiro não pode criar solicitações");
+      return NextResponse.redirect(new URL("/", request.url));
     }
 
     // Adicionar dados do usuário aos headers para as páginas

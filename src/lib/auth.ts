@@ -52,3 +52,8 @@ export function isUserAdmin(user: User | null): boolean {
   if (!user) return false;
   return user.user_level === 'adm';
 }
+
+export function canCreateSolicitacao(user: User | null): boolean {
+  if (!user) return false;
+  return user.user_level !== 'financeiro';
+}
