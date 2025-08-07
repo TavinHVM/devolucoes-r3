@@ -5,19 +5,22 @@ import db from "@/lib/db";
 import { validateUserPermission } from "@/utils/permissions/serverPermissions";
 
 export async function POST(request: Request) {
+  try {
     // Validate user permissions
-    const permissionCheck = validateUserPermission(request as unknown as import('next/server').NextRequest, 'aprovar');
-    
+    const permissionCheck = validateUserPermission(
+      request as unknown as import("next/server").NextRequest,
+      "aprovar"
+    );
+
     if (!permissionCheck.success) {
-        return NextResponse.json(
-            { error: permissionCheck.error },
-            { status: 403 }
-        );
+      return NextResponse.json(
+        { error: permissionCheck.error },
+        { status: 403 }
+      );
     }
 
     const url = new URL(request.url);
-    try {
-        const id: number = parseInt(url.pathname.split("/").pop() || "0", 10);
+    const id: number = parseInt(url.pathname.split("/").pop() || "0", 10);
 
     const solicitacao = await db.solicitacoes.findUnique({
       where: {
@@ -31,7 +34,10 @@ export async function POST(request: Request) {
 
     if (!solicitacao) {
       console.log("Solicitação não encontrada");
-      return NextResponse.json([], { status: 404 });
+      return NextResponse.json(
+        { error: "Solicitação não encontrada" },
+        { status: 404 }
+      );
     }
 
     const statusOnData = solicitacao.status.toUpperCase();
@@ -48,6 +54,7 @@ export async function POST(request: Request) {
       "arquivo_nf_devolucao"
     ) as File | null;
     const arquivoRecibo = formData.get("arquivo_recibo") as File | null;
+    const vale = formData.get("vale") as string | null;
 
     // Converter arquivos para Buffer se existirem
     let arquivoNfBuffer: Buffer | null = null;
@@ -77,15 +84,20 @@ export async function POST(request: Request) {
         aprovada_at: new Date(),
         arquivo_nf_devolucao: arquivoNfBuffer,
         arquivo_recibo: arquivoReciboBuffer,
+        vale: vale,
       },
     });
 
     console.log("Solicitação Aprovada!");
-    return NextResponse.json(solicitacao);
+    return NextResponse.json({
+      success: true,
+      message: "Solicitação aprovada com sucesso",
+      id: solicitacao.id,
+    });
   } catch (error) {
-    console.error("Erro ao buscar Solicitação:", error);
+    console.error("Erro ao aprovar solicitação:", error);
     return NextResponse.json(
-      { error: "Erro ao buscar Solicitação" },
+      { error: "Erro interno do servidor" },
       { status: 500 }
     );
   }

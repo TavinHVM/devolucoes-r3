@@ -1,7 +1,28 @@
+import { getStoredToken } from "@/lib/auth";
+
+// Função auxiliar para obter headers com token de autenticação
+function getAuthHeaders(includeContentType = true): Record<string, string> {
+  const token = getStoredToken();
+  const headers: Record<string, string> = {
+    "Cache-Control": "no-cache",
+  };
+
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+
+  if (includeContentType) {
+    headers["Content-Type"] = "application/json";
+  }
+
+  return headers;
+}
+
 export async function AprovarSolicitacao(
   id: number,
   nfDevolucao?: File,
-  recibo?: File
+  recibo?: File,
+  vale?: string
 ) {
   try {
     const formData = new FormData();
@@ -14,13 +35,18 @@ export async function AprovarSolicitacao(
       formData.append("arquivo_recibo", recibo);
     }
 
+    if (vale) {
+      formData.append("vale", vale);
+    }
+
+    // Para FormData, não incluímos Content-Type (o browser define automaticamente)
+    const authHeaders = getAuthHeaders(false);
+
     const response = await fetch(
       `/api/btnsSolicitacoes/aprovarSolicitacao/${id}`,
       {
         method: "POST",
-        headers: {
-          "Cache-Control": "no-cache",
-        },
+        headers: authHeaders,
         body: formData,
       }
     );
@@ -53,9 +79,7 @@ export async function RecusarSolicitacao(id: number, motivo_recusa: string) {
       `/api/btnsSolicitacoes/recusarSolicitacao/${id}`,
       {
         method: "POST",
-        headers: {
-          "Cache-Control": "no-cache",
-        },
+        headers: getAuthHeaders(true), // incluir Content-Type para JSON
         body: JSON.stringify({ motivo_recusa }),
       }
     );
@@ -73,10 +97,7 @@ export async function DesdobrarSolicitacao(id: number) {
       `/api/btnsSolicitacoes/desdobrarSolicitacao/${id}`,
       {
         method: "POST",
-        headers: {
-          "Cache-Control": "no-cache",
-        },
-        // cache: 'no-store',
+        headers: getAuthHeaders(false),
       }
     );
     if (!response.ok) {
@@ -96,10 +117,7 @@ export async function AbaterSolicitacao(id: number) {
       `/api/btnsSolicitacoes/abaterSolicitacao/${id}`,
       {
         method: "POST",
-        headers: {
-          "Cache-Control": "no-cache",
-        },
-        // cache: 'no-store',
+        headers: getAuthHeaders(false),
       }
     );
     if (!response.ok) {
@@ -116,10 +134,7 @@ export async function FinalizarSolicitacao(id: number) {
       `/api/btnsSolicitacoes/finalizarSolicitacao/${id}`,
       {
         method: "POST",
-        headers: {
-          "Cache-Control": "no-cache",
-        },
-        // cache: 'no-store',
+        headers: getAuthHeaders(false),
       }
     );
     if (!response.ok) {
@@ -139,10 +154,7 @@ export async function ReenviarSolicitacao(id: number) {
       `/api/btnsSolicitacoes/reenviarSolicitacao/${id}`,
       {
         method: "POST",
-        headers: {
-          "Cache-Control": "no-cache",
-        },
-        // cache: 'no-store',
+        headers: getAuthHeaders(false),
       }
     );
     if (!response.ok) {

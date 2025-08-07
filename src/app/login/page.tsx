@@ -1,11 +1,17 @@
-'use client';
-import { useRouter } from 'next/navigation';
-import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
-import { Input } from '../../components/ui/input';
-import { Button } from '../../components/ui/button';
-import { Label } from '../../components/ui/label';
-import { useForm, SubmitHandler, Controller } from 'react-hook-form';
-import { useState } from 'react';
+"use client";
+import { useRouter } from "next/navigation";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "../../components/ui/card";
+import { Input } from "../../components/ui/input";
+import { Button } from "../../components/ui/button";
+import { Label } from "../../components/ui/label";
+import { useForm, SubmitHandler, Controller } from "react-hook-form";
+import { useState, useEffect } from "react";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface LoginForm {
   email: string;
@@ -14,54 +20,58 @@ interface LoginForm {
 
 export default function Login() {
   const router = useRouter();
+  const { login, isAuthenticated, isLoading: authLoading } = useAuth();
   const form = useForm<LoginForm>({
     defaultValues: {
-      email: '',
-      password: '',
+      email: "",
+      password: "",
     },
   });
   const [showForgot, setShowForgot] = useState(false);
-  const [forgotEmail, setForgotEmail] = useState('');
+  const [forgotEmail, setForgotEmail] = useState("");
   const [forgotStatus, setForgotStatus] = useState<string | null>(null);
   const [loginError, setLoginError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+
+  // Redirecionar se já estiver autenticado
+  useEffect(() => {
+    if (!authLoading && isAuthenticated) {
+      router.push("/");
+    }
+  }, [isAuthenticated, authLoading, router]);
 
   const onSubmit: SubmitHandler<LoginForm> = async (data) => {
     setIsLoading(true);
     setLoginError(null);
 
     try {
-      const response = await fetch('/api/usuarios/login', {
-        method: 'POST',
+      const response = await fetch("/api/usuarios/login", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(data),
+        credentials: "include", // Importante para cookies
       });
 
       const result = await response.json();
 
       if (response.ok) {
-        // Login bem-sucedido
-        localStorage.setItem('user', JSON.stringify(result.user));
-        localStorage.setItem('token', result.token);
+        // Login bem-sucedido - usar o AuthContext
+        console.log("Login bem-sucedido:", result);
+        login(result.user, result.token);
 
-        console.log('Login bem-sucedido, dados salvos no localStorage');
-        console.log('Usuário:', result.user);
-        console.log('Token:', result.token);
-
-        // Aguardar um momento para garantir que o localStorage foi salvo
+        // Aguardar um momento para o estado ser atualizado
         setTimeout(() => {
-          console.log('Redirecionando para home...');
-          router.push('/');
+          router.push("/");
         }, 100);
       } else {
         // Erro no login
-        setLoginError(result.error || 'Erro ao fazer login');
+        setLoginError(result.error || "Erro ao fazer login");
       }
     } catch (error) {
-      console.error('Erro na requisição de login:', error);
-      setLoginError('Erro de conexão. Tente novamente.');
+      console.error("Erro na requisição de login:", error);
+      setLoginError("Erro de conexão. Tente novamente.");
     } finally {
       setIsLoading(false);
     }
@@ -69,9 +79,20 @@ export default function Login() {
 
   const handleForgotPassword = async (e: React.FormEvent) => {
     e.preventDefault();
-    setForgotStatus('Funcionalidade de redefinição de senha será implementada em breve.');
+    setForgotStatus(
+      "Funcionalidade de redefinição de senha será implementada em breve."
+    );
     // Aqui você pode implementar a funcionalidade de redefinição de senha no futuro
   };
+
+  // Mostrar loading se ainda estiver verificando autenticação
+  if (authLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-gray-900">
+        <div className="w-20 h-20 border-4 border-green-600/30 border-t-green-600 rounded-full animate-spin"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-900 p-4">
@@ -103,9 +124,15 @@ export default function Login() {
                   </div>
                 )}
 
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                <form
+                  onSubmit={form.handleSubmit(onSubmit)}
+                  className="space-y-6"
+                >
                   <div className="space-y-2">
-                    <Label htmlFor="email" className="text-white text-sm font-medium">
+                    <Label
+                      htmlFor="email"
+                      className="text-white text-sm font-medium"
+                    >
                       Email
                     </Label>
                     <Controller
@@ -126,7 +153,10 @@ export default function Login() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="password" className="text-white text-sm font-medium">
+                    <Label
+                      htmlFor="password"
+                      className="text-white text-sm font-medium"
+                    >
                       Senha
                     </Label>
                     <Controller
@@ -157,7 +187,7 @@ export default function Login() {
                         Entrando...
                       </div>
                     ) : (
-                      'Entrar'
+                      "Entrar"
                     )}
                   </Button>
                 </form>
@@ -165,7 +195,9 @@ export default function Login() {
             ) : (
               <div>
                 <div className="mb-6 text-center">
-                  <h3 className="text-lg font-semibold text-white mb-2">Redefinir Senha</h3>
+                  <h3 className="text-lg font-semibold text-white mb-2">
+                    Redefinir Senha
+                  </h3>
                   <p className="text-sm text-slate-400">
                     Digite seu email para receber as instruções
                   </p>
@@ -173,15 +205,18 @@ export default function Login() {
 
                 <form onSubmit={handleForgotPassword} className="space-y-6">
                   <div className="space-y-2">
-                    <Label htmlFor="forgot_email" className="text-white text-sm font-medium">
+                    <Label
+                      htmlFor="forgot_email"
+                      className="text-white text-sm font-medium"
+                    >
                       E-mail
                     </Label>
                     <Input
                       id="forgot_email"
                       type="email"
                       placeholder="seu@email.com"
-                      value={forgotEmail ?? ''}
-                      onChange={e => {
+                      value={forgotEmail ?? ""}
+                      onChange={(e) => {
                         setForgotEmail(e.target.value);
                       }}
                       required
@@ -203,7 +238,7 @@ export default function Login() {
                       className="flex-1 h-11 bg-slate-700/50 hover:bg-slate-600 text-white border-slate-600 transition-all duration-200"
                       onClick={() => {
                         setShowForgot(false);
-                        setForgotEmail('');
+                        setForgotEmail("");
                         setForgotStatus(null);
                       }}
                     >
