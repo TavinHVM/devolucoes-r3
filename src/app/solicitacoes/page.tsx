@@ -86,6 +86,7 @@ function SolicitacoesContent() {
           setStatus={setStatus}
           refreshing={refreshing}
           onRefresh={fetchSolicitacoes}
+          filteredSolicitacoes={finalSolicitacoes}
         />
 
         {/* Main Table */}

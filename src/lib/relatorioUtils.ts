@@ -2,23 +2,8 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 
-// Definição do tipo para as solicitações
-export type Solicitacao = {
-  id: number;
-  nome: string;
-  filial: string;
-  numero_nf: string;
-  carga: string;
-  codigo_cobranca: string;
-  codigo_cliente: string;
-  rca: string;
-  motivo_devolucao: string;
-  vale?: string;
-  codigo_produto: string;
-  tipo_devolucao: string;
-  status: string;
-  created_at: string;
-};
+// Importar o tipo correto das solicitações
+import { Solicitacao } from "@/types/solicitacao";
 
 // Função utilitária para carregar imagem base64 da public
 export async function getLogoBase64(path = '/r3logo.png') {
@@ -71,12 +56,12 @@ export async function gerarRelatorioPDF({
     s.filial,
     s.numero_nf,
     s.carga,
-    s.codigo_cobranca,
-    s.codigo_cliente,
+    s.cod_cobranca,
+    s.cod_cliente,
     s.rca,
     s.motivo_devolucao,
     s.vale || '',
-    s.codigo_produto,
+    s.nome_cobranca,
     s.tipo_devolucao,
     s.status,
     new Date(s.created_at).toLocaleDateString()
@@ -84,7 +69,7 @@ export async function gerarRelatorioPDF({
   autoTable(doc, {
     startY: 110,
     head: [[
-      'ID', 'Nome', 'Filial', 'Nº NF', 'Carga', 'Cód. Cobrança', 'Código Cliente', 'RCA', 'Motivo', 'Vale', 'Cód. Produto', 'Tipo', 'Status', 'Data'
+      'ID', 'Nome', 'Filial', 'Nº NF', 'Carga', 'Cód. Cobrança', 'Código Cliente', 'RCA', 'Motivo', 'Vale', 'Nome Cobrança', 'Tipo', 'Status', 'Data'
     ]],
     body: tableData,
     styles: { fontSize: 9, cellPadding: 3 },
@@ -110,7 +95,7 @@ export function gerarRelatorioXLSX({
 }) {
   const wsData = [
     [
-      'ID', 'Nome', 'Filial', 'Nº NF', 'Carga', 'Cód. Cobrança', 'Código Cliente', 'RCA', 'Motivo', 'Vale', 'Cód. Produto', 'Tipo', 'Status', 'Data'
+      'ID', 'Nome', 'Filial', 'Nº NF', 'Carga', 'Cód. Cobrança', 'Código Cliente', 'RCA', 'Motivo', 'Vale', 'Nome Cobrança', 'Tipo', 'Status', 'Data'
     ],
     ...solicitacoes.map(s => [
       s.id,
@@ -118,12 +103,12 @@ export function gerarRelatorioXLSX({
       s.filial,
       s.numero_nf,
       s.carga,
-      s.codigo_cobranca,
-      s.codigo_cliente,
+      s.cod_cobranca,
+      s.cod_cliente,
       s.rca,
       s.motivo_devolucao,
       s.vale || '',
-      s.codigo_produto,
+      s.nome_cobranca,
       s.tipo_devolucao,
       s.status,
       new Date(s.created_at).toLocaleDateString()
