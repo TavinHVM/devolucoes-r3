@@ -12,6 +12,7 @@ import { Label } from "../../components/ui/label";
 import { useForm, SubmitHandler, Controller } from "react-hook-form";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import Image from "next/image";
 
 interface LoginForm {
   email: string;
@@ -100,13 +101,14 @@ export default function Login() {
         <Card className="shadow-2xl bg-slate-800 border border-slate-700/50 backdrop-blur-sm">
           <CardHeader className="space-y-1 pb-6 px-8 pt-8">
             <div className="flex justify-center mb-4">
-              <div className="w-20 h-20 bg-slate-900 rounded-full flex items-center justify-center shadow-lg p-2">
-                <img
+                <Image
                   src="/r3logo.png"
                   alt="R3 Logo"
-                  className="w-full h-full object-contain"
+                  width={80}
+                  height={80}
+                  className="w-[80px] h-[80px] object-contain"
+                  priority
                 />
-              </div>
             </div>
             <CardTitle className="text-center text-white text-2xl font-bold tracking-tight">
               Devoluções R3
