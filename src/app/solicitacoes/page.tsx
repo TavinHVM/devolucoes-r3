@@ -1,9 +1,10 @@
 "use client";
 import { useEffect } from "react";
 import Header from "../../components/header";
-import { useAuth } from "@/lib/useAuth";
+import { useAuth } from "@/contexts/AuthContext";
 import { getUserPermissions } from "@/utils/permissions/userPermissions";
 import { useSolicitacoes } from "@/hooks/useSolicitacoes";
+import ProtectedRoute from "@/components/ProtectedRoute";
 import {
   StatsCards,
   FiltersControls,
@@ -12,6 +13,14 @@ import {
 } from "@/components/solicitacoes";
 
 export default function VisualizacaoSolicitacoes() {
+  return (
+    <ProtectedRoute>
+      <SolicitacoesContent />
+    </ProtectedRoute>
+  );
+}
+
+function SolicitacoesContent() {
   // Authentication and permissions
   const { user, isAuthenticated, isLoading } = useAuth();
   const userPermissions = getUserPermissions(user);

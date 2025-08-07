@@ -1,7 +1,6 @@
 import React from "react";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -9,12 +8,10 @@ import {
 } from "@/components/ui/dialog";
 import {
   FileText,
-  Eye,
   Calendar,
   User,
   Handshake,
   Wallet,
-  Download,
 } from "lucide-react";
 import { Solicitacao } from "@/types/solicitacao";
 import { truncateText } from "@/utils/truncateText";
@@ -47,10 +44,14 @@ export const SolicitacaoTableRow: React.FC<SolicitacaoTableRowProps> = ({
     tipo_devolucao,
     created_at,
     status,
-    arquivo_url,
   } = solicitacao;
 
   return (
+    <Dialog>
+    <DialogTrigger
+      asChild
+      className="cursor-pointer hover:text-white"
+    >
     <TableRow className="border-slate-700 hover:bg-slate-700/30">
       <TableCell>
         <Badge variant="outline" className="text-slate-300 border-slate-600">
@@ -113,40 +114,14 @@ export const SolicitacaoTableRow: React.FC<SolicitacaoTableRowProps> = ({
           {status.toUpperCase()}
         </Badge>
       </TableCell>
-      <TableCell className="text-right">
-        <div className="flex items-center gap-2">
-          <Dialog>
-            <DialogTrigger
-              asChild
-              className="cursor-pointer hover:text-white"
-            >
-              <Button
-                variant="outline"
-                size="sm"
-                className="bg-slate-700 border-slate-600 text-slate-300 hover:bg-slate-600"
-              >
-                <Eye className="h-4 w-4" />
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-4xl max-h-[95vh] overflow-y-auto scrollbar-dark bg-slate-800 border-slate-700 text-white">
-              <SolicitacaoDetailView
-                solicitacao={solicitacao}
-                userPermissions={userPermissions}
-              />
-            </DialogContent>
-          </Dialog>
-
-          {arquivo_url && (
-            <Button
-              variant="outline"
-              size="sm"
-              className="bg-blue-500/20 border-blue-500/30 text-blue-400 hover:text-blue-400 hover:bg-blue-500/30 cursor-pointer"
-            >
-              <Download className="h-4 w-4" />
-            </Button>
-          )}
-        </div>
-      </TableCell>
     </TableRow>
+  </DialogTrigger>
+  <DialogContent className="max-w-4xl max-h-[95vh] overflow-y-auto scrollbar-dark bg-slate-800 border-slate-700 text-white">
+    <SolicitacaoDetailView
+      solicitacao={solicitacao}
+      userPermissions={userPermissions}
+    />
+  </DialogContent>
+</Dialog>
   );
 };

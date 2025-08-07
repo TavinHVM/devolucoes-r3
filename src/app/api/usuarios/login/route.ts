@@ -1,19 +1,19 @@
-import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
+import { NextResponse } from "next/server";
+import { PrismaClient } from "@prisma/client";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 
 const prisma = new PrismaClient();
 
 export async function POST(request: Request) {
   try {
     const data = await request.json();
-    
-    console.log('Tentativa de login para:', data.email);
+
+    console.log("Tentativa de login para:", data.email);
 
     if (!data.email || !data.password) {
       return NextResponse.json(
-        { error: 'Email e senha são obrigatórios' },
+        { error: "Email e senha são obrigatórios" },
         { status: 400 }
       );
     }
@@ -21,13 +21,13 @@ export async function POST(request: Request) {
     // Buscar usuário pelo email
     const user = await prisma.user_profiles.findFirst({
       where: {
-        email: data.email
-      }
+        email: data.email,
+      },
     });
 
     if (!user) {
       return NextResponse.json(
-        { error: 'Email ou senha inválidos' },
+        { error: "Email ou senha inválidos" },
         { status: 401 }
       );
     }
@@ -37,21 +37,21 @@ export async function POST(request: Request) {
 
     if (!isPasswordValid) {
       return NextResponse.json(
-        { error: 'Email ou senha inválidos' },
+        { error: "Email ou senha inválidos" },
         { status: 401 }
       );
     }
 
-    // Gerar token JWT
+    // Gerar token JWT com expiração maior
     const token = jwt.sign(
-      { 
-        userId: user.id, 
+      {
+        userId: user.id,
         email: user.email,
         role: user.role,
-        user_level: user.user_level
+        user_level: user.user_level,
       },
-      process.env.JWT_SECRET || 'your-secret-key',
-      { expiresIn: '24h' }
+      process.env.JWT_SECRET || "your-secret-key",
+      { expiresIn: "7d" } // 7 dias ao invés de 24h
     );
 
     // Retornar dados do usuário (sem a senha) e o token
@@ -62,29 +62,28 @@ export async function POST(request: Request) {
       email: user.email,
       role: user.role,
       user_level: user.user_level,
-      created_at: user.created_at
+      created_at: user.created_at,
     };
 
     const response = NextResponse.json({
-      message: 'Login realizado com sucesso',
+      message: "Login realizado com sucesso",
       user: userResponse,
-      token
+      token,
     });
 
-    // Definir cookie com o token
-    response.cookies.set('auth-token', token, {
+    // Definir cookie com o token (7 dias)
+    response.cookies.set("auth-token", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 24 * 60 * 60 // 24 horas
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 7 * 24 * 60 * 60, // 7 dias
     });
 
     return response;
-
   } catch (error) {
-    console.error('Erro ao fazer login:', error);
+    console.error("Erro ao fazer login:", error);
     return NextResponse.json(
-      { error: 'Erro interno do servidor' },
+      { error: "Erro interno do servidor" },
       { status: 500 }
     );
   }

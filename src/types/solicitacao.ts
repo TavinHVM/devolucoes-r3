@@ -5,6 +5,7 @@ export type Solicitacao = {
   numero_nf: string;
   carga: string;
   cod_cobranca: string;
+  nome_cobranca: string;
   cod_cliente: string;
   rca: string;
   motivo_devolucao: string;
@@ -12,7 +13,9 @@ export type Solicitacao = {
   tipo_devolucao: string;
   status: string;
   created_at: string;
-  arquivo_url?: string;
+  arquivo_nf?: string;
+  arquivo_nf_devolucao?: string;
+  arquivo_recibo?: string;
   products_list: JSON;
   motivo_recusa: string;
 };

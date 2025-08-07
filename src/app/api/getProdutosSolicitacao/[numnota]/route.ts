@@ -9,7 +9,7 @@ export async function GET(
   { params }: { params: { numnota: string } }
 ) {
   try {
-    const { numnota } = params;
+    const { numnota } = await params;
 
     if (!numnota) {
       return NextResponse.json(
