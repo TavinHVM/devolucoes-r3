@@ -101,6 +101,7 @@ function SolicitacoesContent() {
           onSort={handleSort}
           onClearSort={handleClearSort}
           onPageChange={setCurrentPage}
+          onRefreshList={fetchSolicitacoes}
           userPermissions={userPermissions}
         />
       </div>

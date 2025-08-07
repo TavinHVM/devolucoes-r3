@@ -43,10 +43,58 @@ export async function POST(request: Request) {
 
     // Dados dos produtos (JSON string)
     const produtosJson = body.get("produtos") as string;
-    const produtosSelecionadosJson = body.get("produtosSelecionados") as string;
+    const quantidadesDevolucaoJson = body.get("quantidadesDevolucao") as string;
 
-    const produtos: Produto[] = JSON.parse(produtosJson);
-    const produtosSelecionados: string[] = JSON.parse(produtosSelecionadosJson);
+    console.log("Produtos JSON recebido:", produtosJson);
+    console.log("Quantidades Devolução JSON recebido:", quantidadesDevolucaoJson);
+
+    if (!produtosJson) {
+        return NextResponse.json(
+            { error: "Dados dos produtos não fornecidos" },
+            { status: 400 }
+        );
+    }
+
+    if (!quantidadesDevolucaoJson) {
+        return NextResponse.json(
+            { error: "Quantidades de devolução não fornecidas" },
+            { status: 400 }
+        );
+    }
+
+    let produtos: Produto[];
+    let quantidadesDevolucao: Record<string, number>;
+
+    try {
+        produtos = JSON.parse(produtosJson);
+        quantidadesDevolucao = JSON.parse(quantidadesDevolucaoJson);
+    } catch (parseError) {
+        console.error("Erro ao fazer parse dos dados JSON:", parseError);
+        return NextResponse.json(
+            { error: "Dados dos produtos em formato inválido" },
+            { status: 400 }
+        );
+    }
+
+    // Validar se os arrays não estão vazios
+    if (!Array.isArray(produtos) || produtos.length === 0) {
+        return NextResponse.json(
+            { error: "Lista de produtos não pode estar vazia" },
+            { status: 400 }
+        );
+    }
+
+    // Extrair produtos selecionados das quantidades de devolução
+    const produtosSelecionados = Object.keys(quantidadesDevolucao).filter(
+        codigo => quantidadesDevolucao[codigo] > 0
+    );
+
+    if (produtosSelecionados.length === 0) {
+        return NextResponse.json(
+            { error: "Pelo menos um produto deve ser selecionado para devolução" },
+            { status: 400 }
+        );
+    }
 
         // Usar transação para garantir consistência
         const result = await db.$transaction(async (tx) => {
@@ -69,17 +117,28 @@ export async function POST(request: Request) {
         });
 
       // 3. Salvar apenas os produtos selecionados na tabela returned_products
+        console.log("Produtos selecionados para filtro:", produtosSelecionados);
+        console.log("Quantidades de devolução:", quantidadesDevolucao);
+        console.log("Total de produtos:", produtos.length);
+        
         const produtosRetornados = produtos
-        .filter((produto: Produto) =>
-            produtosSelecionados.includes(produto.codigo)
-        )
-        .map((produto: Produto) => ({
-            numeronf: solicitacao.numero_nf,
-            cod_prod: parseInt(produto.codigo),
-            descricao: produto.descricao,
-            quantidade: parseInt(produto.quantidade),
-            punit: parseInt(produto.punit),
-        }));
+        .filter((produto: Produto) => {
+            const isSelected = produtosSelecionados.includes(produto.codigo);
+            console.log(`Produto ${produto.codigo}: ${isSelected ? 'selecionado' : 'não selecionado'}`);
+            return isSelected;
+        })
+        .map((produto: Produto) => {
+            const quantidadeDevolucao = quantidadesDevolucao[produto.codigo] || 0;
+            return {
+                numeronf: solicitacao.numero_nf,
+                cod_prod: parseInt(produto.codigo),
+                descricao: produto.descricao,
+                quantidade: quantidadeDevolucao, // Usar a quantidade específica de devolução
+                punit: parseInt(produto.punit),
+            };
+        });
+
+        console.log("Produtos retornados para salvar:", produtosRetornados.length);
 
         if (produtosRetornados.length > 0) {
             await tx.returned_products.createMany({

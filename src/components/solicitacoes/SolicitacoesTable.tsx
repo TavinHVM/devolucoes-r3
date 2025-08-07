@@ -1,5 +1,11 @@
 import React from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Table, TableBody } from "@/components/ui/table";
 import {
   Pagination,
@@ -25,6 +31,7 @@ interface SolicitacoesTableProps {
   onSort: (column: string, direction: "asc" | "desc") => void;
   onClearSort: (column: string) => void;
   onPageChange: (page: number) => void;
+  onRefreshList?: () => void;
   userPermissions: {
     canAprovar: boolean;
     canRecusar: boolean;
@@ -47,6 +54,7 @@ export const SolicitacoesTable: React.FC<SolicitacoesTableProps> = ({
   onSort,
   onClearSort,
   onPageChange,
+  onRefreshList,
   userPermissions,
 }) => {
   return (
@@ -74,14 +82,12 @@ export const SolicitacoesTable: React.FC<SolicitacoesTableProps> = ({
                     key={solicitacao.id}
                     solicitacao={solicitacao}
                     userPermissions={userPermissions}
+                    onRefreshList={onRefreshList}
                   />
                 ))
               ) : (
                 <tr>
-                  <td
-                    colSpan={9}
-                    className="text-center py-8 text-slate-400"
-                  >
+                  <td colSpan={9} className="text-center py-8 text-slate-400">
                     Nenhuma solicitação encontrada
                   </td>
                 </tr>
@@ -132,7 +138,9 @@ export const SolicitacoesTable: React.FC<SolicitacoesTableProps> = ({
                   <PaginationNext
                     nameNext="Próxima"
                     href="#"
-                    onClick={() => onPageChange(Math.min(currentPage + 1, totalPages))}
+                    onClick={() =>
+                      onPageChange(Math.min(currentPage + 1, totalPages))
+                    }
                     className={
                       currentPage === totalPages
                         ? "pointer-events-none opacity-50"
