@@ -35,11 +35,15 @@ interface SolicitacaoDetailViewProps {
     canFinalizar: boolean;
     canReenviar: boolean;
   };
+  onActionComplete?: (message: string, type: "success" | "error") => void;
+  onCloseDetailDialog?: () => void;
 }
 
 export const SolicitacaoDetailView: React.FC<SolicitacaoDetailViewProps> = ({
   solicitacao,
   userPermissions,
+  onActionComplete,
+  onCloseDetailDialog,
 }) => {
   const [downloadingFiles, setDownloadingFiles] = useState<{
     nf: boolean;
@@ -438,6 +442,8 @@ export const SolicitacaoDetailView: React.FC<SolicitacaoDetailViewProps> = ({
           <ActionButtons
             solicitacao={solicitacao}
             userPermissions={userPermissions}
+            onActionComplete={onActionComplete}
+            onCloseDetailDialog={onCloseDetailDialog}
           />
         </div>
       </div>
