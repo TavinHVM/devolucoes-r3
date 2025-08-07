@@ -95,8 +95,12 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
       setFilesValid(false);
 
       // Fechar o dialog principal e mostrar toast
-      onCloseDetailDialog?.();
       onActionComplete?.("Solicitação aprovada com sucesso!", "success");
+
+      // Pequeno delay antes de fechar o dialog para garantir que o toast apareça
+      setTimeout(() => {
+        onCloseDetailDialog?.();
+      }, 100);
     } catch (error) {
       onActionComplete?.(
         error instanceof Error ? error.message : "Erro ao aprovar solicitação",
@@ -117,8 +121,12 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
       setMotivoRecusa("");
 
       // Fechar o dialog principal e mostrar toast
-      onCloseDetailDialog?.();
       onActionComplete?.("Solicitação recusada com sucesso!", "success");
+
+      // Pequeno delay antes de fechar o dialog
+      setTimeout(() => {
+        onCloseDetailDialog?.();
+      }, 100);
     } catch (error) {
       onActionComplete?.(
         error instanceof Error ? error.message : "Erro ao recusar solicitação",
@@ -135,8 +143,12 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
       await DesdobrarSolicitacao(id);
 
       // Fechar o dialog principal e mostrar toast
-      onCloseDetailDialog?.();
       onActionComplete?.("Solicitação desdobrada com sucesso!", "success");
+
+      // Pequeno delay antes de fechar o dialog
+      setTimeout(() => {
+        onCloseDetailDialog?.();
+      }, 100);
     } catch (error) {
       onActionComplete?.(
         error instanceof Error
@@ -155,8 +167,12 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
       await AbaterSolicitacao(id);
 
       // Fechar o dialog principal e mostrar toast
-      onCloseDetailDialog?.();
       onActionComplete?.("Solicitação abatida com sucesso!", "success");
+
+      // Pequeno delay antes de fechar o dialog
+      setTimeout(() => {
+        onCloseDetailDialog?.();
+      }, 100);
     } catch (error) {
       onActionComplete?.(
         error instanceof Error ? error.message : "Erro ao abater solicitação",
@@ -173,8 +189,12 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
       await FinalizarSolicitacao(id);
 
       // Fechar o dialog principal e mostrar toast
-      onCloseDetailDialog?.();
       onActionComplete?.("Solicitação finalizada com sucesso!", "success");
+
+      // Pequeno delay antes de fechar o dialog
+      setTimeout(() => {
+        onCloseDetailDialog?.();
+      }, 100);
     } catch (error) {
       onActionComplete?.(
         error instanceof Error
@@ -193,8 +213,12 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
       await ReenviarSolicitacao(id);
 
       // Fechar o dialog principal e mostrar toast
-      onCloseDetailDialog?.();
       onActionComplete?.("Solicitação reenviada com sucesso!", "success");
+
+      // Pequeno delay antes de fechar o dialog
+      setTimeout(() => {
+        onCloseDetailDialog?.();
+      }, 100);
     } catch (error) {
       onActionComplete?.(
         error instanceof Error ? error.message : "Erro ao reenviar solicitação",
