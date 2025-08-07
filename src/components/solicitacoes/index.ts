@@ -6,3 +6,4 @@ export { SolicitacaoTableRow } from "./SolicitacaoTableRow";
 export { SolicitacaoDetailView } from "./SolicitacaoDetailView";
 export { ActionButtons } from "./ActionButtons";
 export { PageHeader } from "./PageHeader";
+export { DownloadDialog } from "./DownloadDialog";

@@ -13,8 +13,9 @@ import {
   Filter,
   Search,
   RefreshCw,
-  Download,
 } from "lucide-react";
+import { Solicitacao } from "@/types/solicitacao";
+import { DownloadDialog } from "./DownloadDialog";
 
 interface FiltersControlsProps {
   busca: string;
@@ -23,6 +24,8 @@ interface FiltersControlsProps {
   setStatus: (value: string) => void;
   refreshing: boolean;
   onRefresh: () => void;
+  // Add filtered solicitacoes for download
+  filteredSolicitacoes: Solicitacao[];
 }
 
 export const FiltersControls: React.FC<FiltersControlsProps> = ({
@@ -32,6 +35,7 @@ export const FiltersControls: React.FC<FiltersControlsProps> = ({
   setStatus,
   refreshing,
   onRefresh,
+  filteredSolicitacoes,
 }) => {
   return (
     <Card className="bg-slate-800/50 border-slate-700 mb-6">
@@ -105,10 +109,10 @@ export const FiltersControls: React.FC<FiltersControlsProps> = ({
               {refreshing ? "Atualizando..." : "Atualizar"}
             </Button>
 
-            <Button className="bg-green-600 hover:bg-green-700 text-white h-10 cursor-pointer">
-              <Download className="h-4 w-4 mr-2" />
-              Relatório
-            </Button>
+            <DownloadDialog 
+              solicitacoes={filteredSolicitacoes}
+              currentFilter={status}
+            />
           </div>
         </div>
       </CardContent>
