@@ -97,7 +97,8 @@ export function ProdutosCard({ numeroNF }: ProdutosCardProps) {
                 <TableRow className="border-slate-600">
                     <TableHead className="text-slate-300">Código</TableHead>
                     <TableHead className="text-slate-300">Descrição</TableHead>
-                    <TableHead className="text-slate-300 text-center">Quantidade</TableHead>
+                    <TableHead className="text-slate-300 text-center">Qtd. Total</TableHead>
+                    <TableHead className="text-slate-300 text-center">Qtd. Devolvida</TableHead>
                     <TableHead className="text-slate-300 text-center">Preço Unit.</TableHead>
                     <TableHead className="text-slate-300 text-center">Valor Total</TableHead>
                     <TableHead className="text-slate-300 text-center">Status</TableHead>
@@ -106,9 +107,11 @@ export function ProdutosCard({ numeroNF }: ProdutosCardProps) {
                 <TableBody>
                 {produtos.length > 0 ? (
                     produtos.map((produto) => {
-                    const isRetornado = produtosRetornados.some(
+                    const produtoRetornado = produtosRetornados.find(
                         (p) => p.cod_prod === produto.cod_prod
                     );
+                    const isRetornado = !!produtoRetornado;
+                    const quantidadeDevolvida = produtoRetornado?.quantidade || 0;
 
                     return (
                         <TableRow key={produto.id} className="border-slate-600">
@@ -127,21 +130,26 @@ export function ProdutosCard({ numeroNF }: ProdutosCardProps) {
                             {produto.quantidade}
                         </TableCell>
                         <TableCell className="text-center text-slate-300">
+                            {quantidadeDevolvida}
+                        </TableCell>
+                        <TableCell className="text-center text-slate-300">
                             {formatPrice(produto.punit)}
                         </TableCell>
                         <TableCell className="text-center text-white font-medium">
                             {formatPrice(produto.punit * produto.quantidade)}
                         </TableCell>
                         <TableCell className="text-center">
-                            <Badge
-                            className={
-                                isRetornado
-                                ? "bg-red-500/20 text-red-400 border-red-500/50 w-[100%]"
-                                : "bg-green-500/20 text-green-400 border-green-500/50 w-[100%]"
-                            }
-                            >
-                            {isRetornado ? "Devolução" : "Normal"}
-                            </Badge>
+                            <div className="flex justify-center">
+                                <Badge
+                                className={
+                                    isRetornado
+                                    ? "bg-red-500/20 text-red-400 border-red-500/50"
+                                    : "bg-green-500/20 text-green-400 border-green-500/50"
+                                }
+                                >
+                                {isRetornado ? "Devolução" : "Normal"}
+                                </Badge>
+                            </div>
                         </TableCell>
                         </TableRow>
                     );
@@ -149,7 +157,7 @@ export function ProdutosCard({ numeroNF }: ProdutosCardProps) {
                 ) : (
                     <TableRow>
                     <TableCell
-                        colSpan={6}
+                        colSpan={7}
                         className="text-center text-slate-400 py-4"
                     >
                         Nenhum produto encontrado

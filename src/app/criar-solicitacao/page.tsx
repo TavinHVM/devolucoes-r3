@@ -482,7 +482,7 @@ function SolicitacaoContent() {
       const formData = new FormData();
 
       // Usar dados do formulário ou valores dos estados se disponíveis
-      formData.append("nome", data.nome || "Solicitação de Devolução");
+      formData.append("nome", data.nome || nomeClient);
       formData.append("filial", data.filial || codigoFilial);
       formData.append("numero_nf", data.numero_nf || numeroNF);
       formData.append("carga", data.carga || numeroCarga);
@@ -547,7 +547,7 @@ function SolicitacaoContent() {
       if (typeof window !== "undefined") {
         localStorage.setItem(
           "solicitacao-toast-message",
-          `Solicitação criada com sucesso! ${result.produtosSalvos} produtos salvos, ${result.produtosRetornados} para devolução.`
+          `Solicitação criada com sucesso! ${result.totalProdutosNota} produtos da nota salvos, ${result.produtosParaDevolucao} selecionados para devolução.`
         );
         localStorage.setItem("solicitacao-toast-type", "success");
       }
@@ -1002,7 +1002,9 @@ function SolicitacaoContent() {
                 <Table>
                   <TableHeader>
                     <TableRow className="border-slate-700 hover:bg-slate-700/50">
-                      <TableHead className="text-slate-300 text-center">Código</TableHead>
+                      <TableHead className="text-slate-300 text-center">
+                        Código
+                      </TableHead>
                       <TableHead className="text-slate-300">Produto</TableHead>
                       <TableHead className="text-slate-300 text-center">
                         Qtd. Total
@@ -1281,7 +1283,7 @@ function SolicitacaoContent() {
                   try {
                     console.log("Executando método alternativo...");
                     const formData = new FormData();
-                    formData.append("nome", "Solicitação de Devolução");
+                    formData.append("nome", nomeClient);
                     formData.append("filial", codigoFilial);
                     formData.append("numero_nf", numeroNF);
                     formData.append("carga", numeroCarga);
@@ -1330,7 +1332,7 @@ function SolicitacaoContent() {
                     if (typeof window !== "undefined") {
                       localStorage.setItem(
                         "solicitacao-toast-message",
-                        `Solicitação criada com sucesso! ${result.produtosSalvos} produtos salvos, ${result.produtosRetornados} para devolução.`
+                        `Solicitação criada com sucesso! ${result.totalProdutosNota} produtos da nota salvos, ${result.produtosParaDevolucao} selecionados para devolução.`
                       );
                       localStorage.setItem("solicitacao-toast-type", "success");
                     }
