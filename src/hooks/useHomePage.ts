@@ -20,16 +20,22 @@ export const useHomePage = (isAuthenticated: boolean) => {
   const [randomTips] = useState(getRandomTips());
   const [timeOfDay] = useState(getTimeOfDay());
 
+  // Define a type for solicitacao items
+  interface Solicitacao {
+    status: string;
+    // add other properties if needed
+  }
+
   // Fetch dashboard stats
   useEffect(() => {
     const fetchStats = async () => {
       try {
         const response = await fetch('/api/getSolicitacoes');
         if (response.ok) {
-          const data = await response.json();
-          const pendentes = data.filter((s: any) => s.status.toUpperCase() === 'PENDENTE').length;
-          const aprovadas = data.filter((s: any) => s.status.toUpperCase() === 'APROVADA').length;
-          const recusadas = data.filter((s: any) => s.status.toUpperCase() === 'RECUSADA').length;
+          const data: Solicitacao[] = await response.json();
+          const pendentes = data.filter((s: Solicitacao) => s.status.toUpperCase() === 'PENDENTE').length;
+          const aprovadas = data.filter((s: Solicitacao) => s.status.toUpperCase() === 'APROVADA').length;
+          const recusadas = data.filter((s: Solicitacao) => s.status.toUpperCase() === 'RECUSADA').length;
           
           setStats({
             totalSolicitacoes: data.length,
