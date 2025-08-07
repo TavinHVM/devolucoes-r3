@@ -13,7 +13,6 @@ import {
   SystemStatus,
   DashboardLoading,
 } from "../components/home";
-import { useRouter } from "next/router";
 
 export default function Home() {
   return (
@@ -24,8 +23,7 @@ export default function Home() {
 }
 
 function HomeContent() {
-  const router = useRouter();
-  const { user, isAuthenticated, isLoading } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const { stats, randomTips, timeOfDay } = useHomePage(isAuthenticated);
 
   if (stats.loading) {
