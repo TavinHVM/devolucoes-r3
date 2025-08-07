@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getRandomTip, getTimeOfDay } from '../utils/homeUtils';
+import { getRandomTips, getTimeOfDay } from '../utils/homeUtils';
 
 interface Stats {
   totalSolicitacoes: number;
@@ -17,7 +17,7 @@ export const useHomePage = (isAuthenticated: boolean) => {
     recusadas: 0,
     loading: true,
   });
-  const [randomTip] = useState(getRandomTip());
+  const [randomTips] = useState(getRandomTips());
   const [timeOfDay] = useState(getTimeOfDay());
 
   // Fetch dashboard stats
@@ -52,7 +52,7 @@ export const useHomePage = (isAuthenticated: boolean) => {
 
   return {
     stats,
-    randomTip,
+    randomTips,
     timeOfDay,
   };
 };

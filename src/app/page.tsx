@@ -13,6 +13,7 @@ import {
   SystemStatus,
   DashboardLoading,
 } from "../components/home";
+import { useRouter } from "next/router";
 
 export default function Home() {
   return (
@@ -23,8 +24,9 @@ export default function Home() {
 }
 
 function HomeContent() {
-  const { user, isAuthenticated } = useAuth();
-  const { stats, randomTip, timeOfDay } = useHomePage(isAuthenticated);
+  const router = useRouter();
+  const { user, isAuthenticated, isLoading } = useAuth();
+  const { stats, randomTips, timeOfDay } = useHomePage(isAuthenticated);
 
   if (stats.loading) {
     return <DashboardLoading />;
@@ -41,16 +43,20 @@ function HomeContent() {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Content */}
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-2 space-y-6">
             <QuickActions />
             <PerformanceOverview stats={stats} />
+            
+            {/* Bottom row for Tips and System Status */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <TipsAndInfo randomTips={randomTips} />
+              <SystemStatus />
+            </div>
           </div>
 
           {/* Sidebar */}
           <div className="space-y-6">
             <RecentActivity />
-            <TipsAndInfo randomTip={randomTip} />
-            <SystemStatus />
           </div>
         </div>
       </div>
