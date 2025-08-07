@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Button } from "../ui/button";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
-import { isUserAdmin } from "@/lib/auth";
+import { isUserAdmin, canCreateSolicitacao } from "@/lib/auth";
 import {
   FileText,
   Plus,
@@ -15,6 +15,7 @@ export const QuickActions: React.FC = () => {
   const router = useRouter();
   const { user } = useAuth();
   const isAdmin = isUserAdmin(user);
+  const canCreate = canCreateSolicitacao(user);
 
   const quickActions = [
     {
@@ -23,6 +24,7 @@ export const QuickActions: React.FC = () => {
       icon: Plus,
       href: '/criar-solicitacao',
       color: 'bg-blue-500 hover:bg-blue-600',
+      requiresCreatePermission: true,
     },
     {
       title: 'Ver Solicitações',
@@ -41,8 +43,12 @@ export const QuickActions: React.FC = () => {
     },
   ];
 
-  // Filter actions based on user level
-  const filteredActions = quickActions.filter(action => !action.adminOnly || isAdmin);
+  // Filter actions based on user level and permissions
+  const filteredActions = quickActions.filter(action => {
+    if (action.adminOnly && !isAdmin) return false;
+    if (action.requiresCreatePermission && !canCreate) return false;
+    return true;
+  });
 
   return (
     <Card className="bg-slate-800/50 border-slate-700">
@@ -53,7 +59,13 @@ export const QuickActions: React.FC = () => {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className={`grid grid-cols-1 ${filteredActions.length === 2 ? 'md:grid-cols-2' : 'md:grid-cols-3'} gap-4 px-4`}>
+        <div className={`grid grid-cols-1 ${
+          filteredActions.length === 1 
+            ? 'md:grid-cols-1' 
+            : filteredActions.length === 2 
+            ? 'md:grid-cols-2' 
+            : 'md:grid-cols-3'
+        } gap-4 px-4`}>
           {filteredActions.map((action, index) => {
             const IconComponent = action.icon;
             return (

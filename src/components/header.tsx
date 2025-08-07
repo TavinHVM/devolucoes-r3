@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
-import { getUserDisplayName, isUserAdmin } from "@/lib/auth";
+import { getUserDisplayName, isUserAdmin, canCreateSolicitacao } from "@/lib/auth";
 
 // Ícones Lucide
 import { Home, FileText, Plus, Users, Power } from "lucide-react";
@@ -28,6 +28,7 @@ const navLinks = [
     href: "/criar-solicitacao",
     label: "Criar Solicitação",
     icon: <Plus size={20} />,
+    requiresCreatePermission: true,
   },
   // { href: "/criar-codcobranca", label: "Códigos Cobrança", icon: <Receipt size={20} /> },
   { 
@@ -43,9 +44,14 @@ export default function Header() {
   const [open, setOpen] = useState(false);
   const { user, logout } = useAuth();
   const isAdmin = isUserAdmin(user);
+  const canCreate = canCreateSolicitacao(user);
 
-  // Filter navigation links based on user level
-  const filteredNavLinks = navLinks.filter(link => !link.adminOnly || isAdmin);
+  // Filter navigation links based on user level and permissions
+  const filteredNavLinks = navLinks.filter(link => {
+    if (link.adminOnly && !isAdmin) return false;
+    if (link.requiresCreatePermission && !canCreate) return false;
+    return true;
+  });
 
   const handleLogout = async () => {
     await logout(); // O AuthContext já faz o redirecionamento

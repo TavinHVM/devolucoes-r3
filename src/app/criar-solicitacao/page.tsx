@@ -14,6 +14,7 @@ import { Badge } from "../../components/ui/badge";
 import { useForm } from "react-hook-form";
 import Header from "../../components/header";
 import ProtectedRoute from "../../components/ProtectedRoute";
+import CreateSolicitacaoRoute from "../../components/CreateSolicitacaoRoute";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -147,7 +148,9 @@ export async function fetchInfosNF(numnota: string): Promise<InfosNF | null> {
 export default function Solicitacao() {
   return (
     <ProtectedRoute>
-      <SolicitacaoContent />
+      <CreateSolicitacaoRoute>
+        <SolicitacaoContent />
+      </CreateSolicitacaoRoute>
     </ProtectedRoute>
   );
 }
