@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -12,9 +12,16 @@ import {
   User,
   Package,
   Download,
+  Loader2,
+  MessageSquare,
+  AlertTriangle,
 } from "lucide-react";
 import { Solicitacao } from "@/types/solicitacao";
-import { getStatusIcon, getStatusClass, getStatusBadgeVariant } from "@/utils/solicitacoes/statusUtils";
+import {
+  getStatusIcon,
+  getStatusClass,
+  getStatusBadgeVariant,
+} from "@/utils/solicitacoes/statusUtils";
 import { ProdutosCard } from "@/components/solicitacoes/produtos";
 import { ActionButtons } from "./ActionButtons";
 
@@ -34,6 +41,69 @@ export const SolicitacaoDetailView: React.FC<SolicitacaoDetailViewProps> = ({
   solicitacao,
   userPermissions,
 }) => {
+  const [downloadingFiles, setDownloadingFiles] = useState<{
+    nf: boolean;
+    nf_devolucao: boolean;
+    recibo: boolean;
+  }>({
+    nf: false,
+    nf_devolucao: false,
+    recibo: false,
+  });
+
+  const downloadFile = async (
+    solicitacaoId: number,
+    tipoArquivo: "nf" | "nf_devolucao" | "recibo"
+  ) => {
+    try {
+      setDownloadingFiles((prev) => ({ ...prev, [tipoArquivo]: true }));
+
+      const response = await fetch(
+        `/api/solicitacoes/${solicitacaoId}/download/${tipoArquivo}`,
+        {
+          method: "GET",
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Erro ao baixar arquivo");
+      }
+
+      // Obter o nome do arquivo do header da resposta
+      const contentDisposition = response.headers.get("content-disposition");
+      let filename = `arquivo_${tipoArquivo}_${solicitacaoId}`;
+
+      if (contentDisposition) {
+        const filenameMatch = contentDisposition.match(/filename="?([^"]*)"?/);
+        if (filenameMatch) {
+          filename = filenameMatch[1];
+        }
+      }
+
+      // Converter a resposta para blob
+      const blob = await response.blob();
+
+      // Criar URL temporária para download
+      const url = window.URL.createObjectURL(blob);
+
+      // Criar elemento <a> temporário para trigger do download
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+
+      // Limpar recursos
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (error) {
+      console.error("Erro ao baixar arquivo:", error);
+      alert("Erro ao baixar arquivo. Tente novamente.");
+    } finally {
+      setDownloadingFiles((prev) => ({ ...prev, [tipoArquivo]: false }));
+    }
+  };
+
   const {
     id,
     nome,
@@ -45,11 +115,14 @@ export const SolicitacaoDetailView: React.FC<SolicitacaoDetailViewProps> = ({
     tipo_devolucao,
     vale,
     cod_cobranca,
+    nome_cobranca,
     motivo_devolucao,
     motivo_recusa,
     status,
     created_at,
-    arquivo_url,
+    arquivo_nf,
+    arquivo_nf_devolucao,
+    arquivo_recibo,
   } = solicitacao;
 
   return (
@@ -73,7 +146,9 @@ export const SolicitacaoDetailView: React.FC<SolicitacaoDetailViewProps> = ({
                 <div className="flex justify-center h-full">
                   <Badge
                     variant={getStatusBadgeVariant(status)}
-                    className={`flex items-center gap-1 w-fit ${getStatusClass(status)}`}
+                    className={`flex items-center gap-1 w-fit ${getStatusClass(
+                      status
+                    )}`}
                   >
                     {getStatusIcon(status)}
                     {status.toUpperCase()}
@@ -110,8 +185,12 @@ export const SolicitacaoDetailView: React.FC<SolicitacaoDetailViewProps> = ({
                   <p className="text-white font-medium">{nome}</p>
                 </div>
                 <div className="flex gap-2 items-center">
-                  <p className="text-slate-400 text-sm">Identificador do Cliente:</p>
-                  <p className="text-white font-medium">{"10.641.901/0001-16"}</p>
+                  <p className="text-slate-400 text-sm">
+                    Identificador do Cliente:
+                  </p>
+                  <p className="text-white font-medium">
+                    {"10.641.901/0001-16"}
+                  </p>
                 </div>
                 <div className="flex gap-2 items-center">
                   <p className="text-slate-400 text-sm">Filial:</p>
@@ -195,7 +274,7 @@ export const SolicitacaoDetailView: React.FC<SolicitacaoDetailViewProps> = ({
                 </div>
                 <div className="flex gap-2 items-center">
                   <p className="text-slate-400 text-sm">Nome Cobrança:</p>
-                  <p className="text-white font-medium">{cod_cobranca}</p>
+                  <p className="text-white font-medium">{nome_cobranca}</p>
                 </div>
               </div>
             </CardContent>
@@ -205,11 +284,124 @@ export const SolicitacaoDetailView: React.FC<SolicitacaoDetailViewProps> = ({
         {/* Motivo da Devolução */}
         <Card className="bg-slate-700/50 border-slate-600">
           <CardHeader>
-            <CardTitle className="text-white">Motivo da Devolução</CardTitle>
+            <CardTitle className="text-white flex items-center gap-2">
+              <MessageSquare className="h-5 w-5 text-blue-400" />
+              Motivo da Devolução
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="mx-8">
-              <p className="text-slate-300">{motivo_devolucao}</p>
+            <div className="mx-4 p-4 bg-slate-600/30 rounded-lg border border-slate-600/50">
+              <div className="flex items-start gap-3">
+                <div className="w-1 h-full bg-blue-400 rounded-full min-h-[20px]"></div>
+                <div className="flex-1">
+                  <p className="text-slate-200 leading-relaxed text-base font-medium">
+                    {motivo_devolucao}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Download dos Arquivos */}
+        <Card className="bg-slate-700/50 border-slate-600">
+          <CardHeader>
+            <CardTitle className="text-white flex items-center gap-2">
+              <Download className="h-5 w-5" />
+              Download dos Arquivos
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4">
+              {arquivo_nf && (
+                <div className="flex flex-col items-center">
+                  <Button
+                    size="lg"
+                    className="w-full h-20 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+                    onClick={() => downloadFile(id, "nf")}
+                    disabled={downloadingFiles.nf}
+                  >
+                    <div className="flex flex-col items-center gap-2">
+                      {downloadingFiles.nf ? (
+                        <Loader2 className="h-6 w-6 animate-spin" />
+                      ) : (
+                        <FileText className="h-6 w-6" />
+                      )}
+                      <span className="text-sm font-semibold">
+                        {downloadingFiles.nf ? "Baixando..." : "Nota Fiscal"}
+                      </span>
+                    </div>
+                  </Button>
+                  <p className="text-slate-400 text-xs mt-2 text-center">
+                    Arquivo da nota fiscal original
+                  </p>
+                </div>
+              )}
+
+              {arquivo_nf_devolucao && (
+                <div className="flex flex-col items-center">
+                  <Button
+                    size="lg"
+                    className="w-full h-20 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+                    onClick={() => downloadFile(id, "nf_devolucao")}
+                    disabled={downloadingFiles.nf_devolucao}
+                  >
+                    <div className="flex flex-col items-center gap-2">
+                      {downloadingFiles.nf_devolucao ? (
+                        <Loader2 className="h-6 w-6 animate-spin" />
+                      ) : (
+                        <Package className="h-6 w-6" />
+                      )}
+                      <span className="text-sm font-semibold">
+                        {downloadingFiles.nf_devolucao
+                          ? "Baixando..."
+                          : "NF Devolução"}
+                      </span>
+                    </div>
+                  </Button>
+                  <p className="text-slate-400 text-xs mt-2 text-center">
+                    Nota fiscal de devolução
+                  </p>
+                </div>
+              )}
+
+              {arquivo_recibo && (
+                <div className="flex flex-col items-center">
+                  <Button
+                    size="lg"
+                    className="w-full h-20 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+                    onClick={() => downloadFile(id, "recibo")}
+                    disabled={downloadingFiles.recibo}
+                  >
+                    <div className="flex flex-col items-center gap-2">
+                      {downloadingFiles.recibo ? (
+                        <Loader2 className="h-6 w-6 animate-spin" />
+                      ) : (
+                        <Download className="h-6 w-6" />
+                      )}
+                      <span className="text-sm font-semibold">
+                        {downloadingFiles.recibo ? "Baixando..." : "Recibo"}
+                      </span>
+                    </div>
+                  </Button>
+                  <p className="text-slate-400 text-xs mt-2 text-center">
+                    Comprovante de recebimento
+                  </p>
+                </div>
+              )}
+
+              {/* Mensagem quando não há arquivos */}
+              {!arquivo_nf && !arquivo_nf_devolucao && !arquivo_recibo && (
+                <div className="col-span-full flex flex-col items-center justify-center py-8 text-slate-400">
+                  <FileText className="h-12 w-12 mb-3 opacity-50" />
+                  <p className="text-lg font-medium">
+                    Nenhum arquivo disponível
+                  </p>
+                  <p className="text-sm">
+                    Esta solicitação não possui arquivos anexados
+                  </p>
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>
@@ -218,11 +410,21 @@ export const SolicitacaoDetailView: React.FC<SolicitacaoDetailViewProps> = ({
         {Boolean(motivo_recusa && motivo_recusa.trim()) && (
           <Card className="bg-slate-700/50 border-slate-600">
             <CardHeader>
-              <CardTitle className="text-white">Motivo da Recusa</CardTitle>
+              <CardTitle className="text-white flex items-center gap-2">
+                <AlertTriangle className="h-5 w-5 text-red-400" />
+                Motivo da Recusa
+              </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="mx-8">
-                <p className="text-slate-300">{motivo_recusa}</p>
+              <div className="mx-4 p-4 bg-red-600/10 rounded-lg border border-red-500/30">
+                <div className="flex items-start gap-3">
+                  <div className="w-1 h-full bg-red-400 rounded-full min-h-[20px]"></div>
+                  <div className="flex-1">
+                    <p className="text-red-200 leading-relaxed text-base font-medium">
+                      {motivo_recusa}
+                    </p>
+                  </div>
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -233,18 +435,14 @@ export const SolicitacaoDetailView: React.FC<SolicitacaoDetailViewProps> = ({
 
         {/* Botões de Ação - Centralizados */}
         <div className="flex justify-center gap-4 mt-6">
-          <ActionButtons solicitacao={solicitacao} userPermissions={userPermissions} />
+          <ActionButtons
+            solicitacao={solicitacao}
+            userPermissions={userPermissions}
+          />
         </div>
       </div>
 
-      <DialogFooter>
-        {arquivo_url && (
-          <Button className="bg-blue-600 hover:bg-blue-700">
-            <Download className="h-4 w-4 mr-2" />
-            Baixar NF
-          </Button>
-        )}
-      </DialogFooter>
+      <DialogFooter></DialogFooter>
     </>
   );
 };

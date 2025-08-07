@@ -1,9 +1,8 @@
-'use client';
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { useAuth } from '../lib/useAuth';
-import { useHomePage } from '../hooks/useHomePage';
-import Header from '../components/header';
+"use client";
+import { useAuth } from "../contexts/AuthContext";
+import { useHomePage } from "../hooks/useHomePage";
+import Header from "../components/header";
+import ProtectedRoute from "../components/ProtectedRoute";
 import {
   WelcomeHeader,
   DashboardStats,
@@ -13,34 +12,31 @@ import {
   TipsAndInfo,
   SystemStatus,
   DashboardLoading,
-} from '../components/home';
+} from "../components/home";
 
 export default function Home() {
-  const router = useRouter();
-  const { user, isAuthenticated, isLoading } = useAuth();
+  return (
+    <ProtectedRoute>
+      <HomeContent />
+    </ProtectedRoute>
+  );
+}
+
+function HomeContent() {
+  const { user, isAuthenticated } = useAuth();
   const { stats, randomTip, timeOfDay } = useHomePage(isAuthenticated);
 
-  useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      router.replace('/login');
-    }
-  }, [isLoading, isAuthenticated, router]);
-
-  if (isLoading || stats.loading) {
+  if (stats.loading) {
     return <DashboardLoading />;
-  }
-
-  if (!isAuthenticated) {
-    return null; // Vai redirecionar para login
   }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
       <Header />
-      
+
       <div className="container mx-auto px-4 py-8">
         <WelcomeHeader user={user} timeOfDay={timeOfDay} />
-        
+
         <DashboardStats stats={stats} />
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

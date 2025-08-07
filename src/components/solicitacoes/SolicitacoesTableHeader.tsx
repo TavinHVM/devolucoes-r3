@@ -65,7 +65,6 @@ export const SolicitacoesTableHeader: React.FC<SolicitacoesTableHeaderProps> = (
           />
         </TableHead>
         <TableHead className="text-slate-300">Status</TableHead>
-        <TableHead className="text-slate-300 pl-7">Ações</TableHead>
       </TableRow>
     </TableHeader>
   );
