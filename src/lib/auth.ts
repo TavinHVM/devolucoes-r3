@@ -47,3 +47,8 @@ export function getUserDisplayName(user: User | null): string {
   if (!user) return '';
   return `${user.first_name} ${user.last_name}`;
 }
+
+export function isUserAdmin(user: User | null): boolean {
+  if (!user) return false;
+  return user.user_level === 'adm';
+}

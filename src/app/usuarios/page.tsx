@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Users } from 'lucide-react';
 import Header from '../../components/header';
 import ProtectedRoute from '../../components/ProtectedRoute';
+import AdminRoute from '../../components/AdminRoute';
 import {
   UsuariosStats,
   UsuariosControls,
@@ -19,7 +20,9 @@ import {
 export default function Usuarios() {
   return (
     <ProtectedRoute>
-      <UsuariosContent />
+      <AdminRoute>
+        <UsuariosContent />
+      </AdminRoute>
     </ProtectedRoute>
   );
 }

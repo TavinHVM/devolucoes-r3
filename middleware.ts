@@ -13,6 +13,8 @@ interface UserTokenPayload {
 
 export function middleware(request: NextRequest) {
   const publicPaths = ["/login", "/reset-password", "/debug", "/test-login"];
+  const adminOnlyPaths = ["/usuarios"];
+  const adminOnlyApiPaths = ["/api/usuarios", "/api/usuarios/create", "/api/usuarios/edit", "/api/usuarios/delete"];
   const pathname = request.nextUrl.pathname;
 
   console.log("Middleware executado para:", pathname);
@@ -23,9 +25,9 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Se for API route, não bloquear no middleware (deixar para a própria API validar)
-  if (pathname.startsWith("/api/")) {
-    console.log("API route, permitindo acesso (validação na própria API)");
+  // Para APIs que não precisam de verificação admin, permitir acesso (validação na própria API)
+  if (pathname.startsWith("/api/") && !adminOnlyApiPaths.some(path => pathname.startsWith(path))) {
+    console.log("API route não-admin, permitindo acesso (validação na própria API)");
     return NextResponse.next();
   }
 
@@ -46,6 +48,19 @@ export function middleware(request: NextRequest) {
     ) as UserTokenPayload;
 
     console.log("Token válido para usuário:", payload.email);
+
+    // Verificar se é uma rota/API que requer permissão de admin
+    const isAdminOnlyPage = adminOnlyPaths.some(path => pathname.startsWith(path));
+    const isAdminOnlyApi = adminOnlyApiPaths.some(path => pathname.startsWith(path));
+    
+    if ((isAdminOnlyPage || isAdminOnlyApi) && payload.user_level !== 'adm') {
+      console.log("Acesso negado: usuário não é admin");
+      if (isAdminOnlyApi) {
+        return NextResponse.json({ error: 'Acesso negado. Apenas administradores podem acessar esta funcionalidade.' }, { status: 403 });
+      } else {
+        return NextResponse.redirect(new URL("/", request.url));
+      }
+    }
 
     // Adicionar dados do usuário aos headers para as páginas
     const response = NextResponse.next();

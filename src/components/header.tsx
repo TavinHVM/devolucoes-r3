@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
-import { getUserDisplayName } from "@/lib/auth";
+import { getUserDisplayName, isUserAdmin } from "@/lib/auth";
 
 // Ícones Lucide
 import { Home, FileText, Plus, Users, Power } from "lucide-react";
@@ -30,13 +30,22 @@ const navLinks = [
     icon: <Plus size={20} />,
   },
   // { href: "/criar-codcobranca", label: "Códigos Cobrança", icon: <Receipt size={20} /> },
-  { href: "/usuarios", label: "Usuários", icon: <Users size={20} /> },
+  { 
+    href: "/usuarios", 
+    label: "Usuários", 
+    icon: <Users size={20} />,
+    adminOnly: true 
+  },
 ];
 
 export default function Header() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const { user, logout } = useAuth();
+  const isAdmin = isUserAdmin(user);
+
+  // Filter navigation links based on user level
+  const filteredNavLinks = navLinks.filter(link => !link.adminOnly || isAdmin);
 
   const handleLogout = async () => {
     await logout(); // O AuthContext já faz o redirecionamento
@@ -99,7 +108,7 @@ export default function Header() {
 
         {/* Navegação */}
         <nav className="flex items-center gap-6">
-          {navLinks.map((link) => (
+          {filteredNavLinks.map((link) => (
             <Link
               key={link.href}
               href={link.href}
