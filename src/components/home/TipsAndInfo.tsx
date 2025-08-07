@@ -4,17 +4,20 @@ import {
   AlertCircle,
   Target,
   CheckCircle2,
+  Lightbulb,
 } from "lucide-react";
 
 interface TipsAndInfoProps {
-  randomTip: {
+  randomTips: {
     title: string;
     message: string;
     type: string;
-  };
+  }[];
 }
 
-export const TipsAndInfo: React.FC<TipsAndInfoProps> = ({ randomTip }) => {
+export const TipsAndInfo: React.FC<TipsAndInfoProps> = ({ randomTips }) => {
+  const [randomTip, randomTip2] = randomTips;
+
   return (
     <Card className="bg-slate-800/50 border-slate-700">
       <CardHeader>
@@ -28,10 +31,20 @@ export const TipsAndInfo: React.FC<TipsAndInfoProps> = ({ randomTip }) => {
           <div className="p-3 rounded-lg bg-blue-500/10 border border-blue-500/20">
             <div className="flex items-center gap-2 mb-1">
               <Target className="h-4 w-4 text-blue-400" />
-              <span className="text-blue-400 font-medium text-sm">{randomTip.title}</span>
+              <span className="text-blue-400 font-medium text-sm">{randomTip?.title}</span>
             </div>
             <p className="text-slate-300 text-sm">
-              {randomTip.message}
+              {randomTip?.message}
+            </p>
+          </div>
+
+          <div className="p-3 rounded-lg bg-purple-500/10 border border-purple-500/20">
+            <div className="flex items-center gap-2 mb-1">
+              <Lightbulb className="h-4 w-4 text-purple-400" />
+              <span className="text-purple-400 font-medium text-sm">{randomTip2?.title}</span>
+            </div>
+            <p className="text-slate-300 text-sm">
+              {randomTip2?.message}
             </p>
           </div>
           

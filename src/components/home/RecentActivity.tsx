@@ -9,7 +9,7 @@ import {
   ArrowRight,
   Clock,
 } from "lucide-react";
-import { formatRelativeTime, formatBrazilianDateTime } from "../../utils/timeUtils";
+import { formatBrazilianDateTime } from "../../utils/timeUtils";
 
 interface ActivityItem {
   id: number;
@@ -130,7 +130,7 @@ export const RecentActivity: React.FC = () => {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="space-y-4 mx-4 max-h-137 overflow-y-auto scrollbar-dark">
+        <div className="space-y-4 mx-4 max-h-167 overflow-y-auto scrollbar-dark">
           {displayActivities.length === 0 ? (
             <div className="flex items-center justify-center p-8 text-slate-400">
               <div className="text-center">

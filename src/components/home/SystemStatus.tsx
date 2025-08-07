@@ -1,13 +1,18 @@
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Badge } from "../ui/badge";
-import { Calendar } from "lucide-react";
+import { 
+  Calendar, 
+  Clock,
+  Server,
+  Zap
+} from "lucide-react";
 import { formatLastUpdate } from "../../utils/homeUtils";
 
 export const SystemStatus: React.FC = () => {
   return (
     <Card className="bg-slate-800/50 border-slate-700">
-      <CardHeader className="px-4">
+      <CardHeader>
         <CardTitle className="text-white flex items-center gap-2">
           <Calendar className="h-5 w-5 text-purple-400" />
           Status do Sistema
@@ -15,19 +20,42 @@ export const SystemStatus: React.FC = () => {
       </CardHeader>
       <CardContent>
         <div className="space-y-3 mx-4">
-          <div className="flex items-center justify-between">
-            <span className="text-slate-300 text-sm">Sistema</span>
-            <Badge className="bg-green-500/20 text-green-400 border-green-500/30">
-              Online
-            </Badge>
+          {/* Status do Servidor */}
+          <div className="p-3 rounded-lg bg-green-500/10 border border-green-500/20 min-h-[72px] flex flex-col justify-between">
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2">
+                <Server className="h-4 w-4 text-green-400" />
+                <span className="text-green-400 font-medium text-sm">Sistema</span>
+              </div>
+              <Badge className="bg-green-500/20 text-green-400 border-green-500/30">
+                Online
+              </Badge>
+            </div>
+            <p className="text-slate-300 text-sm">
+              Todos os serviços operando normalmente
+            </p>
           </div>
-          <div className="flex items-center justify-between">
-            <span className="text-slate-300 text-sm">Hórario de entrada:</span>
-            <span className="text-slate-400 text-sm">{formatLastUpdate()}</span>
+
+          {/* Horário de Entrada */}
+          <div className="p-3 rounded-lg bg-blue-500/10 border border-blue-500/20 min-h-[72px] flex flex-col justify-between">
+            <div className="flex items-center gap-2 mb-1">
+              <Clock className="h-4 w-4 text-blue-400" />
+              <span className="text-blue-400 font-medium text-sm">Última Entrada</span>
+            </div>
+            <p className="text-slate-300 text-sm">
+              {formatLastUpdate()}
+            </p>
           </div>
-          <div className="flex items-center justify-between">
-            <span className="text-slate-300 text-sm">Versão</span>
-            <span className="text-slate-400 text-sm">v1.0 (Em constante desenvolvimento)</span>
+
+          {/* Versão do Sistema */}
+          <div className="p-3 rounded-lg bg-purple-500/10 border border-purple-500/20 min-h-[72px] flex flex-col justify-between">
+            <div className="flex items-center gap-2 mb-1">
+              <Zap className="h-4 w-4 text-purple-400" />
+              <span className="text-purple-400 font-medium text-sm">Versão</span>
+            </div>
+            <p className="text-slate-300 text-sm">
+              v2.1.0 - Em constante desenvolvimento
+            </p>
           </div>
         </div>
       </CardContent>

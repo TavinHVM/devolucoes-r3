@@ -18,7 +18,7 @@ import {
 export default function Home() {
   const router = useRouter();
   const { user, isAuthenticated, isLoading } = useAuth();
-  const { stats, randomTip, timeOfDay } = useHomePage(isAuthenticated);
+  const { stats, randomTips, timeOfDay } = useHomePage(isAuthenticated);
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
@@ -51,7 +51,7 @@ export default function Home() {
             
             {/* Bottom row for Tips and System Status */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <TipsAndInfo randomTip={randomTip} />
+              <TipsAndInfo randomTips={randomTips} />
               <SystemStatus />
             </div>
           </div>
