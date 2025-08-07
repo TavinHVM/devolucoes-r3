@@ -82,13 +82,13 @@ export default function Usuarios() {
           setSearchTerm={setSearchTerm}
           selectedLevel={selectedLevel}
           setSelectedLevel={setSelectedLevel}
-          onCreateUser={() => setShowCreateModal(true)}
         />
 
         <UsuariosTable
           usuarios={filteredUsuarios}
           onEditUser={handleEditUserClick}
           onDeleteUser={handleDeleteUserClick}
+          onCreateUser={() => setShowCreateModal(true)}
         />
 
         <CreateUserModal

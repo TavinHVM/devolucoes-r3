@@ -6,25 +6,39 @@ export const getInitials = (firstName: string, lastName: string) => {
 
 export const levelBadgeConfig = {
   adm: {
-    bgColor: '#dc2626',
-    textColor: '#ffffff'
+    bgColor: '#ff0000ff',
+    textColor: '#ffffff',
+    icon: 'shield-check',
+    label: 'Administrador'
   },
   vendas: {
-    bgColor: '#3b82f6',
-    textColor: '#ffffff'
+    bgColor: '#0062ffff',
+    textColor: '#ffffff',
+    icon: 'shopping-cart',
+    label: 'Vendas'
   },
   financeiro: {
-    bgColor: '#059669',
-    textColor: 'text-white'
+    bgColor: '#00ffaeff',
+    textColor: '#ffffff',
+    icon: 'badge-cent',
+    label: 'Financeiro'
   },
   logistica: {
-    bgColor: '#f97316',
-    textColor: '#ffffff'
+    bgColor: '#ff6a00ff',
+    textColor: '#ffffff',
+    icon: 'truck',
+    label: 'Logística'
   },
   default: {
     bgColor: '#6b7280',
-    textColor: '#ffffff'
+    textColor: '#ffffff',
+    icon: 'circle',
+    label: 'Outro'
   }
+};
+
+export const getLevelBadgeConfig = (level: string) => {
+  return levelBadgeConfig[level.toLowerCase() as keyof typeof levelBadgeConfig] || levelBadgeConfig.default;
 };
 
 export const getLevelBadgeClass = (level: string) => {
@@ -40,7 +54,7 @@ export const getLevelBadgeClass = (level: string) => {
     classes.push(config.textColor);
   }
   
-  classes.push('border-0', 'hover:bg-current', 'hover:text-current', 'transition-none');
+  classes.push('border-0', 'hover:bg-current', 'hover:text-current', 'transition-none', 'shadow-sm');
   
   return classes.join(' ');
 };
@@ -51,7 +65,9 @@ export const getLevelBadgeStyle = (level: string) => {
   const baseStyle: React.CSSProperties = {
     border: 'none',
     transition: 'none',
-    cursor: 'default'
+    cursor: 'default',
+    backdropFilter: 'blur(8px)',
+    WebkitBackdropFilter: 'blur(8px)'
   };
   
   const needsInlineStyle = config.bgColor.startsWith('#') || config.textColor.startsWith('#');
@@ -73,7 +89,13 @@ export const getLevelBadgeStyle = (level: string) => {
     }
     
     if (backgroundColor) {
-      baseStyle.backgroundColor = backgroundColor;
+      // Converte hex para rgba com transparência
+      const hex = backgroundColor.replace('#', '');
+      const r = parseInt(hex.substr(0, 2), 16);
+      const g = parseInt(hex.substr(2, 2), 16);
+      const b = parseInt(hex.substr(4, 2), 16);
+      baseStyle.backgroundColor = `rgba(${r}, ${g}, ${b}, 0.2)`; // 20% de opacidade
+      baseStyle.border = `1px solid rgba(${r}, ${g}, ${b}, 0.3)`; // Borda com 30% de opacidade
     }
     
     if (textColor) {

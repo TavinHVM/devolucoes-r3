@@ -57,7 +57,7 @@ export function CreateUserModal({ open, onOpenChange, onSubmit }: CreateUserModa
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="first_name" className="text-slate-300">Nome</Label>
+              <Label htmlFor="first_name" className="text-slate-300 mb-2">Nome</Label>
               <Input
                 id="first_name"
                 value={form.first_name}
@@ -67,7 +67,7 @@ export function CreateUserModal({ open, onOpenChange, onSubmit }: CreateUserModa
               />
             </div>
             <div>
-              <Label htmlFor="last_name" className="text-slate-300">Sobrenome</Label>
+              <Label htmlFor="last_name" className="text-slate-300 mb-2">Sobrenome</Label>
               <Input
                 id="last_name"
                 value={form.last_name}
@@ -79,7 +79,7 @@ export function CreateUserModal({ open, onOpenChange, onSubmit }: CreateUserModa
           </div>
           
           <div>
-            <Label htmlFor="email" className="text-slate-300">E-mail</Label>
+            <Label htmlFor="email" className="text-slate-300 mb-2">E-mail</Label>
             <Input
               id="email"
               type="email"
@@ -91,7 +91,7 @@ export function CreateUserModal({ open, onOpenChange, onSubmit }: CreateUserModa
           </div>
           
           <div>
-            <Label htmlFor="role" className="text-slate-300">Cargo</Label>
+            <Label htmlFor="role" className="text-slate-300 mb-2">Cargo</Label>
             <Input
               id="role"
               value={form.role}
@@ -101,23 +101,23 @@ export function CreateUserModal({ open, onOpenChange, onSubmit }: CreateUserModa
             />
           </div>
           
-          <div>
-            <Label className="text-slate-300">Nível de Acesso</Label>
-            <CustomSelect value={form.user_level} onValueChange={value => setForm(f => ({ ...f, user_level: value }))}>
-              <SelectTrigger className="bg-slate-700 border-slate-600 text-white">
-                <SelectValue placeholder="Selecione o nível" />
-              </SelectTrigger>
-              <SelectContent className="bg-slate-700 border-slate-600">
-                <SelectItem value="adm" className="text-white">Administrador</SelectItem>
-                <SelectItem value="vendas" className="text-white">Vendas</SelectItem>
-                <SelectItem value="financeiro" className="text-white">Financeiro</SelectItem>
-                <SelectItem value="logistica" className="text-white">Logística</SelectItem>
-              </SelectContent>
-            </CustomSelect>
+          <div className="w-full">
+            <Label className="text-slate-300 mb-2">Nível de Acesso</Label>
+              <CustomSelect value={form.user_level} onValueChange={value => setForm(f => ({ ...f, user_level: value }))}>
+                <SelectTrigger className="bg-slate-700 border-slate-600 text-white w-full">
+                  <SelectValue placeholder="Selecione o nível" />
+                </SelectTrigger>
+                <SelectContent className="bg-slate-700 border-slate-600">
+                  <SelectItem value="adm" className="text-white">Administrador</SelectItem>
+                  <SelectItem value="vendas" className="text-white">Vendas</SelectItem>
+                  <SelectItem value="financeiro" className="text-white">Financeiro</SelectItem>
+                  <SelectItem value="logistica" className="text-white">Logística</SelectItem>
+                </SelectContent>
+              </CustomSelect>
           </div>
           
           <div>
-            <Label htmlFor="password" className="text-slate-300">Senha</Label>
+            <Label htmlFor="password" className="text-slate-300 mb-2">Senha</Label>
             <Input
               id="password"
               type="password"

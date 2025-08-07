@@ -3,26 +3,53 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '.
 import { Avatar, AvatarFallback } from '../ui/avatar';
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
-import { Edit2, Trash2, Mail } from 'lucide-react';
+import { Edit2, Trash2, Mail, ShieldCheck, ShoppingCart, Truck, Circle, BadgeCent, UserPlus } from 'lucide-react';
 import { Usuario } from './types';
-import { getInitials, getLevelBadgeClass, getLevelBadgeStyle } from './utils';
+import { getInitials, getLevelBadgeClass, getLevelBadgeStyle, getLevelBadgeConfig } from './utils';
 
 interface UsuariosTableProps {
   usuarios: Usuario[];
   onEditUser: (usuario: Usuario) => void;
   onDeleteUser: (id: string) => void;
+  onCreateUser: () => void;
 }
 
-export function UsuariosTable({ usuarios, onEditUser, onDeleteUser }: UsuariosTableProps) {
+const getLevelIcon = (level: string) => {
+  const iconProps = { size: 14, className: "mr-1" };
+
+  switch (level.toLowerCase()) {
+    case 'adm':
+      return <ShieldCheck {...iconProps} />;
+    case 'vendas':
+      return <ShoppingCart {...iconProps} />;
+    case 'financeiro':
+      return <BadgeCent {...iconProps} />;
+    case 'logistica':
+      return <Truck {...iconProps} />;
+    default:
+      return <Circle {...iconProps} />;
+  }
+};
+
+export function UsuariosTable({ usuarios, onEditUser, onDeleteUser, onCreateUser }: UsuariosTableProps) {
   return (
     <Card className="bg-slate-800/50 border-slate-700">
-      <CardHeader>
-        <CardTitle className="text-white">
-          Lista de Usuários ({usuarios.length})
-        </CardTitle>
-        <CardDescription className="text-slate-400">
-          Gerencie todos os usuários do sistema
-        </CardDescription>
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+        <div>
+          <CardTitle className="text-white">
+            Lista de Usuários ({usuarios.length})
+          </CardTitle>
+          <CardDescription className="text-slate-400">
+            Gerencie todos os usuários do sistema
+          </CardDescription>
+        </div>
+        <Button
+          onClick={onCreateUser}
+          className="bg-blue-600 hover:bg-blue-700 text-white h-10 px-6"
+        >
+          <UserPlus className="h-4 w-4 mr-2" />
+          Novo Usuário
+        </Button>
       </CardHeader>
       <CardContent>
         <Table>
@@ -70,11 +97,14 @@ export function UsuariosTable({ usuarios, onEditUser, onDeleteUser }: UsuariosTa
                     <p className="text-slate-300">{usuario.role}</p>
                   </TableCell>
                   <TableCell>
-                    <Badge 
-                      className={`capitalize ${getLevelBadgeClass(usuario.user_level)} !hover:bg-current !hover:text-current !hover:opacity-100 hover:shadow-none cursor-default select-none`}
+                    <Badge
+                      className={`capitalize ${getLevelBadgeClass(usuario.user_level)} !hover:bg-current !hover:text-current !hover:opacity-100 hover:shadow-none cursor-default select-none w-32 max-w-32 py-[10px] items-center justify-center`}
                       style={getLevelBadgeStyle(usuario.user_level)}
                     >
-                      {usuario.user_level}
+                      {getLevelIcon(usuario.user_level)}
+                      <span className='font-bold'>
+                        {getLevelBadgeConfig(usuario.user_level).label}
+                      </span>
                     </Badge>
                   </TableCell>
                   <TableCell className="text-right pr-6">

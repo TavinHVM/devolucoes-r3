@@ -1,5 +1,5 @@
 import { Card, CardContent } from '../ui/card';
-import { Users, Shield, User, Warehouse, BadgeCent } from 'lucide-react';
+import { Users, BadgeCent, ShoppingCart, Truck, ShieldCheck } from 'lucide-react';
 import { Usuario } from './types';
 
 interface UsuariosStatsProps {
@@ -17,13 +17,13 @@ export function UsuariosStats({ usuarios }: UsuariosStatsProps) {
     {
       label: 'Administradores',
       value: usuarios.filter(u => u.user_level === 'adm').length,
-      icon: Shield,
+      icon: ShieldCheck,
       color: 'red'
     },
     {
       label: 'Vendas',
       value: usuarios.filter(u => u.user_level === 'vendas').length,
-      icon: User,
+      icon: ShoppingCart,
       color: 'blue'
     },
     {
@@ -35,7 +35,7 @@ export function UsuariosStats({ usuarios }: UsuariosStatsProps) {
     {
       label: 'Logística',
       value: usuarios.filter(u => u.user_level === 'logistica').length,
-      icon: Warehouse,
+      icon: Truck,
       color: 'orange'
     }
   ];
