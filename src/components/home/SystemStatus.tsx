@@ -22,12 +22,12 @@ export const SystemStatus: React.FC = () => {
             </Badge>
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-slate-300 text-sm">Última atualização</span>
+            <span className="text-slate-300 text-sm">Hórario de entrada:</span>
             <span className="text-slate-400 text-sm">{formatLastUpdate()}</span>
           </div>
           <div className="flex items-center justify-between">
             <span className="text-slate-300 text-sm">Versão</span>
-            <span className="text-slate-400 text-sm">v2.1.0</span>
+            <span className="text-slate-400 text-sm">v1.0 (Em constante desenvolvimento)</span>
           </div>
         </div>
       </CardContent>

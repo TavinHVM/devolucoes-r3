@@ -25,7 +25,7 @@ export const getRandomTip = () => {
     },
     {
       title: 'Lembrete Importante',
-      message: 'Solicitações pendentes há mais de 24h aparecem destacadas na lista.',
+      message: 'As atividades recentes são atualizadas automaticamente e mostradas ao lado na página inicial.',
       type: 'reminder'
     },
     {
@@ -35,12 +35,12 @@ export const getRandomTip = () => {
     },
     {
       title: 'Eficiência',
-      message: 'Use as ações em lote para processar múltiplas solicitações de uma vez.',
+      message: 'Ao criar uma nova solicitação, algumas informações podem ser preenchidas automaticamente com base no número da NF.',
       type: 'efficiency'
     },
     {
       title: 'Navegação',
-      message: 'Use Ctrl+K para abrir a busca rápida em qualquer página.',
+      message: 'No topo da página, você pode alternar entre as telas do sistema.',
       type: 'navigation'
     }
   ];
