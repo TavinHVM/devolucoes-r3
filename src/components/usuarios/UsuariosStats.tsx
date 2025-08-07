@@ -12,7 +12,7 @@ export function UsuariosStats({ usuarios }: UsuariosStatsProps) {
       label: 'Total de Usuários',
       value: usuarios.length,
       icon: Users,
-      color: 'blue'
+      color: 'indigo'
     },
     {
       label: 'Administradores',
@@ -45,7 +45,8 @@ export function UsuariosStats({ usuarios }: UsuariosStatsProps) {
       blue: 'bg-blue-500/20 text-blue-400',
       red: 'bg-red-500/20 text-red-400',
       green: 'bg-green-500/20 text-green-400',
-      orange: 'bg-orange-500/20 text-orange-500'
+      orange: 'bg-orange-500/20 text-orange-500',
+      indigo: 'bg-indigo-500/20 text-indigo-400'
     };
     return colors[color as keyof typeof colors] || colors.blue;
   };
