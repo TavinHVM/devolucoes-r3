@@ -45,16 +45,20 @@ export default function Home() {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Content */}
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-2 space-y-6">
             <QuickActions />
             <PerformanceOverview stats={stats} />
+            
+            {/* Bottom row for Tips and System Status */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <TipsAndInfo randomTip={randomTip} />
+              <SystemStatus />
+            </div>
           </div>
 
           {/* Sidebar */}
           <div className="space-y-6">
             <RecentActivity />
-            <TipsAndInfo randomTip={randomTip} />
-            <SystemStatus />
           </div>
         </div>
       </div>

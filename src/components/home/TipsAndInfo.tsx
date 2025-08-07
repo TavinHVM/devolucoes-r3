@@ -41,7 +41,7 @@ export const TipsAndInfo: React.FC<TipsAndInfoProps> = ({ randomTip }) => {
               <span className="text-green-400 font-medium text-sm">Lembrete</span>
             </div>
             <p className="text-slate-300 text-sm">
-              Solicitações pendentes há mais de 24h aparecem destacadas na lista.
+              Sempre que necessitar de ajuda, entre em contato com o suporte.
             </p>
           </div>
         </div>
