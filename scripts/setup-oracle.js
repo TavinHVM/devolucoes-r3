@@ -20,7 +20,8 @@ if (isProduction) {
     const extractPath = path.join(projectRoot, "instantclient");
 
     // URL para download do Oracle Instant Client Basic (Linux x64)
-    const downloadUrl = "https://download.oracle.com/otn_software/linux/instantclient/211000/instantclient-basic-linux.x64-21.1.0.0.0.zip";
+    const downloadUrl =
+      "https://download.oracle.com/otn_software/linux/instantclient/211000/instantclient-basic-linux.x64-21.1.0.0.0.zip";
 
     // Baixa usando wget/curl se o arquivo não existir
     if (!fs.existsSync(zipPath)) {
@@ -31,7 +32,9 @@ if (isProduction) {
       } catch {
         console.log("⚠️ wget falhou, tentando curl...");
         try {
-          execSync(`curl -L -o "${zipPath}" "${downloadUrl}"`, { stdio: "inherit" });
+          execSync(`curl -L -o "${zipPath}" "${downloadUrl}"`, {
+            stdio: "inherit",
+          });
         } catch (curlError) {
           console.error("❌ Falha no download com wget e curl");
           throw curlError;
