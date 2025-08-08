@@ -1,9 +1,7 @@
 import { NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-
-const prisma = new PrismaClient();
+import db from "@/lib/db";
 
 export async function POST(request: Request) {
   try {
@@ -19,7 +17,7 @@ export async function POST(request: Request) {
     }
 
     // Buscar usuário pelo email
-    const user = await prisma.user_profiles.findFirst({
+    const user = await db.user_profiles.findFirst({
       where: {
         email: data.email,
       },

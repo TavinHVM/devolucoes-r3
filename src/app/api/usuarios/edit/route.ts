@@ -1,8 +1,6 @@
 import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
-
-const prisma = new PrismaClient();
+import db from '@/lib/db';
 
 export async function PUT(request: Request) {
   try {
@@ -27,7 +25,7 @@ export async function PUT(request: Request) {
       delete updateData.password;
     }
 
-    const updatedUser = await prisma.user_profiles.update({
+    const updatedUser = await db.user_profiles.update({
       where: { id: Number(id) },
       data: {
         ...updateData,
