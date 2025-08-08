@@ -1,0 +1,19 @@
+{
+  "version": 2,
+  "buildCommand": "chmod +x build.sh && ./build.sh",
+  "outputDirectory": ".next",
+  "installCommand": "npm install",
+  "framework": "nextjs",
+  "env": {
+    "NODE_ENV": "production",
+    "LD_LIBRARY_PATH": "/tmp/instantclient:/usr/lib:/lib",
+    "ORACLE_HOME": "/tmp/instantclient"
+  },
+  "functions": {
+    "src/app/api/**/*.ts": {
+      "maxDuration": 30,
+      "memory": 512
+    }
+  },
+  "regions": ["cle1"]
+}

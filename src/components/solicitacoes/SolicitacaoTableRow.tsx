@@ -144,13 +144,15 @@ export const SolicitacaoTableRow: React.FC<SolicitacaoTableRowProps> = ({
             </TableCell>
           </TableRow>
         </DialogTrigger>
-        <DialogContent className="max-w-4xl max-h-[95vh] overflow-y-auto scrollbar-dark bg-slate-800 border-slate-700 text-white">
-          <SolicitacaoDetailView
-            solicitacao={solicitacao}
-            userPermissions={userPermissions}
-            onActionComplete={handleActionComplete}
-            onCloseDetailDialog={handleCloseDetailDialog}
-          />
+        <DialogContent className="max-w-[60%] max-h-[95vh] overflow-y-auto scrollbar-dark bg-slate-800 border-slate-700 text-white">
+          <div className="w-full">
+            <SolicitacaoDetailView
+              solicitacao={solicitacao}
+              userPermissions={userPermissions}
+              onActionComplete={handleActionComplete}
+              onCloseDetailDialog={handleCloseDetailDialog}
+            />
+          </div>
         </DialogContent>
       </Dialog>
     </>
