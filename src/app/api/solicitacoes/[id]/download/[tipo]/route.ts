@@ -3,10 +3,10 @@ import db from "@/lib/db";
 
 export async function GET(
     request: NextRequest,
-    { params }: { params: { id: string; tipo: string } }
+    { params }: { params: Promise<{ id: string; tipo: string }> }
     ) {
     try {
-        const { id, tipo } = params;
+        const { id, tipo } = await params;
 
         // Validar parâmetros
         if (!id || !tipo) {
