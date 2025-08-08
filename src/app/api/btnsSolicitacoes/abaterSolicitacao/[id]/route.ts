@@ -57,6 +57,7 @@ export async function POST(request: Request) {
       data: {
         status: "ABATIDA",
         abatida_at: new Date(),
+        abatida_by: permissionCheck.user?.name || null,
       },
     });
 

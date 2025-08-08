@@ -82,6 +82,7 @@ export async function POST(request: Request) {
       data: {
         status: "APROVADA",
         aprovada_at: new Date(),
+        aprovada_by: permissionCheck.user?.name || null,
         arquivo_nf_devolucao: arquivoNfBuffer,
         arquivo_recibo: arquivoReciboBuffer,
         vale: vale,
