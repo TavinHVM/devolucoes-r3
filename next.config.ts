@@ -27,10 +27,8 @@ const nextConfig: NextConfig = {
     return config;
   },
 
-  // Configurações experimentais para melhor compatibilidade
-  experimental: {
-    serverComponentsExternalPackages: ["oracledb"],
-  },
+  // Configurações para melhor compatibilidade
+  serverExternalPackages: ["oracledb"],
 
   // Headers para CORS se necessário
   async headers() {

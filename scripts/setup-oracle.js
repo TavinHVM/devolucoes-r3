@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
 const fs = require("fs");
 const path = require("path");
 const { execSync } = require("child_process");
@@ -18,12 +19,30 @@ if (isProduction) {
     const zipPath = path.join(projectRoot, "instantclient-basic.zip");
     const extractPath = path.join(projectRoot, "instantclient");
 
-    // Verifica se o arquivo zip existe
+    // URL para download do Oracle Instant Client Basic (Linux x64)
+    const downloadUrl =
+      "https://download.oracle.com/otn_software/linux/instantclient/211000/instantclient-basic-linux.x64-21.1.0.0.0.zip";
+
+    // Baixa usando wget/curl se o arquivo não existir
     if (!fs.existsSync(zipPath)) {
-      console.error(
-        "❌ Arquivo instantclient-basic.zip não encontrado na raiz do projeto"
-      );
-      process.exit(1);
+      console.log("📥 Baixando Oracle Instant Client...");
+      try {
+        console.log("Tentando download com wget...");
+        execSync(`wget -O "${zipPath}" "${downloadUrl}"`, { stdio: "inherit" });
+      } catch {
+        console.log("⚠️ wget falhou, tentando curl...");
+        try {
+          execSync(`curl -L -o "${zipPath}" "${downloadUrl}"`, {
+            stdio: "inherit",
+          });
+        } catch (curlError) {
+          console.error("❌ Falha no download com wget e curl");
+          throw curlError;
+        }
+      }
+      console.log("✅ Download concluído");
+    } else {
+      console.log("📦 Usando arquivo local existente");
     }
 
     // Cria diretório para extrair
@@ -75,6 +94,12 @@ if (isProduction) {
         2
       )
     );
+
+    // Remove o arquivo zip após extração para economizar espaço
+    if (fs.existsSync(zipPath)) {
+      fs.unlinkSync(zipPath);
+      console.log("🗑️ Arquivo zip removido após extração");
+    }
 
     console.log("✅ Oracle Instant Client configurado com sucesso!");
     console.log(`🔗 LD_LIBRARY_PATH: ${process.env.LD_LIBRARY_PATH}`);
