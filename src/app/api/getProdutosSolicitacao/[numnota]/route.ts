@@ -6,7 +6,7 @@ import {
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { numnota: string } }
+  { params }: { params: Promise<{ numnota: string }> }
 ) {
   try {
     const { numnota } = await params;
