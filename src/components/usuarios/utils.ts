@@ -44,7 +44,7 @@ export const getLevelBadgeConfig = (level: string) => {
 export const getLevelBadgeClass = (level: string) => {
   const config = levelBadgeConfig[level.toLowerCase() as keyof typeof levelBadgeConfig] || levelBadgeConfig.default;
   
-  let classes = [];
+  const classes = [];
   
   if (!config.bgColor.startsWith('#')) {
     classes.push(config.bgColor);
