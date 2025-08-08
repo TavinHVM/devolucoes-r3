@@ -60,6 +60,7 @@ export async function POST(request: Request) {
       data: {
         status: "RECUSADA",
         recusada_at: new Date(),
+        recusada_by: permissionCheck.user?.name || null,
         motivo_recusa: motivo_recusa,
       },
     });

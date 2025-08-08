@@ -51,6 +51,13 @@ model solicitacoes {
   reenviada_at              DateTime?
   abatida_at                DateTime?
   finalizada_at             DateTime?
+  pendente_by               String?
+  aprovada_by               String?
+  recusada_by               String?
+  desdobrada_by             String?
+  reenviada_by              String?
+  abatida_by                String?
+  finalizada_by             String?
   created_at                DateTime  @default(now())
   updated_at                DateTime?  @default(now())
 }

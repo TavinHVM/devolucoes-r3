@@ -6,7 +6,7 @@
  * @param fields - Lista de campos do objeto onde será feita a busca
  * @returns Lista de objetos filtrados
  */
-export function filterBySearch<T extends Record<string, any>>(
+export function filterBySearch<T extends Record<string, unknown>>(
     data: T[],
     term: string,
     fields: (keyof T)[]

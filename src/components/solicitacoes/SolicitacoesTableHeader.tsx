@@ -17,7 +17,7 @@ export const SolicitacoesTableHeader: React.FC<SolicitacoesTableHeaderProps> = (
   return (
     <TableHeader>
       <TableRow className="border-slate-700 hover:bg-slate-700/30">
-        <TableHead className="text-slate-300">
+        <TableHead className="text-slate-300 justify-center flex">
           <OrderBtn
             label="ID"
             columnKey="id"
