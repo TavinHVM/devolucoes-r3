@@ -1,6 +1,6 @@
-import { Usuario } from '../../app/usuarios/page';
+import { UserProfile } from '../../types/solicitacao';
 
-export const fetchUsuarios = async (): Promise<Usuario[]> => {
+export const fetchUsuarios = async (): Promise<UserProfile[]> => {
   try {
     const response = await fetch('/api/usuarios', {
       method: 'GET',
