@@ -9,6 +9,7 @@ import {
 import { Input } from "../../components/ui/input";
 import { Button } from "../../components/ui/button";
 import { Label } from "../../components/ui/label";
+import { AuthLoading } from "../../components/LoadingPage";
 import { useForm, SubmitHandler, Controller } from "react-hook-form";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -88,11 +89,7 @@ export default function Login() {
 
   // Mostrar loading se ainda estiver verificando autenticação
   if (authLoading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-gray-900">
-        <div className="w-20 h-20 border-4 border-green-600/30 border-t-green-600 rounded-full animate-spin"></div>
-      </div>
-    );
+    return <AuthLoading />;
   }
 
   return (

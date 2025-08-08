@@ -3,6 +3,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { canCreateSolicitacao } from "@/lib/auth";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import { LoadingPage } from "./LoadingPage";
 
 interface CreateSolicitacaoRouteProps {
   children: React.ReactNode;
@@ -21,11 +22,7 @@ export default function CreateSolicitacaoRoute({ children }: CreateSolicitacaoRo
 
   // Show loading while checking authentication
   if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
-        <div className="text-white text-lg">Verificando permissões...</div>
-      </div>
-    );
+    return <LoadingPage message="Verificando permissões..." />;
   }
 
   // Show access denied for users who can't create solicitations
