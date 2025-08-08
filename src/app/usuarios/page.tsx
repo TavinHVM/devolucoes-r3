@@ -4,6 +4,7 @@ import { Users } from 'lucide-react';
 import Header from '../../components/header';
 import ProtectedRoute from '../../components/ProtectedRoute';
 import AdminRoute from '../../components/AdminRoute';
+import { LoadingPage } from '../../components/LoadingPage';
 import {
   UsuariosStats,
   UsuariosControls,
@@ -55,17 +56,9 @@ function UsuariosContent() {
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
-        <Header />
-        <div className="container mx-auto px-4 py-8">
-          <div className="flex items-center justify-center h-64">
-            <div className="text-white text-lg">Carregando usuários...</div>
-          </div>
-        </div>
-      </div>
-    );
+    return <LoadingPage message="Carregando usuários..." />;
   }
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
