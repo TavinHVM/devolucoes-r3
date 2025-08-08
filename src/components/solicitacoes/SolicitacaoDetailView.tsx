@@ -305,8 +305,8 @@ export const SolicitacaoDetailView: React.FC<SolicitacaoDetailViewProps> = ({
             <div className="mx-4 p-4 bg-slate-600/30 rounded-lg border border-slate-600/50">
               <div className="flex items-start gap-3">
                 <div className="w-1 h-full bg-blue-400 rounded-full min-h-[20px]"></div>
-                <div className="flex-1">
-                  <p className="text-slate-200 leading-relaxed text-base font-medium">
+                <div className="flex-1 max-w-full">
+                  <p className="text-slate-200 leading-relaxed text-base font-medium wrap-anywhere max-h-[200px] overflow-auto px-6">
                     {motivo_devolucao}
                   </p>
                 </div>
