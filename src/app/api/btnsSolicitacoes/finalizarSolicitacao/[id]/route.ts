@@ -60,6 +60,7 @@ export async function POST(request: Request) {
       data: {
         status: "FINALIZADA",
         finalizada_at: new Date(),
+        finalizada_by: permissionCheck.user?.name || null,
       },
     });
 

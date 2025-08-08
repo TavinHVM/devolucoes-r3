@@ -72,7 +72,7 @@ export const SolicitacaoTableRow: React.FC<SolicitacaoTableRowProps> = ({
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogTrigger asChild className="cursor-pointer hover:text-white">
           <TableRow className="border-slate-700 hover:bg-slate-700/30">
-            <TableCell>
+            <TableCell className="text-center">
               <Badge
                 variant="outline"
                 className="text-slate-300 border-slate-600"
@@ -125,7 +125,11 @@ export const SolicitacaoTableRow: React.FC<SolicitacaoTableRowProps> = ({
               <div className="flex items-center gap-2">
                 <Calendar className="h-4 w-4 text-slate-400" />
                 <span className="text-white">
-                  {new Date(created_at).toLocaleDateString()}
+                  {new Date(created_at).toLocaleDateString()} -{" "}
+                  {new Date(created_at).toLocaleTimeString([], {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
                 </span>
               </div>
             </TableCell>

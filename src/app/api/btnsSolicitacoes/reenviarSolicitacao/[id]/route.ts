@@ -58,6 +58,7 @@ export async function POST(request: Request) {
       data: {
         status: "REENVIADA",
         reenviada_at: new Date(),
+        reenviada_by: permissionCheck.user?.name || null,
       },
     });
 
