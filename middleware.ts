@@ -2,11 +2,12 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import jwt from "jsonwebtoken";
 
-interface UserTokenPayload {
+export interface UserTokenPayload {
   userId: number;
   email: string;
   role: string;
   user_level: string;
+  name: string;
   iat: number;
   exp: number;
 }

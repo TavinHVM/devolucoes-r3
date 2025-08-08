@@ -59,6 +59,7 @@ export async function POST(request: Request) {
       data: {
         status: "DESDOBRADA",
         desdobrada_at: new Date(),
+        desdobrada_by: permissionCheck.user?.name || null,
       },
     });
 

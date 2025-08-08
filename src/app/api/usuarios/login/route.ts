@@ -49,9 +49,10 @@ export async function POST(request: Request) {
         email: user.email,
         role: user.role,
         user_level: user.user_level,
+        name: `${user.first_name} ${user.last_name}`,
       },
       process.env.JWT_SECRET || "your-secret-key",
-      { expiresIn: "7d" } // 7 dias ao invés de 24h
+      { expiresIn: "1d" } // 1 dia ao invés de 24h
     );
 
     // Retornar dados do usuário (sem a senha) e o token

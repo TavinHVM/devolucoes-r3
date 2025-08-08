@@ -15,6 +15,7 @@ import {
   Loader2,
   MessageSquare,
   AlertTriangle,
+  Calendar,
 } from "lucide-react";
 import { Solicitacao } from "@/types/solicitacao";
 import {
@@ -160,7 +161,14 @@ export const SolicitacaoDetailView: React.FC<SolicitacaoDetailViewProps> = ({
                 </div>
                 <div className="flex text-slate-400 justify-end text-sm items-center gap-1">
                   <span>Criada em:</span>
-                  <span>{new Date(created_at).toLocaleDateString()}</span>
+                  <Calendar className="h-4 w-4 text-slate-400" />
+                <span className="text-white">
+                  {new Date(created_at).toLocaleDateString()} -{" "}
+                  {new Date(created_at).toLocaleTimeString([], {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
+                </span>
                 </div>
               </div>
             </div>
