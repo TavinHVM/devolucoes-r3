@@ -227,7 +227,7 @@ export function InfoFormStep({
                         <Textarea
                           placeholder="Descreva o motivo da devolução"
                           {...field}
-                          className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-400 resize-none"
+                          className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-400 resize-none overflow-auto h-[90px] max-h-[90px] scrollbar-dark"
                           rows={3}
                         />
                       </FormControl>
