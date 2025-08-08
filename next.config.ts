@@ -13,11 +13,47 @@ const nextConfig: NextConfig = {
         "oci-objectstorage",
         "oci-secrets"
       );
+
+      // Configurações específicas para Oracle em produção
+      if (process.env.NODE_ENV === "production") {
+        config.resolve.fallback = {
+          ...config.resolve.fallback,
+          fs: false,
+          path: false,
+          os: false,
+        };
+      }
     }
     return config;
+  },
+
+  // Configurações experimentais para melhor compatibilidade
+  experimental: {
+    serverComponentsExternalPackages: ["oracledb"],
+  },
+
+  // Headers para CORS se necessário
+  async headers() {
+    return [
+      {
+        source: "/api/:path*",
+        headers: [
+          {
+            key: "Access-Control-Allow-Origin",
+            value: "*",
+          },
+          {
+            key: "Access-Control-Allow-Methods",
+            value: "GET, POST, PUT, DELETE, OPTIONS",
+          },
+          {
+            key: "Access-Control-Allow-Headers",
+            value: "Content-Type, Authorization",
+          },
+        ],
+      },
+    ];
   },
 };
 
 export default nextConfig;
-
-
