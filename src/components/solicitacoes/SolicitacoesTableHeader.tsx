@@ -53,8 +53,24 @@ export const SolicitacoesTableHeader: React.FC<SolicitacoesTableHeaderProps> = (
             onClearSort={onClearSort}
           />
         </TableHead>
-        <TableHead className="text-slate-300">Código RCA</TableHead>
-        <TableHead className="text-slate-300">Tipo</TableHead>
+        <TableHead className="text-slate-300">
+          <OrderBtn
+            label="Código RCA"
+            columnKey="rca"
+            activeSort={sortColumns}
+            onSort={onSort}
+            onClearSort={onClearSort}
+          />
+        </TableHead>
+        <TableHead className="text-slate-300 px-6">
+          <OrderBtn
+            label="Tipo"
+            columnKey="tipo_devolucao"
+            activeSort={sortColumns}
+            onSort={onSort}
+            onClearSort={onClearSort}
+          />
+        </TableHead>
         <TableHead className="text-slate-300">
           <OrderBtn
             label="Data"
