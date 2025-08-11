@@ -19,7 +19,7 @@ export const TipsAndInfo: React.FC<TipsAndInfoProps> = ({ randomTips }) => {
   const [randomTip, randomTip2] = randomTips;
 
   return (
-    <Card className="bg-slate-800/50 border-slate-700">
+    <Card className="bg-slate-800/50 border-slate-700 min-h-[370px] max-h-[370px]">
       <CardHeader>
         <CardTitle className="text-white flex items-center gap-2">
           <AlertCircle className="h-5 w-5 text-orange-400" />
