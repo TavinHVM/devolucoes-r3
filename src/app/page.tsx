@@ -39,21 +39,21 @@ function HomeContent() {
 
         <DashboardStats stats={stats} />
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
           {/* Main Content */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="lg:col-span-2 flex flex-col gap-6">
             <QuickActions />
             <PerformanceOverview stats={stats} />
             
             {/* Bottom row for Tips and System Status */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
               <TipsAndInfo randomTips={randomTips} />
               <SystemStatus />
             </div>
           </div>
 
           {/* Sidebar */}
-          <div className="space-y-6">
+          <div className="flex flex-col">
             <RecentActivity />
           </div>
         </div>

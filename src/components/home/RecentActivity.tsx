@@ -104,7 +104,7 @@ export const RecentActivity: React.FC = () => {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4 mx-4 max-h-96 overflow-y-auto scrollbar-dark">
+          <div className="space-y-4 mx-4 max-h-80 overflow-y-auto scrollbar-dark">
             {[1, 2, 3].map((i) => (
               <div key={i} className="flex items-start gap-3 p-3 rounded-lg bg-slate-700/30 animate-pulse">
                 <div className="h-4 w-4 bg-slate-600 rounded-full"></div>
@@ -130,7 +130,7 @@ export const RecentActivity: React.FC = () => {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="space-y-4 mx-4 max-h-167 overflow-y-auto scrollbar-dark">
+        <div className="space-y-4 mx-4 max-h-172.5 overflow-y-auto scrollbar-dark">
           {displayActivities.length === 0 ? (
             <div className="flex items-center justify-center p-8 text-slate-400">
               <div className="text-center">
@@ -160,10 +160,10 @@ export const RecentActivity: React.FC = () => {
           </div>
         )}
 
-        <div className="mx-4">
+        <div className="mx-4 mt-4">
           <Button 
             variant="ghost" 
-            className="w-full mt-4 text-blue-400 hover:text-blue-300 hover:bg-blue-500/10 px-4 bg-blue-500/20"
+            className="w-full text-blue-400 hover:text-blue-300 hover:bg-blue-500/10 px-4 bg-blue-500/20"
             onClick={() => router.push('/solicitacoes')}
           >
             Ver todas as atividades

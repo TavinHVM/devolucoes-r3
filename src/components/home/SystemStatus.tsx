@@ -11,7 +11,7 @@ import { formatLastUpdate } from "../../utils/homeUtils";
 
 export const SystemStatus: React.FC = () => {
   return (
-    <Card className="bg-slate-800/50 border-slate-700">
+    <Card className="bg-slate-800/50 border-slate-700 min-h-[370px] max-h-[370px]">
       <CardHeader>
         <CardTitle className="text-white flex items-center gap-2">
           <Calendar className="h-5 w-5 text-purple-400" />
@@ -57,8 +57,8 @@ export const SystemStatus: React.FC = () => {
               v1.0 - Em constante desenvolvimento
             </p>
           </div>
-        </div>
-      </CardContent>
+    </div>
+  </CardContent>
     </Card>
   );
 };
