@@ -16,53 +16,6 @@ export const getTimeOfDay = (): 'morning' | 'afternoon' | 'evening' => {
   return 'evening';
 };
 
-export const getRandomTip = () => {
-  const tips = [
-    {
-      title: 'Dica de Produtividade',
-      message: 'Use os filtros na página de solicitações para encontrar rapidamente o que você procura.',
-      type: 'productivity'
-    },
-    {
-      title: 'Lembrete Importante',
-      message: 'As atividades recentes são atualizadas automaticamente e mostradas ao lado na página inicial.',
-      type: 'reminder'
-    },
-    {
-      title: 'Funcionalidade',
-      message: 'Você pode ordenar as colunas da tabela clicando nos cabeçalhos.',
-      type: 'feature'
-    },
-    {
-      title: 'Eficiência',
-      message: 'Ao criar uma nova solicitação, algumas informações podem ser preenchidas automaticamente com base no número da NF.',
-      type: 'efficiency'
-    },
-    {
-      title: 'Navegação',
-      message: 'No topo da página, você pode alternar entre as telas do sistema.',
-      type: 'navigation'
-    },
-    {
-      title: 'Atalho Rápido',
-      message: 'Use Ctrl+K para abrir a busca rápida em qualquer página do sistema.',
-      type: 'shortcut'
-    },
-    {
-      title: 'Segurança',
-      message: 'Sempre faça logout ao sair do sistema para manter suas informações seguras.',
-      type: 'security'
-    },
-    {
-      title: 'Performance',
-      message: 'O sistema salva automaticamente os filtros aplicados para sua próxima sessão.',
-      type: 'performance'
-    }
-  ];
-  
-  return tips[Math.floor(Math.random() * tips.length)];
-};
-
 export const getRandomTips = () => {
   const tips = [
     {

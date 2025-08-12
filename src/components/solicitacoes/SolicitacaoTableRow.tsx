@@ -1,7 +1,7 @@
 import React, { useState } from "react";
+import { toast } from "sonner";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Toast } from "@/components/ui/toast";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { FileText, Calendar, User, Handshake, Wallet } from "lucide-react";
 import { Solicitacao } from "@/types/solicitacao";
@@ -32,13 +32,13 @@ export const SolicitacaoTableRow: React.FC<SolicitacaoTableRowProps> = ({
   onRefreshList,
 }) => {
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [toast, setToast] = useState<{
-    message: string;
-    type: "success" | "error";
-  } | null>(null);
 
   const handleActionComplete = (message: string, type: "success" | "error") => {
-    setToast({ message, type });
+    if (type === "success") {
+      toast.success(message);
+    } else {
+      toast.error(message);
+    }
     // Atualizar a lista de solicitações
     onRefreshList?.();
   };
@@ -60,15 +60,6 @@ export const SolicitacaoTableRow: React.FC<SolicitacaoTableRowProps> = ({
 
   return (
     <>
-      {/* Toast renderizado no nível da página */}
-      {toast && (
-        <Toast
-          message={toast.message}
-          type={toast.type}
-          onClose={() => setToast(null)}
-        />
-      )}
-
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogTrigger asChild className="cursor-pointer hover:text-white">
           <TableRow className="border-slate-700 hover:bg-slate-700/30">

@@ -1,13 +1,13 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { Usuario, CreateUserForm, EditUserForm, ToastMessage } from './types';
+import { toast } from 'sonner';
+import { Usuario, CreateUserForm, EditUserForm } from './types';
 import { fetchUsuarios } from '../../utils/usuarios/fetchUsuarios';
 import { createUser, editUser as editUserAPI, deleteUser } from '../../utils/usuarios/apiUtils';
 
 export const useUsuarios = () => {
   const [usuarios, setUsuarios] = useState<Usuario[]>([]);
   const [loading, setLoading] = useState(true);
-  const [toast, setToast] = useState<ToastMessage | null>(null);
 
   const fetchUsuariosList = async () => {
     try {
@@ -16,7 +16,7 @@ export const useUsuarios = () => {
       setUsuarios(data);
     } catch (error) {
       console.error('Erro ao buscar os usuários:', error);
-      setToast({ message: 'Erro ao carregar usuários.', type: 'error' });
+      toast.error('Erro ao carregar usuários.');
     } finally {
       setLoading(false);
     }
@@ -25,12 +25,12 @@ export const useUsuarios = () => {
   const handleCreateUser = async (form: CreateUserForm) => {
     try {
       await createUser(form);
-      setToast({ message: 'Usuário criado com sucesso!', type: 'success' });
+      toast.success('Usuário criado com sucesso!');
       fetchUsuariosList();
       return true;
     } catch (error) {
       console.error('Erro ao criar usuário:', error);
-      setToast({ message: 'Erro ao criar usuário.', type: 'error' });
+      toast.error('Erro ao criar usuário.');
       return false;
     }
   };
@@ -38,12 +38,12 @@ export const useUsuarios = () => {
   const handleEditUser = async (id: number, form: EditUserForm) => {
     try {
       await editUserAPI(id, form);
-      setToast({ message: 'Usuário editado com sucesso!', type: 'success' });
+      toast.success('Usuário editado com sucesso!');
       fetchUsuariosList();
       return true;
     } catch (error) {
       console.error('Erro ao editar usuário:', error);
-      setToast({ message: 'Erro ao editar usuário.', type: 'error' });
+      toast.error('Erro ao editar usuário.');
       return false;
     }
   };
@@ -51,12 +51,12 @@ export const useUsuarios = () => {
   const handleDeleteUser = async (id: string) => {
     try {
       await deleteUser(id);
-      setToast({ message: 'Usuário excluído com sucesso!', type: 'success' });
+      toast.success('Usuário excluído com sucesso!');
       fetchUsuariosList();
       return true;
     } catch (error) {
       console.error('Erro ao excluir usuário:', error);
-      setToast({ message: 'Erro ao excluir usuário.', type: 'error' });
+      toast.error('Erro ao excluir usuário.');
       return false;
     }
   };
@@ -65,18 +65,9 @@ export const useUsuarios = () => {
     fetchUsuariosList();
   }, []);
 
-  useEffect(() => {
-    if (toast) {
-      const timer = setTimeout(() => setToast(null), 4000);
-      return () => clearTimeout(timer);
-    }
-  }, [toast]);
-
   return {
     usuarios,
     loading,
-    toast,
-    setToast,
     handleCreateUser,
     handleEditUser,
     handleDeleteUser,

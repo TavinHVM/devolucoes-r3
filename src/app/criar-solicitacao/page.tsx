@@ -4,7 +4,6 @@ import Header from "../../components/header";
 import ProtectedRoute from "../../components/ProtectedRoute";
 import CreateSolicitacaoRoute from "../../components/CreateSolicitacaoRoute";
 import {
-  Toast,
   PageHeader,
   ProgressIndicator,
   InfoFormStep,
@@ -25,8 +24,6 @@ export default function Solicitacao() {
 function SolicitacaoContent() {
   const {
     // Estados
-    toast,
-    setToast,
     currentStep,
     numeroNF,
     setNumeroNF,
@@ -63,15 +60,6 @@ function SolicitacaoContent() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
       <Header />
-
-      {/* Toast Overlay */}
-      {toast && (
-        <Toast
-          message={toast.message}
-          type={toast.type}
-          onClose={() => setToast(null)}
-        />
-      )}
 
       <div className="container mx-auto px-4 py-8">
         <PageHeader />

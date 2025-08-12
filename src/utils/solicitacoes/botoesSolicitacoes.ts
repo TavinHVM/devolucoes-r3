@@ -1,4 +1,5 @@
 import { getStoredToken } from "@/lib/auth";
+import { toast } from "sonner";
 
 // Função auxiliar para obter headers com token de autenticação
 function getAuthHeaders(includeContentType = true): Record<string, string> {
@@ -64,11 +65,9 @@ export async function AprovarSolicitacao(
     return await response.json();
   } catch (error) {
     if (error instanceof Error) {
-      console.error(error.message); // Aqui você pode exibir com toast.error(error.message)
+      toast.error(error.message);
     } else {
-      console.error(
-        "Erro inesperado ao mudar Status da solicitação para Aprovada."
-      );
+      toast.error("Erro inesperado ao mudar Status da solicitação para Aprovada.");
     }
   }
 }

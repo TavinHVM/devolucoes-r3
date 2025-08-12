@@ -4,7 +4,6 @@ export { UsuariosTable } from './UsuariosTable';
 export { CreateUserModal } from './CreateUserModal';
 export { EditUserModal } from './EditUserModal';
 export { DeleteConfirmModal } from './DeleteConfirmModal';
-export { Toast } from './Toast';
 export { useUsuarios } from './useUsuarios';
 export { filterUsuarios } from './utils';
-export type { Usuario, CreateUserForm, EditUserForm, ToastMessage } from './types';
+export type { Usuario, CreateUserForm, EditUserForm } from './types';

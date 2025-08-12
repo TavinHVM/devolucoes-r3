@@ -12,7 +12,6 @@ import {
   CreateUserModal,
   EditUserModal,
   DeleteConfirmModal,
-  Toast,
   useUsuarios,
   filterUsuarios,
   Usuario
@@ -38,8 +37,6 @@ function UsuariosContent() {
   const {
     usuarios,
     loading,
-    toast,
-    setToast,
     handleCreateUser,
     handleEditUser,
     handleDeleteUser,
@@ -112,8 +109,6 @@ function UsuariosContent() {
           onConfirm={handleDeleteUser}
         />
       </div>
-      
-      {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
     </div>
   );
 }

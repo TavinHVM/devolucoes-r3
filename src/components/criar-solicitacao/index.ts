@@ -1,4 +1,3 @@
-export { Toast } from './Toast';
 export { PageHeader } from './PageHeader';
 export { ProgressIndicator } from './ProgressIndicator';
 export { InfoFormStep } from './InfoFormStep';

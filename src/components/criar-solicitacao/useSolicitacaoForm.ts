@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { toast } from "sonner";
 import {
   fetchProdutosNF,
   fetchInfosNF,
@@ -25,11 +26,6 @@ const formSchema = z.object({
 });
 
 export function useSolicitacaoForm() {
-  const [toast, setToast] = useState<{
-    message: string;
-    type: "success" | "error";
-  } | null>(null);
-
   const [currentStep, setCurrentStep] = useState<1 | 2>(1);
   const [numeroNF, setNumeroNF] = useState<string>("");
   const [codigoRca, setCodigoRca] = useState<string>("");
@@ -69,20 +65,16 @@ export function useSolicitacaoForm() {
       const toastMsg = localStorage.getItem("solicitacao-toast-message");
       const toastType = localStorage.getItem("solicitacao-toast-type");
       if (toastMsg && toastType) {
-        setToast({ message: toastMsg, type: toastType as "success" | "error" });
+        if (toastType === "success") {
+          toast.success(toastMsg);
+        } else {
+          toast.error(toastMsg);
+        }
         localStorage.removeItem("solicitacao-toast-message");
         localStorage.removeItem("solicitacao-toast-type");
       }
     }
   }, []);
-
-  // Toast auto-hide
-  useEffect(() => {
-    if (toast) {
-      const timer = setTimeout(() => setToast(null), 4000);
-      return () => clearTimeout(timer);
-    }
-  }, [toast]);
 
   // Controlar automaticamente o tipo de devolução baseado na seleção
   useEffect(() => {
@@ -193,18 +185,12 @@ export function useSolicitacaoForm() {
   const avancarPagina = async () => {
     const motivoDevolucao = form.getValues("motivo_devolucao");
     if (!motivoDevolucao || motivoDevolucao.trim() === "") {
-      setToast({
-        message: "Por favor, preencha o motivo da devolução antes de continuar.",
-        type: "error",
-      });
+      toast.error("Por favor, preencha o motivo da devolução antes de continuar.");
       return;
     }
 
     if (!arquivoNF) {
-      setToast({
-        message: "Por favor, selecione o arquivo da nota fiscal antes de continuar.",
-        type: "error",
-      });
+      toast.error("Por favor, selecione o arquivo da nota fiscal antes de continuar.");
       return;
     }
 
@@ -339,12 +325,9 @@ export function useSolicitacaoForm() {
       window.location.reload();
     } catch (error) {
       console.error("Erro ao criar registro:", error);
-      setToast({
-        message: `Erro ao criar solicitação: ${
-          error instanceof Error ? error.message : "Erro desconhecido"
-        }`,
-        type: "error",
-      });
+      toast.error(`Erro ao criar solicitação: ${
+        error instanceof Error ? error.message : "Erro desconhecido"
+      }`);
     }
   };
 
@@ -358,8 +341,6 @@ export function useSolicitacaoForm() {
 
   return {
     // Estados
-    toast,
-    setToast,
     currentStep,
     numeroNF,
     setNumeroNF,

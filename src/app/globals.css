@@ -60,7 +60,7 @@
   --accent: oklch(0.97 0 0);
   --accent-foreground: oklch(0.205 0 0);
   --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
+  --border: oklch(0% 0 0);
   --input: oklch(0.922 0 0);
   --ring: oklch(0.708 0 0);
   --chart-1: oklch(0.646 0.222 41.116);
@@ -116,12 +116,15 @@
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }
 }
 
-html, body, #__next {
+html,
+body,
+#__next {
   height: 100%;
   min-height: 100vh;
   margin: 0;
@@ -168,3 +171,29 @@ html, body, #__next {
   }
 }
 
+/* Sonner Toast Styles */
+[data-sonner-toast] {
+  background-color: #059669 !important; /* Verde padrão */
+  border: 1px solid #047857 !important; /* Verde mais escuro */
+  color: #ffffff !important; /* Texto branco */
+}
+
+[data-sonner-toast][data-type="success"] {
+  background-color: #059669 !important; /* Verde para success */
+  border: 1px solid #047857 !important; /* Verde mais escuro */
+  color: #ffffff !important;
+}
+
+[data-sonner-toast][data-type="error"] {
+  background-color: #dc2626 !important; /* Vermelho para error */
+  border: 1px solid #991b1b !important; /* Vermelho mais escuro */
+  color: #ffffff !important;
+}
+
+[data-sonner-toast] [data-title] {
+  color: #ffffff !important;
+}
+
+[data-sonner-toast] [data-description] {
+  color: #ffffff !important;
+}
