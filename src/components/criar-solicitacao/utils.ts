@@ -1,14 +1,14 @@
 export interface Produto {
-  codprod: string;
+  codprod: number;
   descricao: string;
   qt: number;
   punit: number;
 }
 
 export interface InfosNF {
-  codcli: string;
-  numcar: string;
-  codusur: string;
+  codcli: number;
+  numcar: number;
+  codusur: number;
   codcob: string;
   cobranca: string;
   cliente: string;
@@ -25,18 +25,33 @@ export interface ProdutoFormatado {
 
 export async function fetchProdutosNF(numnota: string): Promise<Produto[]> {
   try {
-    console.log("Fazendo requisição para:", `/api/getProdutosNF/${numnota}`);
-    const res = await fetch(`/api/getProdutosNF/${numnota}`);
+    console.log(
+      "Fazendo requisição para:",
+      `/api/proxy/getProdutosNF/${numnota}`
+    );
+    const res = await fetch(`/api/proxy/getProdutosNF/${numnota}`);
     console.log("Status da resposta:", res.status);
 
     if (!res.ok) {
       throw new Error(`HTTP error! status: ${res.status}`);
     }
 
-    const data = await res.json();
-    console.log("Dados recebidos da API:", data);
+    const response = await res.json();
+    console.log("Resposta completa da API produtos:", response);
 
-    return data.produtos || [];
+    // Verificar se a resposta tem o formato esperado
+    if (
+      response.success &&
+      response.produtos &&
+      Array.isArray(response.produtos)
+    ) {
+      console.log("Produtos extraídos:", response.produtos);
+      console.log("Total de produtos:", response.total);
+      return response.produtos as Produto[];
+    } else {
+      console.error("Formato de resposta inesperado para produtos:", response);
+      return [];
+    }
   } catch (error) {
     console.error("Erro na função fetchProdutosNF:", error);
     return [];
@@ -44,13 +59,30 @@ export async function fetchProdutosNF(numnota: string): Promise<Produto[]> {
 }
 
 export async function fetchInfosNF(numnota: string): Promise<InfosNF | null> {
-  const res = await fetch(`/api/getInfosNF/${numnota}`);
-  if (!res.ok) {
-    console.error("Erro na requisição:", res.status, res.statusText);
+  try {
+    console.log("Fazendo requisição para:", `/api/proxy/getInfosNF/${numnota}`);
+    const res = await fetch(`/api/proxy/getInfosNF/${numnota}`);
+
+    if (!res.ok) {
+      console.error("Erro na requisição:", res.status, res.statusText);
+      return null;
+    }
+
+    const response = await res.json();
+    console.log("Resposta completa da API:", response);
+
+    // Verificar se a resposta tem o formato esperado
+    if (response.success && response.data) {
+      console.log("Dados extraídos do campo 'data':", response.data);
+      return response.data as InfosNF;
+    } else {
+      console.error("Formato de resposta inesperado:", response);
+      return null;
+    }
+  } catch (error) {
+    console.error("Erro na função fetchInfosNF:", error);
     return null;
   }
-  const data = await res.json();
-  return data;
 }
 
 export function checkIdentificador(identificador: string): string {
@@ -70,7 +102,7 @@ export function checkIdentificador(identificador: string): string {
 
 export function formatProdutos(produtosNF: Produto[]): ProdutoFormatado[] {
   return produtosNF.map((produto) => ({
-    codigo: produto.codprod,
+    codigo: produto.codprod.toString(),
     descricao: produto.descricao,
     quantidade: produto.qt.toString(),
     punit: produto.punit.toString(),

@@ -1,10 +1,31 @@
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+} from "@/components/ui/form";
 import { FileUploadNF } from "@/components/fileUploadNF";
-import { Search, User, Package, CreditCard, ArrowRight } from "lucide-react";
+import { NFWarning } from "./NFWarning";
+import { useNFVerification } from "@/hooks/useNFVerification";
+import {
+  Search,
+  User,
+  Package,
+  CreditCard,
+  ArrowRight,
+  Loader2,
+} from "lucide-react";
 import { UseFormReturn } from "react-hook-form";
 
 type FormData = {
@@ -37,6 +58,16 @@ interface InfoFormStepProps {
   onAdvance: () => void;
   checkIdentificador: (id: string) => string;
   isButtonEnabled: () => boolean;
+  onNFInfosFetched?: (infos: {
+    codcli: string;
+    numcar: string;
+    codusur: string;
+    codcob: string;
+    cobranca: string;
+    cliente: string;
+    codfilial: string;
+    cgcent: string;
+  }) => void;
 }
 
 export function InfoFormStep({
@@ -54,8 +85,44 @@ export function InfoFormStep({
   setArquivoNF,
   onAdvance,
   checkIdentificador,
-  isButtonEnabled
+  isButtonEnabled,
+  onNFInfosFetched,
 }: InfoFormStepProps) {
+  const {
+    isChecking,
+    checkResult,
+    showWarning,
+    checkExistingSolicitacoes,
+    fetchInfosNF,
+    dismissWarning,
+  } = useNFVerification();
+
+  // Função para verificar e buscar informações da NF
+  const handleNFChange = async (value: string) => {
+    setNumeroNF(value);
+
+    if (value.length >= 4) {
+      // Primeiro verifica se já existem solicitações
+      await checkExistingSolicitacoes(value);
+
+      // Depois busca as informações da NF no Oracle (independente de existir solicitação)
+      if (onNFInfosFetched) {
+        const nfInfos = await fetchInfosNF(value);
+        if (nfInfos) {
+          onNFInfosFetched({
+            codcli: String(nfInfos.codcli),
+            numcar: String(nfInfos.numcar),
+            codusur: String(nfInfos.codusur),
+            codcob: String(nfInfos.codcob),
+            cobranca: String(nfInfos.cobranca),
+            cliente: String(nfInfos.cliente),
+            codfilial: String(nfInfos.codfilial),
+            cgcent: String(nfInfos.cgcent),
+          });
+        }
+      }
+    }
+  };
   return (
     <div className="max-w-4xl mx-auto">
       <Card className="bg-slate-800/50 border-slate-700 p-4">
@@ -69,6 +136,16 @@ export function InfoFormStep({
           </CardDescription>
         </CardHeader>
         <CardContent>
+          {/* Aviso de solicitações existentes */}
+          {showWarning &&
+            checkResult &&
+            checkResult.solicitacoes.length > 0 && (
+              <NFWarning
+                solicitacoes={checkResult.solicitacoes}
+                onDismiss={dismissWarning}
+              />
+            )}
+
           <Form {...form}>
             <form className="space-y-6">
               <div className="gap-6">
@@ -78,21 +155,31 @@ export function InfoFormStep({
                   name="numero_nf"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-white">Número da Nota Fiscal</FormLabel>
+                      <FormLabel className="text-white">
+                        Número da Nota Fiscal
+                      </FormLabel>
                       <FormControl>
-                        <Input
-                          placeholder="Digite o número da NF"
-                          {...field}
-                          value={numeroNF}
-                          onChange={(e) => {
-                            const value = e.target.value.replace(/\\D/g, "");
-                            if (value.length <= 6) {
-                              setNumeroNF(value);
-                              field.onChange(value);
-                            }
-                          }}
-                          className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-400"
-                        />
+                        <div className="relative">
+                          <Input
+                            placeholder="Digite o número da NF"
+                            {...field}
+                            value={numeroNF}
+                            onChange={(e) => {
+                              const value = e.target.value.replace(/\D/g, "");
+                              if (value.length <= 6) {
+                                handleNFChange(value);
+                                field.onChange(value);
+                              }
+                            }}
+                            className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-400"
+                            disabled={isChecking}
+                          />
+                          {isChecking && (
+                            <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                              <Loader2 className="h-4 w-4 animate-spin text-slate-400" />
+                            </div>
+                          )}
+                        </div>
                       </FormControl>
                     </FormItem>
                   )}
@@ -132,108 +219,112 @@ export function InfoFormStep({
               </Card>
 
               {/* Informações da Carga e Cobrança */}
-               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Card className="bg-slate-700/50 border-slate-600">
-                    <CardHeader>
+                  <CardHeader>
                     <CardTitle className="text-white text-lg flex items-center gap-2">
-                        <Package className="h-5 w-5" />
-                        Informações da Carga
+                      <Package className="h-5 w-5" />
+                      Informações da Carga
                     </CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-4 mx-4">
+                  </CardHeader>
+                  <CardContent className="space-y-4 mx-4">
                     <div>
-                        <label className="text-sm font-medium text-slate-300">
+                      <label className="text-sm font-medium text-slate-300">
                         Número da Carga
-                        </label>
-                        <div className="mt-1 p-3 bg-slate-600 rounded-lg border border-slate-500">
+                      </label>
+                      <div className="mt-1 p-3 bg-slate-600 rounded-lg border border-slate-500">
                         <span className="text-white">
-                            {numeroCarga || "CARGA NÃO ENCONTRADA"}
+                          {numeroCarga || "CARGA NÃO ENCONTRADA"}
                         </span>
-                        </div>
+                      </div>
                     </div>
                     <div>
-                        <label className="text-sm font-medium text-slate-300">
+                      <label className="text-sm font-medium text-slate-300">
                         Código RCA
-                        </label>
-                        <div className="mt-1 p-3 bg-slate-600 rounded-lg border border-slate-500">
+                      </label>
+                      <div className="mt-1 p-3 bg-slate-600 rounded-lg border border-slate-500">
                         <span className="text-white">
-                            {codigoRca || "RCA NÃO ENCONTRADO"}
+                          {codigoRca || "RCA NÃO ENCONTRADO"}
                         </span>
-                        </div>
+                      </div>
                     </div>
                     <div>
-                        <label className="text-sm font-medium text-slate-300">
+                      <label className="text-sm font-medium text-slate-300">
                         Código Filial
-                        </label>
-                        <div className="mt-1 p-3 bg-slate-600 rounded-lg border border-slate-500">
+                      </label>
+                      <div className="mt-1 p-3 bg-slate-600 rounded-lg border border-slate-500">
                         <span className="text-white">
-                            {codigoFilial || "FILIAL NÃO ENCONTRADA"}
+                          {codigoFilial || "FILIAL NÃO ENCONTRADA"}
                         </span>
-                        </div>
+                      </div>
                     </div>
-                    </CardContent>
+                  </CardContent>
                 </Card>
 
                 <Card className="bg-slate-700/50 border-slate-600">
-                    <CardHeader>
+                  <CardHeader>
                     <CardTitle className="text-white text-lg flex items-center gap-2">
-                        <CreditCard className="h-5 w-5" />
-                        Informações de Cobrança
+                      <CreditCard className="h-5 w-5" />
+                      Informações de Cobrança
                     </CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-4 px-4">
+                  </CardHeader>
+                  <CardContent className="space-y-4 px-4">
                     <div>
-                        <label className="text-sm font-medium text-slate-300">
+                      <label className="text-sm font-medium text-slate-300">
                         Código da Cobrança
-                        </label>
-                        <div className="mt-1 p-3 bg-slate-600 rounded-lg border border-slate-500">
+                      </label>
+                      <div className="mt-1 p-3 bg-slate-600 rounded-lg border border-slate-500">
                         <span className="text-white">
-                            {numeroCodigoCobranca || "CÓDIGO NÃO ENCONTRADO"}
+                          {numeroCodigoCobranca || "CÓDIGO NÃO ENCONTRADO"}
                         </span>
-                        </div>
+                      </div>
                     </div>
                     <div>
-                        <label className="text-sm font-medium text-slate-300">
+                      <label className="text-sm font-medium text-slate-300">
                         Nome da Cobrança
-                        </label>
-                        <div className="mt-1 p-3 bg-slate-600 rounded-lg border border-slate-500">
+                      </label>
+                      <div className="mt-1 p-3 bg-slate-600 rounded-lg border border-slate-500">
                         <span className="text-white">
-                            {nomeCodigoCobranca || "NOME NÃO ENCONTRADO"}
+                          {nomeCodigoCobranca || "NOME NÃO ENCONTRADO"}
                         </span>
-                        </div>
+                      </div>
                     </div>
                     <div>
-                        <label className="text-sm font-medium text-slate-300">
+                      <label className="text-sm font-medium text-slate-300">
                         Código Identificador
-                        </label>
-                        <div className="mt-1 p-3 bg-slate-600 rounded-lg border border-slate-500">
+                      </label>
+                      <div className="mt-1 p-3 bg-slate-600 rounded-lg border border-slate-500">
                         <span className="text-white">
-                            {identificador ? checkIdentificador(identificador) : "CÓDIGO NÃO ENCONTRADO"}
+                          {identificador
+                            ? checkIdentificador(identificador)
+                            : "CÓDIGO NÃO ENCONTRADO"}
                         </span>
-                        </div>
+                      </div>
                     </div>
-                    </CardContent>
+                  </CardContent>
                 </Card>
-               </div>
+              </div>
 
-                  {/* Motivo da Devolução */}
-                <FormField
-                  control={form.control}
-                  name="motivo_devolucao"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-white">Motivo da Devolução</FormLabel>
-                      <FormControl>
-                        <Textarea
-                          placeholder="Descreva o motivo da devolução"
-                          {...field}
-                          className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-400 resize-none overflow-auto h-[90px] max-h-[90px] scrollbar-dark"
-                          rows={3}
-                        />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
+              {/* Motivo da Devolução */}
+              <FormField
+                control={form.control}
+                name="motivo_devolucao"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-white">
+                      Motivo da Devolução
+                    </FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder="Descreva o motivo da devolução"
+                        {...field}
+                        className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-400 resize-none overflow-auto h-[90px] max-h-[90px] scrollbar-dark"
+                        rows={3}
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
 
               <div className="mt-6">
                 <FileUploadNF

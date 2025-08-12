@@ -8,7 +8,7 @@ import {
   fetchInfosNF,
   formatProdutos,
   checkIdentificador,
-  type ProdutoFormatado
+  type ProdutoFormatado,
 } from "./utils";
 
 const formSchema = z.object({
@@ -38,7 +38,9 @@ export function useSolicitacaoForm() {
   const [tipoDevolucao, setTipoDevolucao] = useState<string>("");
   const [identificador, setIdentificador] = useState<string>("");
   const [arquivoNF, setArquivoNF] = useState<File | null>(null);
-  const [quantidadesDevolucao, setQuantidadesDevolucao] = useState<Record<string, number>>({});
+  const [quantidadesDevolucao, setQuantidadesDevolucao] = useState<
+    Record<string, number>
+  >({});
   const [todosSelecionados, setTodosSelecionados] = useState<boolean>(false);
   const [produtos, setProdutos] = useState<ProdutoFormatado[]>([]);
 
@@ -79,10 +81,9 @@ export function useSolicitacaoForm() {
   // Controlar automaticamente o tipo de devolução baseado na seleção
   useEffect(() => {
     if (produtos.length > 0) {
-      const totalQuantidadeDevolucao = Object.values(quantidadesDevolucao).reduce(
-        (acc, qtd) => acc + qtd,
-        0
-      );
+      const totalQuantidadeDevolucao = Object.values(
+        quantidadesDevolucao
+      ).reduce((acc, qtd) => acc + qtd, 0);
       const totalQuantidadeNota = produtos.reduce(
         (acc, p) => acc + Number(p.quantidade),
         0
@@ -90,7 +91,8 @@ export function useSolicitacaoForm() {
 
       const todosComQuantidadeMaxima = produtos.every(
         (produto) =>
-          (quantidadesDevolucao[produto.codigo] || 0) === Number(produto.quantidade)
+          (quantidadesDevolucao[produto.codigo] || 0) ===
+          Number(produto.quantidade)
       );
       setTodosSelecionados(todosComQuantidadeMaxima);
 
@@ -111,17 +113,32 @@ export function useSolicitacaoForm() {
   useEffect(() => {
     const fetchInfosNota = async () => {
       if (numeroNF.length === 6) {
+        console.log("Buscando informações da NF:", numeroNF);
         const infos_nota = await fetchInfosNF(numeroNF);
+        console.log("Informações recebidas:", infos_nota);
+
         if (infos_nota) {
           setNomeClient(infos_nota.cliente);
-          setNumeroCodigoCliente(infos_nota.codcli);
-          setCodigoRca(infos_nota.codusur);
+          setNumeroCodigoCliente(infos_nota.codcli.toString());
+          setCodigoRca(infos_nota.codusur.toString());
           setNumeroCodigoCobranca(infos_nota.codcob);
-          setNumeroCarga(infos_nota.numcar);
+          setNumeroCarga(infos_nota.numcar.toString());
           setNomeCodigoCobranca(infos_nota.cobranca);
           setCodigoFilial(infos_nota.codfilial);
           setIdentificador(infos_nota.cgcent);
+
+          console.log("Estados atualizados:", {
+            cliente: infos_nota.cliente,
+            codcli: infos_nota.codcli,
+            codusur: infos_nota.codusur,
+            codcob: infos_nota.codcob,
+            numcar: infos_nota.numcar,
+            cobranca: infos_nota.cobranca,
+            codfilial: infos_nota.codfilial,
+            cgcent: infos_nota.cgcent,
+          });
         } else {
+          console.log("Nenhuma informação encontrada para a NF:", numeroNF);
           setNomeClient("");
           setNumeroCodigoCliente("");
           setCodigoRca("");
@@ -185,12 +202,20 @@ export function useSolicitacaoForm() {
   const avancarPagina = async () => {
     const motivoDevolucao = form.getValues("motivo_devolucao");
     if (!motivoDevolucao || motivoDevolucao.trim() === "") {
-      toast.error("Por favor, preencha o motivo da devolução antes de continuar.");
+      setToast({
+        message:
+          "Por favor, preencha o motivo da devolução antes de continuar.",
+        type: "error",
+      });
       return;
     }
 
     if (!arquivoNF) {
-      toast.error("Por favor, selecione o arquivo da nota fiscal antes de continuar.");
+      setToast({
+        message:
+          "Por favor, selecione o arquivo da nota fiscal antes de continuar.",
+        type: "error",
+      });
       return;
     }
 
@@ -297,7 +322,10 @@ export function useSolicitacaoForm() {
       formData.append("tipo_devolucao", tipoDevolucao);
       formData.append("cod_cliente", numeroCodigoCliente);
       formData.append("produtos", JSON.stringify(produtos));
-      formData.append("quantidadesDevolucao", JSON.stringify(quantidadesDevolucao));
+      formData.append(
+        "quantidadesDevolucao",
+        JSON.stringify(quantidadesDevolucao)
+      );
 
       if (arquivoNF) {
         formData.append("arquivo_nf", arquivoNF);
@@ -360,7 +388,7 @@ export function useSolicitacaoForm() {
     setQuantidadesDevolucao,
     todosSelecionados,
     form,
-    
+
     // Funções
     checkIdentificador,
     isButtonEnabled,
