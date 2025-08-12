@@ -2,7 +2,6 @@ import {
   Table,
   TableBody,
   TableCell,
-  TableFooter,
   TableHead,
   TableHeader,
   TableRow,
@@ -72,7 +71,7 @@ export function ProductTable({
   const totais = calcularTotais();
 
   return (
-    <Card className="bg-slate-800/50 border-slate-700">
+    <Card className="bg-slate-800 border-slate-700">
       <CardHeader>
         <div className="flex items-center justify-between">
           <div>
@@ -114,14 +113,14 @@ export function ProductTable({
       <CardContent>
         <Table>
           <TableHeader>
-            <TableRow className="border-slate-700 hover:bg-slate-700/50">
+            <TableRow className="border-slate-700 bg-slate-800 hover:bg-slate-800">
               <TableHead className="text-slate-300 text-center">Código</TableHead>
               <TableHead className="text-slate-300">Produto</TableHead>
               <TableHead className="text-slate-300 text-center">Qtd. Total</TableHead>
               <TableHead className="text-slate-300 text-center">Qtd. a Devolver</TableHead>
               <TableHead className="text-slate-300 text-center">Ações</TableHead>
               <TableHead className="text-slate-300 text-center">Preço Unit.</TableHead>
-              <TableHead className="text-slate-300 text-center">Valor Total</TableHead>
+              <TableHead className="text-slate-300 text-center w-36">Valor Total</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -299,12 +298,12 @@ export function ProductTable({
               </TableRow>
             )}
           </TableBody>
-          <TableFooter>
-            <TableRow className="bg-slate-700/20 border-slate-600 hover:bg-slate-700/30">
+          
+            <TableRow className="bg-slate-800 border-slate-600 hover:bg-slate-800/90">
               <TableCell colSpan={2} className="text-white font-bold">
                 <div className="flex items-center gap-2">
-                  <Calculator className="h-4 w-4" />
-                  Totais
+                  <Calculator className="h-5 w-5" />
+                  <span className="text-lg">Totais</span>
                 </div>
               </TableCell>
               <TableCell className="text-center">
@@ -338,7 +337,7 @@ export function ProductTable({
                 </span>
               </TableCell>
             </TableRow>
-          </TableFooter>
+          
         </Table>
       </CardContent>
     </Card>
