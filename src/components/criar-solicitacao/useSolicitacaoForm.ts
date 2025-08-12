@@ -403,3 +403,11 @@ export function useSolicitacaoForm() {
     handleStepChange,
   };
 }
+function setToast({ message, type }: { message: string; type: string; }) {
+  if (type === "success") {
+    toast.success(message);
+  } else {
+    toast.error(message);
+  }
+}
+
