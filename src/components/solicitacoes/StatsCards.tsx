@@ -69,17 +69,17 @@ export const StatsCards: React.FC<StatsCardsProps> = ({ solicitacoes }) => {
   ];
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4 mb-8">
+    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4 mb-6">
       {stats.map((stat, index) => {
         const IconComponent = stat.icon;
         return (
           <Card key={index} className="bg-slate-800/50 border-slate-700">
             <CardContent className="p-4">
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 p-0">
                 <div className={`p-2 ${stat.bgColor} rounded-lg`}>
-                  <IconComponent className={`h-5 w-5 ${stat.iconColor}`} />
+                  <IconComponent className={`h-6 w-6 ${stat.iconColor}`} />
                 </div>
-                <div>
+                <div className="mb-1.5">
                   <p className="text-sm text-slate-400">{stat.title}</p>
                   <p className="text-2xl font-bold text-white">{stat.value}</p>
                 </div>
