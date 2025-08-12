@@ -44,13 +44,8 @@ export const getRandomTips = () => {
       type: 'navigation'
     },
     {
-      title: 'Atalho Rápido',
-      message: 'Use Ctrl+K para abrir a busca rápida em qualquer página do sistema.',
-      type: 'shortcut'
-    },
-    {
       title: 'Segurança',
-      message: 'Sempre faça logout ao sair do sistema para manter suas informações seguras.',
+      message: 'Não compartilhe suas credenciais com ninguém.',
       type: 'security'
     },
     {
