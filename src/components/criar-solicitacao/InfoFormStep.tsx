@@ -17,7 +17,6 @@ import {
 } from "@/components/ui/form";
 import { FileUploadNF } from "@/components/fileUploadNF";
 import { NFWarning } from "./NFWarning";
-import { useNFVerification } from "@/hooks/useNFVerification";
 import {
   Search,
   User,
@@ -62,6 +61,15 @@ interface InfoFormStepProps {
   onSearchNF?: () => void;
   isSearchingNF?: boolean;
   nfExists?: boolean;
+  solicitacoesExistentes?: {
+    id: number;
+    numero_nf: string;
+    status: string;
+    created_at: string;
+    nome: string;
+    cod_cliente: string;
+  }[];
+  dismissWarning?: () => void;
   onNFInfosFetched?: (infos: {
     codcli: string;
     numcar: string;
@@ -93,43 +101,13 @@ export function InfoFormStep({
   onSearchNF,
   isSearchingNF = false,
   nfExists = false,
-  onNFInfosFetched,
+  solicitacoesExistentes = [],
+  dismissWarning,
 }: InfoFormStepProps) {
-  const {
-    checkResult,
-    showWarning,
-    checkExistingSolicitacoes,
-    fetchInfosNF,
-    dismissWarning,
-  } = useNFVerification();
-
   // Função para buscar informações da NF manualmente
   const handleSearchNF = async () => {
     if (onSearchNF) {
       onSearchNF();
-    } else {
-      // Fallback para o comportamento antigo se onSearchNF não for fornecido
-      if (numeroNF.length >= 4) {
-        // Primeiro verifica se já existem solicitações
-        await checkExistingSolicitacoes(numeroNF);
-
-        // Depois busca as informações da NF no Oracle (independente de existir solicitação)
-        if (onNFInfosFetched) {
-          const nfInfos = await fetchInfosNF(numeroNF);
-          if (nfInfos) {
-            onNFInfosFetched({
-              codcli: String(nfInfos.codcli),
-              numcar: String(nfInfos.numcar),
-              codusur: String(nfInfos.codusur),
-              codcob: String(nfInfos.codcob),
-              cobranca: String(nfInfos.cobranca),
-              cliente: String(nfInfos.cliente),
-              codfilial: String(nfInfos.codfilial),
-              cgcent: String(nfInfos.cgcent),
-            });
-          }
-        }
-      }
     }
   };
 
@@ -153,25 +131,13 @@ export function InfoFormStep({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {/* Aviso quando NF já existe */}
-          {nfExists && (
-            <div className="mb-4 p-4 bg-red-500/20 border border-red-500/30 rounded-lg">
-              <div className="flex items-center gap-2 text-red-400">
-                <div className="w-2 h-2 rounded-full bg-red-400"></div>
-                <span className="font-medium">Esta nota fiscal já possui solicitações de devolução</span>
-              </div>
-            </div>
+          {/* Aviso usando componente NFWarning */}
+          {nfExists && solicitacoesExistentes && solicitacoesExistentes.length > 0 && (
+            <NFWarning
+              solicitacoes={solicitacoesExistentes}
+              onDismiss={dismissWarning || (() => {})}
+            />
           )}
-
-          {/* Aviso de solicitações existentes (do hook antigo) */}
-          {showWarning &&
-            checkResult &&
-            checkResult.solicitacoes.length > 0 && (
-              <NFWarning
-                solicitacoes={checkResult.solicitacoes}
-                onDismiss={dismissWarning}
-              />
-            )}
 
           <Form {...form}>
             <form className="space-y-6">

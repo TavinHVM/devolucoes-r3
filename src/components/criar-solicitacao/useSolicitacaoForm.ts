@@ -45,6 +45,14 @@ export function useSolicitacaoForm() {
   const [produtos, setProdutos] = useState<ProdutoFormatado[]>([]);
   const [isSearchingNF, setIsSearchingNF] = useState<boolean>(false);
   const [nfExists, setNfExists] = useState<boolean>(false);
+  const [solicitacoesExistentes, setSolicitacoesExistentes] = useState<{
+    id: number;
+    numero_nf: string;
+    status: string;
+    created_at: string;
+    nome: string;
+    cod_cliente: string;
+  }[]>([]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -127,6 +135,7 @@ export function useSolicitacaoForm() {
         const checkResult = await existingResponse.json();
         if (checkResult.existe && checkResult.total > 0) {
           setNfExists(true);
+          setSolicitacoesExistentes(checkResult.solicitacoes || []);
           toast.error(`Esta nota fiscal já possui ${checkResult.total} solicitação(ões) de devolução`);
           setIsSearchingNF(false);
           return;
@@ -192,6 +201,11 @@ export function useSolicitacaoForm() {
     numeroCodigoCliente,
     form,
   ]);
+
+  const dismissWarning = () => {
+    setNfExists(false);
+    setSolicitacoesExistentes([]);
+  };
 
   const isButtonEnabled = (): boolean => {
     const motivoDevolucao = form.getValues("motivo_devolucao");
@@ -399,9 +413,11 @@ export function useSolicitacaoForm() {
     form,
     isSearchingNF,
     nfExists,
+    solicitacoesExistentes,
 
     // Funções
     searchNF,
+    dismissWarning,
     checkIdentificador,
     isButtonEnabled,
     avancarPagina,

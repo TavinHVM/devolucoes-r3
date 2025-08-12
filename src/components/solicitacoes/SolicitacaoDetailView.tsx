@@ -133,7 +133,7 @@ export const SolicitacaoDetailView: React.FC<SolicitacaoDetailViewProps> = ({
   return (
     <>
       <DialogHeader>
-        <DialogTitle className="flex items-center gap-2 text-white w-full justify-between">
+        <DialogTitle className="flex items-center mb-6 gap-2 text-white w-full justify-between">
           <div className="flex items-center gap-2">
             <FileText className="h-5 w-5" />
             Detalhes da Solicitação #{id}

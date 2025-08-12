@@ -44,9 +44,11 @@ function SolicitacaoContent() {
     form,
     isSearchingNF,
     nfExists,
+    solicitacoesExistentes,
     
     // Funções
     searchNF,
+    dismissWarning,
     checkIdentificador,
     isButtonEnabled,
     avancarPagina,
@@ -92,6 +94,8 @@ function SolicitacaoContent() {
             onSearchNF={searchNF}
             isSearchingNF={isSearchingNF}
             nfExists={nfExists}
+            solicitacoesExistentes={solicitacoesExistentes}
+            dismissWarning={dismissWarning}
             checkIdentificador={checkIdentificador}
             isButtonEnabled={isButtonEnabled}
           />
