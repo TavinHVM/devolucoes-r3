@@ -25,6 +25,7 @@ import {
   CreditCard,
   ArrowRight,
   Loader2,
+  Send,
 } from "lucide-react";
 import { UseFormReturn } from "react-hook-form";
 
@@ -58,6 +59,9 @@ interface InfoFormStepProps {
   onAdvance: () => void;
   checkIdentificador: (id: string) => string;
   isButtonEnabled: () => boolean;
+  onSearchNF?: () => void;
+  isSearchingNF?: boolean;
+  nfExists?: boolean;
   onNFInfosFetched?: (infos: {
     codcli: string;
     numcar: string;
@@ -86,10 +90,12 @@ export function InfoFormStep({
   onAdvance,
   checkIdentificador,
   isButtonEnabled,
+  onSearchNF,
+  isSearchingNF = false,
+  nfExists = false,
   onNFInfosFetched,
 }: InfoFormStepProps) {
   const {
-    isChecking,
     checkResult,
     showWarning,
     checkExistingSolicitacoes,
@@ -97,30 +103,41 @@ export function InfoFormStep({
     dismissWarning,
   } = useNFVerification();
 
-  // Função para verificar e buscar informações da NF
-  const handleNFChange = async (value: string) => {
-    setNumeroNF(value);
+  // Função para buscar informações da NF manualmente
+  const handleSearchNF = async () => {
+    if (onSearchNF) {
+      onSearchNF();
+    } else {
+      // Fallback para o comportamento antigo se onSearchNF não for fornecido
+      if (numeroNF.length >= 4) {
+        // Primeiro verifica se já existem solicitações
+        await checkExistingSolicitacoes(numeroNF);
 
-    if (value.length >= 4) {
-      // Primeiro verifica se já existem solicitações
-      await checkExistingSolicitacoes(value);
-
-      // Depois busca as informações da NF no Oracle (independente de existir solicitação)
-      if (onNFInfosFetched) {
-        const nfInfos = await fetchInfosNF(value);
-        if (nfInfos) {
-          onNFInfosFetched({
-            codcli: String(nfInfos.codcli),
-            numcar: String(nfInfos.numcar),
-            codusur: String(nfInfos.codusur),
-            codcob: String(nfInfos.codcob),
-            cobranca: String(nfInfos.cobranca),
-            cliente: String(nfInfos.cliente),
-            codfilial: String(nfInfos.codfilial),
-            cgcent: String(nfInfos.cgcent),
-          });
+        // Depois busca as informações da NF no Oracle (independente de existir solicitação)
+        if (onNFInfosFetched) {
+          const nfInfos = await fetchInfosNF(numeroNF);
+          if (nfInfos) {
+            onNFInfosFetched({
+              codcli: String(nfInfos.codcli),
+              numcar: String(nfInfos.numcar),
+              codusur: String(nfInfos.codusur),
+              codcob: String(nfInfos.codcob),
+              cobranca: String(nfInfos.cobranca),
+              cliente: String(nfInfos.cliente),
+              codfilial: String(nfInfos.codfilial),
+              cgcent: String(nfInfos.cgcent),
+            });
+          }
         }
       }
+    }
+  };
+
+  // Função para lidar com Enter no input
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && !isSearchingNF && numeroNF.length >= 4) {
+      e.preventDefault();
+      handleSearchNF();
     }
   };
   return (
@@ -136,7 +153,17 @@ export function InfoFormStep({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {/* Aviso de solicitações existentes */}
+          {/* Aviso quando NF já existe */}
+          {nfExists && (
+            <div className="mb-4 p-4 bg-red-500/20 border border-red-500/30 rounded-lg">
+              <div className="flex items-center gap-2 text-red-400">
+                <div className="w-2 h-2 rounded-full bg-red-400"></div>
+                <span className="font-medium">Esta nota fiscal já possui solicitações de devolução</span>
+              </div>
+            </div>
+          )}
+
+          {/* Aviso de solicitações existentes (do hook antigo) */}
           {showWarning &&
             checkResult &&
             checkResult.solicitacoes.length > 0 && (
@@ -161,24 +188,33 @@ export function InfoFormStep({
                       <FormControl>
                         <div className="relative">
                           <Input
-                            placeholder="Digite o número da NF"
+                            placeholder="Digite o número da NF e pressione Enter ou clique no botão"
                             {...field}
                             value={numeroNF}
                             onChange={(e) => {
                               const value = e.target.value.replace(/\D/g, "");
                               if (value.length <= 6) {
-                                handleNFChange(value);
+                                setNumeroNF(value);
                                 field.onChange(value);
                               }
                             }}
-                            className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-400"
-                            disabled={isChecking}
+                            onKeyPress={handleKeyPress}
+                            className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-400 pr-12"
+                            disabled={isSearchingNF}
+                            maxLength={6}
                           />
-                          {isChecking && (
-                            <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                              <Loader2 className="h-4 w-4 animate-spin text-slate-400" />
-                            </div>
-                          )}
+                          <Button
+                            type="button"
+                            onClick={handleSearchNF}
+                            disabled={isSearchingNF || numeroNF.length < 4}
+                            className="absolute right-1 top-1/2 transform -translate-y-1/2 h-8 w-8 p-0 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-600"
+                          >
+                            {isSearchingNF ? (
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : (
+                              <Send className="h-4 w-4" />
+                            )}
+                          </Button>
                         </div>
                       </FormControl>
                     </FormItem>

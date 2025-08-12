@@ -42,8 +42,11 @@ function SolicitacaoContent() {
     setQuantidadesDevolucao,
     todosSelecionados,
     form,
+    isSearchingNF,
+    nfExists,
     
     // Funções
+    searchNF,
     checkIdentificador,
     isButtonEnabled,
     avancarPagina,
@@ -67,7 +70,7 @@ function SolicitacaoContent() {
         <ProgressIndicator
           currentStep={currentStep}
           onStepChange={handleStepChange}
-          canAdvanceToStep2={!!(numeroNF && numeroNF.length === 6)}
+          canAdvanceToStep2={!!(numeroNF && nomeClient)}
         />
 
         {/* Etapa 1: Informações da NF */}
@@ -86,6 +89,9 @@ function SolicitacaoContent() {
             identificador={identificador}
             setArquivoNF={setArquivoNF}
             onAdvance={avancarPagina}
+            onSearchNF={searchNF}
+            isSearchingNF={isSearchingNF}
+            nfExists={nfExists}
             checkIdentificador={checkIdentificador}
             isButtonEnabled={isButtonEnabled}
           />

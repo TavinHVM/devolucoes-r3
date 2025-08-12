@@ -43,6 +43,8 @@ export function useSolicitacaoForm() {
   >({});
   const [todosSelecionados, setTodosSelecionados] = useState<boolean>(false);
   const [produtos, setProdutos] = useState<ProdutoFormatado[]>([]);
+  const [isSearchingNF, setIsSearchingNF] = useState<boolean>(false);
+  const [nfExists, setNfExists] = useState<boolean>(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -109,46 +111,45 @@ export function useSolicitacaoForm() {
     }
   }, [quantidadesDevolucao, produtos]);
 
-  // Buscar informações da nota fiscal
-  useEffect(() => {
-    const fetchInfosNota = async () => {
-      if (numeroNF.length === 6) {
-        console.log("Buscando informações da NF:", numeroNF);
-        const infos_nota = await fetchInfosNF(numeroNF);
-        console.log("Informações recebidas:", infos_nota);
+  // Buscar informações da nota fiscal manualmente
+  const searchNF = async () => {
+    if (!numeroNF || numeroNF.length < 4) {
+      toast.error("Digite pelo menos 4 dígitos da nota fiscal");
+      return;
+    }
 
-        if (infos_nota) {
-          setNomeClient(infos_nota.cliente);
-          setNumeroCodigoCliente(infos_nota.codcli.toString());
-          setCodigoRca(infos_nota.codusur.toString());
-          setNumeroCodigoCobranca(infos_nota.codcob);
-          setNumeroCarga(infos_nota.numcar.toString());
-          setNomeCodigoCobranca(infos_nota.cobranca);
-          setCodigoFilial(infos_nota.codfilial);
-          setIdentificador(infos_nota.cgcent);
-
-          console.log("Estados atualizados:", {
-            cliente: infos_nota.cliente,
-            codcli: infos_nota.codcli,
-            codusur: infos_nota.codusur,
-            codcob: infos_nota.codcob,
-            numcar: infos_nota.numcar,
-            cobranca: infos_nota.cobranca,
-            codfilial: infos_nota.codfilial,
-            cgcent: infos_nota.cgcent,
-          });
-        } else {
-          console.log("Nenhuma informação encontrada para a NF:", numeroNF);
-          setNomeClient("");
-          setNumeroCodigoCliente("");
-          setCodigoRca("");
-          setNumeroCodigoCobranca("");
-          setNumeroCarga("");
-          setNomeCodigoCobranca("");
-          setCodigoFilial("");
-          setIdentificador("");
+    setIsSearchingNF(true);
+    
+    try {
+      // Primeiro verificar se já existe solicitação com esta NF
+      const existingResponse = await fetch(`/api/checkSolicitacao/${numeroNF}`);
+      if (existingResponse.ok) {
+        const checkResult = await existingResponse.json();
+        if (checkResult.existe && checkResult.total > 0) {
+          setNfExists(true);
+          toast.error(`Esta nota fiscal já possui ${checkResult.total} solicitação(ões) de devolução`);
+          setIsSearchingNF(false);
+          return;
         }
+      }
+
+      // Buscar informações da NF
+      const infos_nota = await fetchInfosNF(numeroNF);
+      if (infos_nota) {
+        setNfExists(false);
+        setNomeClient(infos_nota.cliente);
+        setNumeroCodigoCliente(infos_nota.codcli.toString());
+        setCodigoRca(infos_nota.codusur.toString());
+        setNumeroCodigoCobranca(infos_nota.codcob);
+        setNumeroCarga(infos_nota.numcar.toString());
+        setNomeCodigoCobranca(infos_nota.cobranca);
+        setCodigoFilial(infos_nota.codfilial);
+        setIdentificador(infos_nota.cgcent);
+        
+        toast.success("Informações da nota fiscal carregadas com sucesso!");
       } else {
+        toast.error("Nota fiscal não encontrada no sistema");
+        // Limpar campos se NF não encontrada
         setNomeClient("");
         setNumeroCodigoCliente("");
         setCodigoRca("");
@@ -158,9 +159,13 @@ export function useSolicitacaoForm() {
         setCodigoFilial("");
         setIdentificador("");
       }
-    };
-    fetchInfosNota();
-  }, [numeroNF]);
+    } catch (error) {
+      console.error("Erro ao buscar informações da NF:", error);
+      toast.error("Erro ao buscar informações da nota fiscal");
+    } finally {
+      setIsSearchingNF(false);
+    }
+  };
 
   // Atualizar valores do formulário quando os estados mudarem
   useEffect(() => {
@@ -202,20 +207,23 @@ export function useSolicitacaoForm() {
   const avancarPagina = async () => {
     const motivoDevolucao = form.getValues("motivo_devolucao");
     if (!motivoDevolucao || motivoDevolucao.trim() === "") {
-      setToast({
-        message:
-          "Por favor, preencha o motivo da devolução antes de continuar.",
-        type: "error",
-      });
+      toast.error("Por favor, preencha o motivo da devolução antes de continuar.");
       return;
     }
 
     if (!arquivoNF) {
-      setToast({
-        message:
-          "Por favor, selecione o arquivo da nota fiscal antes de continuar.",
-        type: "error",
-      });
+      toast.error("Por favor, selecione o arquivo da nota fiscal antes de continuar.");
+      return;
+    }
+
+    // Verificar se NF existe antes de continuar
+    if (nfExists) {
+      toast.error("Não é possível criar solicitação para uma nota fiscal que já possui solicitações");
+      return;
+    }
+
+    if (!nomeClient) {
+      toast.error("É necessário buscar as informações da nota fiscal antes de continuar");
       return;
     }
 
@@ -234,6 +242,7 @@ export function useSolicitacaoForm() {
         setCurrentStep(2);
       } catch (error) {
         console.error("Erro ao buscar produtos:", error);
+        toast.error("Erro ao buscar produtos da nota fiscal");
         setProdutos([]);
       }
     }
@@ -388,8 +397,11 @@ export function useSolicitacaoForm() {
     setQuantidadesDevolucao,
     todosSelecionados,
     form,
+    isSearchingNF,
+    nfExists,
 
     // Funções
+    searchNF,
     checkIdentificador,
     isButtonEnabled,
     avancarPagina,
@@ -402,12 +414,5 @@ export function useSolicitacaoForm() {
     finalizarSolicitacao,
     handleStepChange,
   };
-}
-function setToast({ message, type }: { message: string; type: string; }) {
-  if (type === "success") {
-    toast.success(message);
-  } else {
-    toast.error(message);
-  }
 }
 
