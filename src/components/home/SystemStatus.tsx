@@ -19,9 +19,9 @@ export const SystemStatus: React.FC = () => {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="space-y-3 mx-4">
+        <div className="space-y-2 mx-3">
           {/* Status do Servidor */}
-          <div className="p-3 rounded-lg bg-green-500/10 border border-green-500/20 min-h-[72px] flex flex-col justify-between">
+          <div className="p-5 rounded-lg bg-green-500/10 border border-green-500/20 min-h-[72px] flex flex-col justify-between">
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
                 <Server className="h-4 w-4 text-green-400" />
@@ -37,7 +37,7 @@ export const SystemStatus: React.FC = () => {
           </div>
 
           {/* Horário de Entrada */}
-          <div className="p-3 rounded-lg bg-blue-500/10 border border-blue-500/20 min-h-[72px] flex flex-col justify-between">
+          <div className="p-5 rounded-lg bg-blue-500/10 border border-blue-500/20 min-h-[72px] flex flex-col justify-between">
             <div className="flex items-center gap-2 mb-1">
               <Clock className="h-4 w-4 text-blue-400" />
               <span className="text-blue-400 font-medium text-sm">Última Entrada</span>
@@ -48,7 +48,7 @@ export const SystemStatus: React.FC = () => {
           </div>
 
           {/* Versão do Sistema */}
-          <div className="p-3 rounded-lg bg-purple-500/10 border border-purple-500/20 min-h-[72px] flex flex-col justify-between">
+          <div className="p-5 rounded-lg bg-purple-500/10 border border-purple-500/20 min-h-[72px] flex flex-col justify-between">
             <div className="flex items-center gap-2 mb-1">
               <Zap className="h-4 w-4 text-purple-400" />
               <span className="text-purple-400 font-medium text-sm">Versão</span>
