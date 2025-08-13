@@ -40,6 +40,16 @@ export function getUserPermissions(user: User | null): UserPermissions {
         canReenviar: false,
       };
 
+    case 'marketplace':
+      return {
+        canAprovar: false,
+        canRecusar: false,
+        canDesdobrar: false,
+        canAbater: false,
+        canFinalizar: false,
+        canReenviar: false,
+      };
+
     case 'financeiro':
       return {
         canAprovar: false,
