@@ -3,7 +3,7 @@ import db from "@/lib/db";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { numero_nf: string } }
+  { params }: { params: Promise<{ numero_nf: string }> }
 ) {
   try {
     const { numero_nf } = await params;
