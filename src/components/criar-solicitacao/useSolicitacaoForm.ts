@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { useForm, useWatch } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
@@ -38,6 +38,7 @@ export function useSolicitacaoForm() {
   const [tipoDevolucao, setTipoDevolucao] = useState<string>("");
   const [identificador, setIdentificador] = useState<string>("");
   const [arquivoNF, setArquivoNF] = useState<File | null>(null);
+  const [motivoDevolucaoText, setMotivoDevolucaoText] = useState<string>("");
   const [quantidadesDevolucao, setQuantidadesDevolucao] = useState<
     Record<string, number>
   >({});
@@ -298,6 +299,7 @@ export function useSolicitacaoForm() {
     form.setValue("cgent", identificador);
     form.setValue("tipo_devolucao", tipoDevolucao);
     form.setValue("cod_cliente", numeroCodigoCliente);
+    form.setValue("motivo_devolucao", motivoDevolucaoText);
   }, [
     nomeClient,
     codigoFilial,
@@ -309,6 +311,7 @@ export function useSolicitacaoForm() {
     identificador,
     tipoDevolucao,
     numeroCodigoCliente,
+    motivoDevolucaoText,
     form,
   ]);
 
@@ -317,25 +320,18 @@ export function useSolicitacaoForm() {
     setSolicitacoesExistentes([]);
   };
 
-  // Watch the motivo_devolucao field for changes
-  const motivoDevolucao = useWatch({
-    control: form.control,
-    name: "motivo_devolucao",
-  });
-
-  // Compute button enabled state reactively
-  const isButtonEnabled = useMemo((): boolean => {
+  const isButtonEnabled = (): boolean => {
     return !!(
       numeroNF &&
       numeroNF.length === 6 &&
-      motivoDevolucao &&
-      motivoDevolucao.trim() !== "" &&
+      motivoDevolucaoText &&
+      motivoDevolucaoText.trim() !== "" &&
       arquivoNF
     );
-  }, [numeroNF, motivoDevolucao, arquivoNF]);
+  };
 
   const avancarPagina = async () => {
-    if (!motivoDevolucao || motivoDevolucao.trim() === "") {
+    if (!motivoDevolucaoText || motivoDevolucaoText.trim() === "") {
       toast.error("Por favor, preencha o motivo da devolução antes de continuar.");
       return;
     }
@@ -456,7 +452,7 @@ export function useSolicitacaoForm() {
       formData.append("cod_cobranca", numeroCodigoCobranca);
       formData.append("rca", codigoRca);
       formData.append("cgent", identificador);
-      formData.append("motivo_devolucao", motivoDevolucao || "");
+      formData.append("motivo_devolucao", motivoDevolucaoText);
       formData.append("tipo_devolucao", tipoDevolucao);
       formData.append("cod_cliente", numeroCodigoCliente);
       formData.append("produtos", JSON.stringify(produtos));
@@ -538,6 +534,8 @@ export function useSolicitacaoForm() {
     isSearchingNF,
     nfExists,
     solicitacoesExistentes,
+    motivoDevolucaoText,
+    setMotivoDevolucaoText,
 
     // Product filtering and sorting states
     productSearchTerm,

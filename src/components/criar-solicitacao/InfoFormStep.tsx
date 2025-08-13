@@ -57,7 +57,7 @@ interface InfoFormStepProps {
   setArquivoNF: (file: File | null) => void;
   onAdvance: () => void;
   checkIdentificador: (id: string) => string;
-  isButtonEnabled: boolean;
+  isButtonEnabled: () => boolean;
   onSearchNF?: () => void;
   isSearchingNF?: boolean;
   nfExists?: boolean;
@@ -70,6 +70,8 @@ interface InfoFormStepProps {
     cod_cliente: string;
   }[];
   dismissWarning?: () => void;
+  motivoDevolucaoText: string;
+  setMotivoDevolucaoText: (value: string) => void;
   onNFInfosFetched?: (infos: {
     codcli: string;
     numcar: string;
@@ -103,6 +105,8 @@ export function InfoFormStep({
   nfExists = false,
   solicitacoesExistentes = [],
   dismissWarning,
+  motivoDevolucaoText,
+  setMotivoDevolucaoText,
 }: InfoFormStepProps) {
   // Função para buscar informações da NF manualmente
   const handleSearchNF = async () => {
@@ -319,7 +323,12 @@ export function InfoFormStep({
                     <FormControl>
                       <Textarea
                         placeholder="Descreva o motivo da devolução"
-                        {...field}
+                        value={motivoDevolucaoText}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          setMotivoDevolucaoText(value);
+                          field.onChange(value);
+                        }}
                         className="bg-slate-700 border-slate-600 text-white placeholder:text-slate-400 resize-none overflow-auto h-[90px] max-h-[90px] scrollbar-dark"
                         rows={3}
                       />
@@ -339,7 +348,7 @@ export function InfoFormStep({
                 <Button
                   type="button"
                   onClick={onAdvance}
-                  disabled={!isButtonEnabled}
+                  disabled={!isButtonEnabled()}
                   className="bg-blue-600 hover:bg-blue-700 text-white px-8"
                 >
                   Avançar para Produtos

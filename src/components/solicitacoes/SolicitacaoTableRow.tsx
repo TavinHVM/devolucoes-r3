@@ -61,8 +61,8 @@ export const SolicitacaoTableRow: React.FC<SolicitacaoTableRowProps> = ({
   return (
     <>
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogTrigger asChild className="cursor-pointer hover:text-white">
-          <TableRow className="border-slate-700 hover:bg-slate-700/30">
+        <DialogTrigger asChild>
+          <TableRow className="border-slate-700 hover:bg-slate-700/30 cursor-pointer hover:text-white">
             <TableCell className="text-center">
               <Badge
                 variant="outline"

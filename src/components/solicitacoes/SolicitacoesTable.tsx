@@ -6,7 +6,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Table, TableBody } from "@/components/ui/table";
+import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import {
   Pagination,
   PaginationContent,
@@ -86,11 +86,11 @@ export const SolicitacoesTable: React.FC<SolicitacoesTableProps> = ({
                   />
                 ))
               ) : (
-                <tr>
-                  <td colSpan={9} className="text-center py-8 text-slate-400">
+                <TableRow>
+                  <TableCell colSpan={9} className="text-center py-8 text-slate-400">
                     Nenhuma solicitação encontrada
-                  </td>
-                </tr>
+                  </TableCell>
+                </TableRow>
               )}
             </TableBody>
           </Table>

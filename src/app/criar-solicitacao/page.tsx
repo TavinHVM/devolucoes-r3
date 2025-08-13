@@ -45,6 +45,8 @@ function SolicitacaoContent() {
     isSearchingNF,
     nfExists,
     solicitacoesExistentes,
+    motivoDevolucaoText,
+    setMotivoDevolucaoText,
     
     // Product filtering and sorting states
     productSearchTerm,
@@ -108,6 +110,8 @@ function SolicitacaoContent() {
             dismissWarning={dismissWarning}
             checkIdentificador={checkIdentificador}
             isButtonEnabled={isButtonEnabled}
+            motivoDevolucaoText={motivoDevolucaoText}
+            setMotivoDevolucaoText={setMotivoDevolucaoText}
           />
         )}
 
