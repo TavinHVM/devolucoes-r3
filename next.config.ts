@@ -28,7 +28,6 @@ const nextConfig: NextConfig = {
   },
 
   // Configurações para melhor compatibilidade
-  serverExternalPackages: ["oracledb"],
 
   // Optimize package imports to shrink client bundles
   experimental: {
