@@ -57,7 +57,7 @@ interface InfoFormStepProps {
   setArquivoNF: (file: File | null) => void;
   onAdvance: () => void;
   checkIdentificador: (id: string) => string;
-  isButtonEnabled: () => boolean;
+  isButtonEnabled: boolean;
   onSearchNF?: () => void;
   isSearchingNF?: boolean;
   nfExists?: boolean;
@@ -339,7 +339,7 @@ export function InfoFormStep({
                 <Button
                   type="button"
                   onClick={onAdvance}
-                  disabled={!isButtonEnabled()}
+                  disabled={!isButtonEnabled}
                   className="bg-blue-600 hover:bg-blue-700 text-white px-8"
                 >
                   Avançar para Produtos

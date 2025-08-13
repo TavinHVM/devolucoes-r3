@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
@@ -317,8 +317,14 @@ export function useSolicitacaoForm() {
     setSolicitacoesExistentes([]);
   };
 
-  const isButtonEnabled = (): boolean => {
-    const motivoDevolucao = form.getValues("motivo_devolucao");
+  // Watch the motivo_devolucao field for changes
+  const motivoDevolucao = useWatch({
+    control: form.control,
+    name: "motivo_devolucao",
+  });
+
+  // Compute button enabled state reactively
+  const isButtonEnabled = useMemo((): boolean => {
     return !!(
       numeroNF &&
       numeroNF.length === 6 &&
@@ -326,10 +332,9 @@ export function useSolicitacaoForm() {
       motivoDevolucao.trim() !== "" &&
       arquivoNF
     );
-  };
+  }, [numeroNF, motivoDevolucao, arquivoNF]);
 
   const avancarPagina = async () => {
-    const motivoDevolucao = form.getValues("motivo_devolucao");
     if (!motivoDevolucao || motivoDevolucao.trim() === "") {
       toast.error("Por favor, preencha o motivo da devolução antes de continuar.");
       return;
@@ -451,7 +456,7 @@ export function useSolicitacaoForm() {
       formData.append("cod_cobranca", numeroCodigoCobranca);
       formData.append("rca", codigoRca);
       formData.append("cgent", identificador);
-      formData.append("motivo_devolucao", form.getValues("motivo_devolucao"));
+      formData.append("motivo_devolucao", motivoDevolucao || "");
       formData.append("tipo_devolucao", tipoDevolucao);
       formData.append("cod_cliente", numeroCodigoCliente);
       formData.append("produtos", JSON.stringify(produtos));
