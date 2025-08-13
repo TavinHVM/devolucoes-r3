@@ -46,6 +46,14 @@ function SolicitacaoContent() {
     nfExists,
     solicitacoesExistentes,
     
+    // Product filtering and sorting states
+    productSearchTerm,
+    setProductSearchTerm,
+    productSortBy,
+    setProductSortBy,
+    productSortColumns,
+    filteredAndSortedProducts,
+    
     // Funções
     searchNF,
     dismissWarning,
@@ -60,6 +68,8 @@ function SolicitacaoContent() {
     alternarSelecaoTodos,
     finalizarSolicitacao,
     handleStepChange,
+    handleProductSort,
+    handleProductClearSort,
   } = useSolicitacaoForm();
 
   return (
@@ -118,6 +128,14 @@ function SolicitacaoContent() {
             alternarSelecaoTodos={alternarSelecaoTodos}
             onBack={voltarPagina}
             onFinalize={finalizarSolicitacao}
+            productSearchTerm={productSearchTerm}
+            setProductSearchTerm={setProductSearchTerm}
+            productSortBy={productSortBy}
+            setProductSortBy={setProductSortBy}
+            productSortColumns={productSortColumns}
+            filteredAndSortedProducts={filteredAndSortedProducts}
+            handleProductSort={handleProductSort}
+            handleProductClearSort={handleProductClearSort}
           />
         )}
       </div>

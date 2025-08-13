@@ -12,12 +12,18 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { ShoppingCart, Calculator, Plus, Minus, SquareCheck, SquareX } from "lucide-react";
 import { formatPrice } from "@/utils/formatPrice";
+import OrderBtn from "@/components/orderBtn";
 
 interface Produto {
   codigo: string;
   descricao: string;
   quantidade: string;
   punit: string;
+}
+
+interface SortColumn {
+  column: string;
+  direction: "asc" | "desc";
 }
 
 interface ProductTableProps {
@@ -30,6 +36,9 @@ interface ProductTableProps {
   devolverTudo: (codigoProduto: string) => void;
   setQuantidadesDevolucao: React.Dispatch<React.SetStateAction<Record<string, number>>>;
   alternarSelecaoTodos: () => void;
+  sortColumns: SortColumn[];
+  onSort: (column: string, direction: "asc" | "desc") => void;
+  onClearSort: (column: string) => void;
 }
 
 export function ProductTable({
@@ -41,7 +50,10 @@ export function ProductTable({
   alterarQuantidadeInput,
   devolverTudo,
   setQuantidadesDevolucao,
-  alternarSelecaoTodos
+  alternarSelecaoTodos,
+  sortColumns,
+  onSort,
+  onClearSort
 }: ProductTableProps) {
   const calcularTotais = () => {
     let totalQuantidade = 0;
@@ -72,7 +84,7 @@ export function ProductTable({
 
   return (
     <Card className="bg-slate-800 border-slate-700">
-      <CardHeader>
+      <CardHeader className="px-4">
         <div className="flex items-center justify-between">
           <div>
             <CardTitle className="text-white flex items-center gap-2">
@@ -114,12 +126,44 @@ export function ProductTable({
         <Table>
           <TableHeader>
             <TableRow className="border-slate-700 bg-slate-800 hover:bg-slate-800">
-              <TableHead className="text-slate-300 text-center">Código</TableHead>
-              <TableHead className="text-slate-300">Produto</TableHead>
-              <TableHead className="text-slate-300 text-center">Qtd. Total</TableHead>
+              <TableHead className="text-slate-300 text-center ml-0 pl-3">
+                <OrderBtn
+                  label="Código"
+                  columnKey="codigo"
+                  activeSort={sortColumns}
+                  onSort={onSort}
+                  onClearSort={onClearSort}
+                />
+              </TableHead>
+              <TableHead className="text-slate-300">
+                <OrderBtn
+                  label="Produto"
+                  columnKey="descricao"
+                  activeSort={sortColumns}
+                  onSort={onSort}
+                  onClearSort={onClearSort}
+                />
+              </TableHead>
+              <TableHead className="text-slate-300 text-center">
+                <OrderBtn
+                  label="Qtd. Total"
+                  columnKey="quantidade"
+                  activeSort={sortColumns}
+                  onSort={onSort}
+                  onClearSort={onClearSort}
+                />
+              </TableHead>
               <TableHead className="text-slate-300 text-center">Qtd. a Devolver</TableHead>
               <TableHead className="text-slate-300 text-center">Ações</TableHead>
-              <TableHead className="text-slate-300 text-center">Preço Unit.</TableHead>
+              <TableHead className="text-slate-300 text-center">
+                <OrderBtn
+                  label="Preço Unit."
+                  columnKey="punit"
+                  activeSort={sortColumns}
+                  onSort={onSort}
+                  onClearSort={onClearSort}
+                />
+              </TableHead>
               <TableHead className="text-slate-300 text-center w-36">Valor Total</TableHead>
             </TableRow>
           </TableHeader>
@@ -299,10 +343,10 @@ export function ProductTable({
             )}
           </TableBody>
           
-            <TableRow className="bg-slate-800 border-slate-600 hover:bg-slate-800/90">
+            <TableRow className="bg-slate-800 border-slate-600 hover:bg-slate-800/90 border-t">
               <TableCell colSpan={2} className="text-white font-bold">
                 <div className="flex items-center gap-2">
-                  <Calculator className="h-5 w-5" />
+                  <Calculator className="h-5 w-5 text-slate-400" />
                   <span className="text-lg">Totais</span>
                 </div>
               </TableCell>

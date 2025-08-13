@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -53,6 +53,116 @@ export function useSolicitacaoForm() {
     nome: string;
     cod_cliente: string;
   }[]>([]);
+  
+  // Product filtering and sorting states
+  const [productSearchTerm, setProductSearchTerm] = useState<string>("");
+  const [productSortBy, setProductSortBy] = useState<string>("codigo-asc");
+  const [productSortColumns, setProductSortColumns] = useState<{
+    column: string;
+    direction: "asc" | "desc";
+  }[]>([]);
+
+  // Filtered and sorted products
+  const filteredAndSortedProducts = useMemo(() => {
+    let filtered = produtos.filter(produto => 
+      produto.codigo.toLowerCase().includes(productSearchTerm.toLowerCase()) ||
+      produto.descricao.toLowerCase().includes(productSearchTerm.toLowerCase())
+    );
+
+    // Apply sorting from productSortBy (from dropdown)
+    if (productSortBy && productSortBy !== "selecionados") {
+      const [field, direction] = productSortBy.split("-") as [string, "asc" | "desc"];
+      filtered = filtered.sort((a, b) => {
+        let aVal: string | number = "";
+        let bVal: string | number = "";
+
+        switch (field) {
+          case "codigo":
+            aVal = a.codigo;
+            bVal = b.codigo;
+            break;
+          case "descricao":
+            aVal = a.descricao;
+            bVal = b.descricao;
+            break;
+          case "quantidade":
+            aVal = Number(a.quantidade);
+            bVal = Number(b.quantidade);
+            break;
+          case "preco":
+            aVal = Number(a.punit);
+            bVal = Number(b.punit);
+            break;
+          default:
+            return 0;
+        }
+
+        if (typeof aVal === "string" && typeof bVal === "string") {
+          return direction === "asc" 
+            ? aVal.localeCompare(bVal) 
+            : bVal.localeCompare(aVal);
+        } else {
+          return direction === "asc" 
+            ? (aVal as number) - (bVal as number)
+            : (bVal as number) - (aVal as number);
+        }
+      });
+    } else if (productSortBy === "selecionados") {
+      // Sort by selected items first
+      filtered = filtered.sort((a, b) => {
+        const qtdA = quantidadesDevolucao[a.codigo] || 0;
+        const qtdB = quantidadesDevolucao[b.codigo] || 0;
+        if (qtdA > 0 && qtdB === 0) return -1;
+        if (qtdB > 0 && qtdA === 0) return 1;
+        return a.codigo.localeCompare(b.codigo);
+      });
+    }
+
+    // Apply additional sorting from table headers (productSortColumns)
+    if (productSortColumns.length > 0) {
+      filtered = filtered.sort((a, b) => {
+        for (const sort of productSortColumns) {
+          let aVal: string | number = "";
+          let bVal: string | number = "";
+
+          switch (sort.column) {
+            case "codigo":
+              aVal = a.codigo;
+              bVal = b.codigo;
+              break;
+            case "descricao":
+              aVal = a.descricao;
+              bVal = b.descricao;
+              break;
+            case "quantidade":
+              aVal = Number(a.quantidade);
+              bVal = Number(b.quantidade);
+              break;
+            case "punit":
+              aVal = Number(a.punit);
+              bVal = Number(b.punit);
+              break;
+            default:
+              continue;
+          }
+
+          let comparison = 0;
+          if (typeof aVal === "string" && typeof bVal === "string") {
+            comparison = aVal.localeCompare(bVal);
+          } else {
+            comparison = (aVal as number) - (bVal as number);
+          }
+
+          if (comparison !== 0) {
+            return sort.direction === "asc" ? comparison : -comparison;
+          }
+        }
+        return 0;
+      });
+    }
+
+    return filtered;
+  }, [produtos, productSearchTerm, productSortBy, productSortColumns, quantidadesDevolucao]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -390,6 +500,15 @@ export function useSolicitacaoForm() {
     }
   };
 
+  // Product sorting handlers
+  const handleProductSort = (column: string, direction: "asc" | "desc") => {
+    setProductSortColumns([{ column, direction }]);
+  };
+
+  const handleProductClearSort = (column: string) => {
+    setProductSortColumns(prev => prev.filter(s => s.column !== column));
+  };
+
   return {
     // Estados
     currentStep,
@@ -415,6 +534,14 @@ export function useSolicitacaoForm() {
     nfExists,
     solicitacoesExistentes,
 
+    // Product filtering and sorting states
+    productSearchTerm,
+    setProductSearchTerm,
+    productSortBy,
+    setProductSortBy,
+    productSortColumns,
+    filteredAndSortedProducts,
+
     // Funções
     searchNF,
     dismissWarning,
@@ -429,6 +556,8 @@ export function useSolicitacaoForm() {
     alternarSelecaoTodos,
     finalizarSolicitacao,
     handleStepChange,
+    handleProductSort,
+    handleProductClearSort,
   };
 }
 

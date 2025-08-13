@@ -3,12 +3,18 @@ import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, CheckCircle2 } from "lucide-react";
 import { DevolutionTypeCard } from "./DevolutionTypeCard";
 import { ProductTable } from "./ProductTable";
+import { ProductFiltersControls } from "./ProductFiltersControls";
 
 interface Produto {
   codigo: string;
   descricao: string;
   quantidade: string;
   punit: string;
+}
+
+interface SortColumn {
+  column: string;
+  direction: "asc" | "desc";
 }
 
 interface ProductSelectionStepProps {
@@ -26,6 +32,15 @@ interface ProductSelectionStepProps {
   alternarSelecaoTodos: () => void;
   onBack: () => void;
   onFinalize: () => Promise<void>;
+  // New props for filtering and sorting
+  productSearchTerm: string;
+  setProductSearchTerm: (value: string) => void;
+  productSortBy: string;
+  setProductSortBy: (value: string) => void;
+  productSortColumns: SortColumn[];
+  filteredAndSortedProducts: Produto[];
+  handleProductSort: (column: string, direction: "asc" | "desc") => void;
+  handleProductClearSort: (column: string) => void;
 }
 
 export function ProductSelectionStep({
@@ -42,7 +57,15 @@ export function ProductSelectionStep({
   setQuantidadesDevolucao,
   alternarSelecaoTodos,
   onBack,
-  onFinalize
+  onFinalize,
+  productSearchTerm,
+  setProductSearchTerm,
+  productSortBy,
+  setProductSortBy,
+  productSortColumns,
+  filteredAndSortedProducts,
+  handleProductSort,
+  handleProductClearSort
 }: ProductSelectionStepProps) {
   const isFinalizationEnabled = () => {
     const totalQuantidadeDevolucao = Object.values(quantidadesDevolucao).reduce(
@@ -80,8 +103,18 @@ export function ProductSelectionStep({
 
       <DevolutionTypeCard tipoDevolucao={tipoDevolucao} />
 
-      <ProductTable
+      <ProductFiltersControls
+        searchTerm={productSearchTerm}
+        setSearchTerm={setProductSearchTerm}
+        sortBy={productSortBy}
+        setSortBy={setProductSortBy}
         produtos={produtos}
+        filteredProdutos={filteredAndSortedProducts}
+        quantidadesDevolucao={quantidadesDevolucao}
+      />
+
+      <ProductTable
+        produtos={filteredAndSortedProducts}
         quantidadesDevolucao={quantidadesDevolucao}
         todosSelecionados={todosSelecionados}
         aumentarQuantidade={aumentarQuantidade}
@@ -90,6 +123,9 @@ export function ProductSelectionStep({
         devolverTudo={devolverTudo}
         setQuantidadesDevolucao={setQuantidadesDevolucao}
         alternarSelecaoTodos={alternarSelecaoTodos}
+        sortColumns={productSortColumns}
+        onSort={handleProductSort}
+        onClearSort={handleProductClearSort}
       />
 
       <div className="flex justify-end mt-6">
