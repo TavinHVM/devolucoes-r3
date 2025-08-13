@@ -11,10 +11,15 @@ import {
   type ProdutoFormatado,
 } from "./utils";
 
+// Helper para validar número da NF (4 ou 6 dígitos numéricos)
+const isNumeroNFValida = (nf: string) => /^(\d{4}|\d{6})$/.test(nf);
+
 const formSchema = z.object({
   nome: z.string().min(1, { message: "" }),
   filial: z.string().min(1, { message: "" }),
-  numero_nf: z.string().min(1, { message: "" }),
+  numero_nf: z
+    .string()
+    .regex(/^(\d{4}|\d{6})$/, { message: "NF deve ter 4 ou 6 dígitos" }),
   carga: z.string().min(1, { message: "" }),
   nome_cobranca: z.string().min(1, { message: "" }),
   cod_cobranca: z.string().min(1, { message: "" }),
@@ -232,8 +237,8 @@ export function useSolicitacaoForm() {
 
   // Buscar informações da nota fiscal manualmente
   const searchNF = async () => {
-    if (!numeroNF || numeroNF.length < 4) {
-      toast.error("Digite pelo menos 4 dígitos da nota fiscal");
+    if (!numeroNF || !isNumeroNFValida(numeroNF)) {
+      toast.error("Número da NF deve ter 4 ou 6 dígitos");
       return;
     }
 
@@ -323,7 +328,7 @@ export function useSolicitacaoForm() {
   const isButtonEnabled = (): boolean => {
     return !!(
       numeroNF &&
-      numeroNF.length === 6 &&
+      isNumeroNFValida(numeroNF) &&
       motivoDevolucaoText &&
       motivoDevolucaoText.trim() !== "" &&
       arquivoNF
@@ -496,7 +501,7 @@ export function useSolicitacaoForm() {
   const handleStepChange = (step: 1 | 2) => {
     if (step === 1) {
       setCurrentStep(1);
-    } else if (step === 2 && numeroNF && numeroNF.length === 6) {
+    } else if (step === 2 && numeroNF && isNumeroNFValida(numeroNF)) {
       avancarPagina();
     }
   };
