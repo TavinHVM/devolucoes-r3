@@ -1,20 +1,25 @@
-import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
-import * as XLSX from 'xlsx';
+// Heavy libs are imported on-demand inside functions to keep initial bundle light
 
 // Importar o tipo correto das solicitações
 import { Solicitacao } from "@/types/solicitacao";
 
 // Função utilitária para carregar imagem base64 da public
+const logoCache = new Map<string, Promise<string>>();
 export async function getLogoBase64(path = '/r3logo.png') {
-  const response = await fetch(path);
-  const blob = await response.blob();
-  return new Promise<string>((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onloadend = () => resolve(reader.result as string);
-    reader.onerror = reject;
-    reader.readAsDataURL(blob);
-  });
+  if (!logoCache.has(path)) {
+    const promise = (async () => {
+      const response = await fetch(path);
+      const blob = await response.blob();
+      return new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result as string);
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
+    })();
+    logoCache.set(path, promise);
+  }
+  return logoCache.get(path)!;
 }
 
 export async function gerarRelatorioPDF({
@@ -32,6 +37,14 @@ export async function gerarRelatorioPDF({
   subtitulo?: string;
   logoBase64?: string; // base64 opcional
 }) {
+  const [{ default: jsPDF }, autoTableMod] = await Promise.all([
+    import('jspdf'),
+    import('jspdf-autotable'),
+  ]);
+  type AutoTableOptions = Record<string, unknown> & {
+    didDrawPage?: (data: { pageNumber: number }) => void;
+  };
+  const autoTable = (autoTableMod as unknown as { default: (doc: unknown, options: AutoTableOptions) => void }).default;
   const doc = new jsPDF('l', 'pt', 'a4');
   const pageWidth = doc.internal.pageSize.getWidth();
   // Logo
@@ -77,7 +90,7 @@ export async function gerarRelatorioPDF({
     alternateRowStyles: { fillColor: [240, 240, 240] },
     margin: { left: 40, right: 40 },
     theme: 'grid',
-    didDrawPage: (data) => {
+    didDrawPage: (data: { pageNumber: number }) => {
       // Rodapé
       const str = `Página ${data.pageNumber} - Gerado em ${dataAtual}`;
       doc.setFontSize(10);
@@ -93,6 +106,9 @@ export function gerarRelatorioXLSX({
 }: {
   solicitacoes: Solicitacao[];
 }) {
+  // Import lazily to avoid loading XLSX unless needed
+  (async () => {
+    const XLSX = await import('xlsx');
   const wsData = [
     [
       'ID', 'Nome', 'Filial', 'Nº NF', 'Carga', 'Cód. Cobrança', 'Código Cliente', 'RCA', 'Motivo', 'Vale', 'Nome Cobrança', 'Tipo', 'Status', 'Data'
@@ -141,4 +157,5 @@ export function gerarRelatorioXLSX({
   XLSX.utils.book_append_sheet(wb, ws, 'Relatório');
   const dataAtual = new Date().toLocaleString().replace(/\D/g, '');
   XLSX.writeFile(wb, `Relatorio_Solicitacoes_${dataAtual}.xlsx`);
+  })();
 } 

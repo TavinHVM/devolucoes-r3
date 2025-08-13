@@ -1,9 +1,4 @@
 import { Button } from "./ui/button";
-import {
-  gerarRelatorioPDF,
-  gerarRelatorioXLSX,
-  getLogoBase64,
-} from "../lib/relatorioUtils";
 import { Solicitacao } from "@/types/solicitacao";
 
 interface Props {
@@ -28,6 +23,7 @@ export default function BaixarRelatorio({ sortedSolicitacoes, status }: Props) {
             <Button
               className="bg-blue-600 hover:bg-blue-700 cursor-pointer"
               onClick={async () => {
+                const { getLogoBase64, gerarRelatorioPDF } = await import("../lib/relatorioUtils");
                 const logoBase64 = await getLogoBase64("/r3logo.png");
                 await gerarRelatorioPDF({
                   solicitacoes: sortedSolicitacoes,
@@ -40,7 +36,8 @@ export default function BaixarRelatorio({ sortedSolicitacoes, status }: Props) {
             </Button>
             <Button
               className="bg-green-600 hover:bg-green-700 cursor-pointer"
-              onClick={() => {
+                     onClick={async () => {
+                const { gerarRelatorioXLSX } = await import("../lib/relatorioUtils");
                 gerarRelatorioXLSX({ solicitacoes: sortedSolicitacoes });
               }}
             >
