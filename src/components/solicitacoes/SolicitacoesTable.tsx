@@ -22,6 +22,7 @@ import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { ExcluirSolicitacoes } from "@/utils/solicitacoes/botoesSolicitacoes";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 
 interface SolicitacoesTableProps {
   currentItems: Solicitacao[];
@@ -63,6 +64,8 @@ export const SolicitacoesTable: React.FC<SolicitacoesTableProps> = ({
   userPermissions,
 }) => {
   const [selectedIds, setSelectedIds] = React.useState<number[]>([]);
+  const [confirmOpen, setConfirmOpen] = React.useState(false);
+  const [deleting, setDeleting] = React.useState(false);
 
   const allOnPageSelected =
     currentItems.length > 0 &&
@@ -87,13 +90,17 @@ export const SolicitacoesTable: React.FC<SolicitacoesTableProps> = ({
   const handleBulkDelete = async () => {
     try {
       if (!selectedIds.length) return;
+      setDeleting(true);
       await ExcluirSolicitacoes(selectedIds);
       setSelectedIds([]);
-      toast.success("Solicitações excluídas com sucesso");
+      toast.success(selectedIds.length === 1 ? "Solicitação excluída com sucesso" : "Solicitações excluídas com sucesso");
       onRefreshList?.();
+      setConfirmOpen(false);
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Erro ao excluir";
       toast.error(msg);
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -113,7 +120,7 @@ export const SolicitacoesTable: React.FC<SolicitacoesTableProps> = ({
             <Button
               className="bg-red-600 hover:bg-red-700 text-white disabled:opacity-50"
               disabled={!selectedIds.length}
-              onClick={handleBulkDelete}
+              onClick={() => setConfirmOpen(true)}
             >
               <Trash2 className="h-4 w-4 mr-2" /> Excluir selecionadas ({selectedIds.length})
             </Button>
@@ -121,6 +128,23 @@ export const SolicitacoesTable: React.FC<SolicitacoesTableProps> = ({
         )}
       </CardHeader>
       <CardContent>
+        {/* Confirm Delete Dialog */}
+        {userPermissions.canDelete && (
+          <ConfirmDialog
+            open={confirmOpen}
+            onOpenChange={setConfirmOpen}
+            title="Confirmar exclusão"
+            description={
+              <span>
+                Tem certeza que deseja excluir {selectedIds.length} solicitação{selectedIds.length !== 1 ? "(ões)" : ""}? Esta ação não pode ser desfeita.
+              </span>
+            }
+            confirmText={`Excluir${selectedIds.length ? ` (${selectedIds.length})` : ""}`}
+            cancelText="Cancelar"
+            onConfirm={handleBulkDelete}
+            loading={deleting}
+          />
+        )}
         <div className="overflow-x-auto">
           <Table>
             <SolicitacoesTableHeader
