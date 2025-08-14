@@ -8,6 +8,7 @@ export interface UserPermissions {
   canAbater: boolean;
   canFinalizar: boolean;
   canReenviar: boolean;
+  canDelete: boolean;
 }
 
 /**
@@ -23,7 +24,8 @@ export function getUserPermissions(user: User | null): UserPermissions {
       canDesdobrar: false,
       canAbater: false,
       canFinalizar: false,
-      canReenviar: false,
+  canReenviar: false,
+  canDelete: false,
     };
   }
 
@@ -37,7 +39,8 @@ export function getUserPermissions(user: User | null): UserPermissions {
         canDesdobrar: false,
         canAbater: false,
         canFinalizar: false,
-        canReenviar: false,
+  canReenviar: false,
+  canDelete: false,
       };
 
     case 'marketplace':
@@ -47,7 +50,8 @@ export function getUserPermissions(user: User | null): UserPermissions {
         canDesdobrar: false,
         canAbater: false,
         canFinalizar: false,
-        canReenviar: false,
+  canReenviar: false,
+  canDelete: false,
       };
 
     case 'financeiro':
@@ -57,7 +61,8 @@ export function getUserPermissions(user: User | null): UserPermissions {
         canDesdobrar: true,
         canAbater: true,
         canFinalizar: true,
-        canReenviar: false,
+  canReenviar: false,
+  canDelete: false,
       };
 
     case 'logistica':
@@ -67,7 +72,8 @@ export function getUserPermissions(user: User | null): UserPermissions {
         canDesdobrar: false,
         canAbater: false,
         canFinalizar: false,
-        canReenviar: true,
+  canReenviar: true,
+  canDelete: false,
       };
 
     case 'adm':
@@ -77,7 +83,8 @@ export function getUserPermissions(user: User | null): UserPermissions {
         canDesdobrar: true,
         canAbater: true,
         canFinalizar: true,
-        canReenviar: true,
+  canReenviar: true,
+  canDelete: true,
       };
 
     default:
@@ -88,7 +95,8 @@ export function getUserPermissions(user: User | null): UserPermissions {
         canDesdobrar: false,
         canAbater: false,
         canFinalizar: false,
-        canReenviar: false,
+  canReenviar: false,
+  canDelete: false,
       };
   }
 }

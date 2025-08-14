@@ -51,7 +51,14 @@ export function getUserFromToken(request: NextRequest): UserTokenPayload | null 
  */
 export function hasServerPermission(
   userLevel: string,
-  action: 'aprovar' | 'recusar' | 'desdobrar' | 'abater' | 'finalizar' | 'reenviar'
+  action:
+    | 'aprovar'
+    | 'recusar'
+    | 'desdobrar'
+    | 'abater'
+    | 'finalizar'
+    | 'reenviar'
+    | 'excluir'
 ): boolean {
   const level = userLevel?.toLowerCase();
 
@@ -67,8 +74,8 @@ export function hasServerPermission(
 
     case 'adm':
     case 'administrador':
-      // Admin has all permissions
-      return true;
+  // Admin has all permissions, including excluir
+  return true;
 
     default:
       return false;
@@ -83,7 +90,14 @@ export function hasServerPermission(
  */
 export function validateUserPermission(
   request: NextRequest,
-  requiredAction: 'aprovar' | 'recusar' | 'desdobrar' | 'abater' | 'finalizar' | 'reenviar'
+  requiredAction:
+    | 'aprovar'
+    | 'recusar'
+    | 'desdobrar'
+    | 'abater'
+    | 'finalizar'
+    | 'reenviar'
+    | 'excluir'
 ): { success: boolean; user?: UserTokenPayload; error?: string } {
   const user = getUserFromToken(request);
 
