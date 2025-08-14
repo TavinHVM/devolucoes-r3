@@ -125,9 +125,13 @@ export const SolicitacaoDetailView: React.FC<SolicitacaoDetailViewProps> = ({
     motivo_recusa,
     status,
     created_at,
+    // BLOBs podem não vir na listagem; usamos flags quando existirem
     arquivo_nf,
     arquivo_nf_devolucao,
     arquivo_recibo,
+    has_arquivo_nf,
+    has_arquivo_nf_devolucao,
+    has_arquivo_recibo,
   } = solicitacao;
 
   return (
@@ -325,7 +329,7 @@ export const SolicitacaoDetailView: React.FC<SolicitacaoDetailViewProps> = ({
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-4">
-              {arquivo_nf && (
+              {(has_arquivo_nf || arquivo_nf) && (
                 <div className="flex flex-col items-center">
                   <Button
                     size="lg"
@@ -350,7 +354,7 @@ export const SolicitacaoDetailView: React.FC<SolicitacaoDetailViewProps> = ({
                 </div>
               )}
 
-              {arquivo_nf_devolucao && (
+              {(has_arquivo_nf_devolucao || arquivo_nf_devolucao) && (
                 <div className="flex flex-col items-center">
                   <Button
                     size="lg"
@@ -377,7 +381,7 @@ export const SolicitacaoDetailView: React.FC<SolicitacaoDetailViewProps> = ({
                 </div>
               )}
 
-              {arquivo_recibo && (
+              {(has_arquivo_recibo || arquivo_recibo) && (
                 <div className="flex flex-col items-center">
                   <Button
                     size="lg"
@@ -403,7 +407,7 @@ export const SolicitacaoDetailView: React.FC<SolicitacaoDetailViewProps> = ({
               )}
 
               {/* Mensagem quando não há arquivos */}
-              {!arquivo_nf && !arquivo_nf_devolucao && !arquivo_recibo && (
+              {!(has_arquivo_nf || arquivo_nf || has_arquivo_nf_devolucao || arquivo_nf_devolucao || has_arquivo_recibo || arquivo_recibo) && (
                 <div className="col-span-full flex flex-col items-center justify-center py-8 text-slate-400">
                   <FileText className="h-12 w-12 mb-3 opacity-50" />
                   <p className="text-lg font-medium">
