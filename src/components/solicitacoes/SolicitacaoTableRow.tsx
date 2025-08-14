@@ -72,6 +72,7 @@ export const SolicitacaoTableRow: React.FC<SolicitacaoTableRowProps> = ({
             {userPermissions.canDelete && (
               <TableCell className="w-8" onClick={(e) => e.stopPropagation()}>
                 <Checkbox
+                  className="data-[state=checked]:bg-red-600"
                   checked={!!selected}
                   onCheckedChange={(v) => onToggleSelected?.(id, !!v)}
                   aria-label={`Selecionar solicitação ${id}`}

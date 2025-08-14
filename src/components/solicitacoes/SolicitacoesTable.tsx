@@ -99,13 +99,15 @@ export const SolicitacoesTable: React.FC<SolicitacoesTableProps> = ({
 
   return (
     <Card className="bg-slate-800/50 border-slate-700">
-      <CardHeader>
-        <CardTitle className="text-white">
-          Lista de Solicitações ({filteredCount})
-        </CardTitle>
-        <CardDescription className="text-slate-400">
-          {filteredCount} de {totalSolicitacoes} solicitações
-        </CardDescription>
+      <CardHeader className="flex justify-between">
+        <div className="flex flex-col gap-2">
+          <CardTitle className="text-white">
+            Lista de Solicitações ({filteredCount})
+          </CardTitle>
+          <CardDescription className="text-slate-400">
+            {filteredCount} de {totalSolicitacoes} solicitações
+          </CardDescription>
+        </div>
         {userPermissions.canDelete && (
           <div className="mt-2">
             <Button

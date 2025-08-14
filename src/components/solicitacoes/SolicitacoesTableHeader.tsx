@@ -28,6 +28,7 @@ export const SolicitacoesTableHeader: React.FC<SolicitacoesTableHeaderProps> = (
         {showSelection && (
           <TableHead className="w-8 text-slate-300">
             <Checkbox
+              className="data-[state=checked]:bg-red-600"
               checked={allSelected}
               onCheckedChange={(v) => onToggleSelectAll?.(!!v)}
               aria-label="Selecionar tudo"
