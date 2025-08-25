@@ -92,7 +92,7 @@ export const FiltersControls: React.FC<FiltersControlsProps> = ({
           </div>
 
           {/* Period filter (data início - data fim) */}
-          <div className="w-full lg:w-72">
+          <div className="w-full lg:w-auto lg:min-w-72">
             <label className="text-slate-300 text-sm font-medium flex items-center justify-between mb-1">
               Período
               <div className="flex items-center hover:bg-slate-800">
@@ -231,7 +231,7 @@ export const FiltersControls: React.FC<FiltersControlsProps> = ({
           </div>
 
           {/* Status */}
-          <div className="w-full lg:w-46">
+          <div className="w-full lg:w-auto lg:min-w-48">
             <label className="text-slate-300 text-sm font-medium">Status</label>
             <Select value={status} onValueChange={(v) => setStatus(v || "Todos")}>
               <SelectTrigger className="mt-1 bg-slate-700 border-slate-600 text-white w-full h-9">
@@ -266,7 +266,7 @@ export const FiltersControls: React.FC<FiltersControlsProps> = ({
             </Select>
           </div>
 
-          <div className="flex gap-2 ml-auto mr-4">
+          <div className="flex gap-2">
             <Button
               onClick={onRefresh}
               disabled={refreshing}
