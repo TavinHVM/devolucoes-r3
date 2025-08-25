@@ -163,3 +163,25 @@ export async function ReenviarSolicitacao(id: number) {
     console.error("Erro ao mudar Status da solicitação para Reenviada:", error);
   }
 }
+
+export async function ExcluirSolicitacoes(ids: number[]) {
+  try {
+    const response = await fetch(`/api/solicitacoes/bulk-delete`, {
+      method: "POST",
+      headers: getAuthHeaders(true),
+      body: JSON.stringify({ ids }),
+    });
+    if (!response.ok) {
+      const data = await response.json().catch(() => null);
+      throw new Error(data?.error || "Erro ao excluir solicitações");
+    }
+    return response.json();
+  } catch (error) {
+    if (error instanceof Error) {
+      toast.error(error.message);
+    } else {
+      toast.error("Erro inesperado ao excluir solicitações.");
+    }
+    throw error;
+  }
+}

@@ -13,29 +13,36 @@ export interface UserTokenPayload {
 }
 
 export function middleware(request: NextRequest) {
-  const publicPaths = ["/login", "/reset-password", "/debug", "/test-login"];
+  const publicPathsSet = new Set(["/login", "/reset-password", "/debug", "/test-login"]);
   const adminOnlyPaths = ["/usuarios"];
   const createSolicitacaoRestricted = ["/criar-solicitacao"];
   const adminOnlyApiPaths = ["/api/usuarios", "/api/usuarios/create", "/api/usuarios/edit", "/api/usuarios/delete"];
   const pathname = request.nextUrl.pathname;
+  const isProd = process.env.NODE_ENV === 'production';
+  const isApi = pathname.startsWith("/api/");
 
-  console.log("Middleware executado para:", pathname);
+  if (!isProd) console.log("Middleware executado para:", pathname);
 
   // Se for uma rota pública, permitir acesso
-  if (publicPaths.includes(pathname)) {
-    console.log("Rota pública, permitindo acesso");
+  if (publicPathsSet.has(pathname)) {
+    if (!isProd) console.log("Rota pública, permitindo acesso");
+    return NextResponse.next();
+  }
+
+  // Pré-flight CORS para APIs
+  if (isApi && request.method === 'OPTIONS') {
     return NextResponse.next();
   }
 
   // Para APIs que não precisam de verificação admin, permitir acesso (validação na própria API)
-  if (pathname.startsWith("/api/") && !adminOnlyApiPaths.some(path => pathname.startsWith(path))) {
-    console.log("API route não-admin, permitindo acesso (validação na própria API)");
+  if (isApi && !adminOnlyApiPaths.some(path => pathname.startsWith(path))) {
+    if (!isProd) console.log("API route não-admin, permitindo acesso (validação na própria API)");
     return NextResponse.next();
   }
 
   // Para outras rotas, verificar autenticação
   const token = request.cookies.get("auth-token")?.value;
-  console.log("Token encontrado:", token ? "SIM" : "NÃO");
+  if (!isProd) console.log("Token encontrado:", token ? "SIM" : "NÃO");
 
   if (!token) {
     console.log("Sem token, redirecionando para login");
@@ -49,7 +56,7 @@ export function middleware(request: NextRequest) {
       process.env.JWT_SECRET || "your-secret-key"
     ) as UserTokenPayload;
 
-    console.log("Token válido para usuário:", payload.email);
+  if (!isProd) console.log("Token válido para usuário:", payload.email);
 
     // Verificar se é uma rota/API que requer permissão de admin
     const isAdminOnlyPage = adminOnlyPaths.some(path => pathname.startsWith(path));
@@ -57,7 +64,7 @@ export function middleware(request: NextRequest) {
     const isCreateSolicitacaoPage = createSolicitacaoRestricted.some(path => pathname.startsWith(path));
     
     if ((isAdminOnlyPage || isAdminOnlyApi) && payload.user_level !== 'adm') {
-      console.log("Acesso negado: usuário não é admin");
+      if (!isProd) console.log("Acesso negado: usuário não é admin");
       if (isAdminOnlyApi) {
         return NextResponse.json({ error: 'Acesso negado. Apenas administradores podem acessar esta funcionalidade.' }, { status: 403 });
       } else {
@@ -67,7 +74,7 @@ export function middleware(request: NextRequest) {
 
     // Verificar se é uma rota que requer permissão para criar solicitações (não pode ser financeiro)
     if (isCreateSolicitacaoPage && payload.role === 'financeiro') {
-      console.log("Acesso negado: usuário financeiro não pode criar solicitações");
+      if (!isProd) console.log("Acesso negado: usuário financeiro não pode criar solicitações");
       return NextResponse.redirect(new URL("/", request.url));
     }
 

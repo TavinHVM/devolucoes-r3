@@ -37,6 +37,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
+import ConfirmDialog from "../ui/confirm-dialog";
 
 interface ActionButtonsProps {
   solicitacao: Solicitacao;
@@ -58,6 +59,8 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
   onActionComplete,
   onCloseDetailDialog,
 }) => {
+  // Dialog de confirmação foi extraído para componente reutilizável
+
   const [motivoRecusa, setMotivoRecusa] = useState("");
   const [selectedFiles, setSelectedFiles] = useState<SelectedFiles>({
     nfDevolucao: null,
@@ -69,6 +72,14 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
   // Estados para controlar dialogs
   const [aprovarDialogOpen, setAprovarDialogOpen] = useState(false);
   const [recusarDialogOpen, setRecusarDialogOpen] = useState(false);
+
+  // Estados para confirmar ações
+  const [confirmAprovarOpen, setConfirmAprovarOpen] = useState(false);
+  const [confirmRecusarOpen, setConfirmRecusarOpen] = useState(false);
+  const [confirmDesdobrarOpen, setConfirmDesdobrarOpen] = useState(false);
+  const [confirmAbaterOpen, setConfirmAbaterOpen] = useState(false);
+  const [confirmFinalizarOpen, setConfirmFinalizarOpen] = useState(false);
+  const [confirmReenviarOpen, setConfirmReenviarOpen] = useState(false);
 
   // Estado de loading para os botões
   const [isLoading, setIsLoading] = useState(false);
@@ -87,6 +98,7 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
       );
 
       // Fechar dialogs locais
+  setConfirmAprovarOpen(false);
       setAprovarDialogOpen(false);
 
       // Resetar formulário
@@ -117,6 +129,7 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
       await RecusarSolicitacao(id, motivoRecusa);
 
       // Fechar dialogs locais
+  setConfirmRecusarOpen(false);
       setRecusarDialogOpen(false);
       setMotivoRecusa("");
 
@@ -143,6 +156,7 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
       await DesdobrarSolicitacao(id);
 
       // Fechar o dialog principal e mostrar toast
+  setConfirmDesdobrarOpen(false);
       onActionComplete?.("Solicitação desdobrada com sucesso!", "success");
 
       // Pequeno delay antes de fechar o dialog
@@ -167,6 +181,7 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
       await AbaterSolicitacao(id);
 
       // Fechar o dialog principal e mostrar toast
+  setConfirmAbaterOpen(false);
       onActionComplete?.("Solicitação abatida com sucesso!", "success");
 
       // Pequeno delay antes de fechar o dialog
@@ -189,6 +204,7 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
       await FinalizarSolicitacao(id);
 
       // Fechar o dialog principal e mostrar toast
+  setConfirmFinalizarOpen(false);
       onActionComplete?.("Solicitação finalizada com sucesso!", "success");
 
       // Pequeno delay antes de fechar o dialog
@@ -213,6 +229,7 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
       await ReenviarSolicitacao(id);
 
       // Fechar o dialog principal e mostrar toast
+  setConfirmReenviarOpen(false);
       onActionComplete?.("Solicitação reenviada com sucesso!", "success");
 
       // Pequeno delay antes de fechar o dialog
@@ -272,7 +289,7 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
                             vale &&
                             vale !== ""
                           ) {
-                            handleAprovar();
+                            setConfirmAprovarOpen(true);
                           }
                         }}
                         className="space-y-6"
@@ -421,7 +438,7 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
                             ? "bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white shadow-xl transform hover:scale-[1.02]"
                             : "bg-gradient-to-r from-slate-600 to-slate-700 text-slate-400 cursor-not-allowed"
                         }`}
-                        onClick={handleRecusar}
+                        onClick={() => setConfirmRecusarOpen(true)}
                         disabled={motivoRecusa.trim() === "" || isLoading}
                       >
                         {isLoading ? (
@@ -454,7 +471,7 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
               ? "bg-blue-700 cursor-not-allowed"
               : "bg-blue-600 hover:bg-blue-700 transform hover:scale-105"
           }`}
-          onClick={handleDesdobrar}
+          onClick={() => setConfirmDesdobrarOpen(true)}
           disabled={isLoading}
         >
           {isLoading ? (
@@ -480,7 +497,7 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
               ? "bg-yellow-700 cursor-not-allowed"
               : "bg-yellow-600 hover:bg-yellow-700 transform hover:scale-105"
           }`}
-          onClick={handleAbater}
+          onClick={() => setConfirmAbaterOpen(true)}
           disabled={isLoading}
         >
           {isLoading ? (
@@ -506,7 +523,7 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
               ? "bg-lime-700 cursor-not-allowed"
               : "bg-lime-600 hover:bg-lime-700 transform hover:scale-105"
           }`}
-          onClick={handleFinalizar}
+          onClick={() => setConfirmFinalizarOpen(true)}
           disabled={isLoading}
         >
           {isLoading ? (
@@ -532,7 +549,7 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
               ? "bg-orange-700 cursor-not-allowed"
               : "bg-orange-600 hover:bg-orange-700 transform hover:scale-105"
           }`}
-          onClick={handleReenviar}
+          onClick={() => setConfirmReenviarOpen(true)}
           disabled={isLoading}
         >
           {isLoading ? (
@@ -557,6 +574,62 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
     <div className="relative">
       {/* Botões renderizados */}
       {renderButtons()}
+
+      {/* Dialogs de confirmação gerais */}
+      <ConfirmDialog
+        open={confirmAprovarOpen}
+        onOpenChange={setConfirmAprovarOpen}
+        title="Tem certeza que deseja Aprovar?"
+        confirmText="Prosseguir"
+        cancelText="Cancelar"
+        onConfirm={handleAprovar}
+        loading={isLoading}
+      />
+      <ConfirmDialog
+        open={confirmRecusarOpen}
+        onOpenChange={setConfirmRecusarOpen}
+        title="Tem certeza que deseja Recusar?"
+        confirmText="Prosseguir"
+        cancelText="Cancelar"
+        onConfirm={handleRecusar}
+        loading={isLoading}
+      />
+      <ConfirmDialog
+        open={confirmDesdobrarOpen}
+        onOpenChange={setConfirmDesdobrarOpen}
+        title="Tem certeza que deseja Desdobrar?"
+        confirmText="Prosseguir"
+        cancelText="Cancelar"
+        onConfirm={handleDesdobrar}
+        loading={isLoading}
+      />
+      <ConfirmDialog
+        open={confirmAbaterOpen}
+        onOpenChange={setConfirmAbaterOpen}
+        title="Tem certeza que deseja Abater?"
+        confirmText="Prosseguir"
+        cancelText="Cancelar"
+        onConfirm={handleAbater}
+        loading={isLoading}
+      />
+      <ConfirmDialog
+        open={confirmFinalizarOpen}
+        onOpenChange={setConfirmFinalizarOpen}
+        title="Tem certeza que deseja Finalizar?"
+        confirmText="Prosseguir"
+        cancelText="Cancelar"
+        onConfirm={handleFinalizar}
+        loading={isLoading}
+      />
+      <ConfirmDialog
+        open={confirmReenviarOpen}
+        onOpenChange={setConfirmReenviarOpen}
+        title="Tem certeza que deseja Reenviar?"
+        confirmText="Prosseguir"
+        cancelText="Cancelar"
+        onConfirm={handleReenviar}
+        loading={isLoading}
+      />
     </div>
   );
 };

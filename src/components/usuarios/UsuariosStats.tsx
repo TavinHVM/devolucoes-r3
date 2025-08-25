@@ -1,5 +1,5 @@
 import { Card, CardContent } from '../ui/card';
-import { Users, BadgeCent, ShoppingCart, Truck, ShieldCheck } from 'lucide-react';
+import { Users, BadgeCent, ShoppingCart, Truck, ShieldCheck, Store } from 'lucide-react';
 import { Usuario } from './types';
 
 interface UsuariosStatsProps {
@@ -37,6 +37,12 @@ export function UsuariosStats({ usuarios }: UsuariosStatsProps) {
       value: usuarios.filter(u => u.user_level === 'logistica').length,
       icon: Truck,
       color: 'orange'
+    },
+    {
+      label: 'Marketplace',
+      value: usuarios.filter(u => u.user_level === 'marketplace').length,
+      icon: Store,
+      color: 'yellow'
     }
   ];
 
@@ -46,13 +52,14 @@ export function UsuariosStats({ usuarios }: UsuariosStatsProps) {
       red: 'bg-red-500/20 text-red-400',
       green: 'bg-green-500/20 text-green-400',
       orange: 'bg-orange-500/20 text-orange-500',
-      indigo: 'bg-indigo-500/20 text-indigo-400'
+      indigo: 'bg-indigo-500/20 text-indigo-400',
+      yellow: 'bg-yellow-500/20 text-yellow-400'
     };
     return colors[color as keyof typeof colors] || colors.blue;
   };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
+    <div className="grid grid-cols-1 md:grid-cols-6 gap-4 mb-8">
       {statsConfig.map((stat, index) => (
         <Card key={index} className="bg-slate-800/50 border-slate-700">
           <CardContent className="p-4">

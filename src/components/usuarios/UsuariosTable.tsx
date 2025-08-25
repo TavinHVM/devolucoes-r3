@@ -3,7 +3,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '.
 import { Avatar, AvatarFallback } from '../ui/avatar';
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
-import { Edit2, Trash2, Mail, ShieldCheck, ShoppingCart, Truck, Circle, BadgeCent, UserPlus } from 'lucide-react';
+import { Edit2, Trash2, Mail, ShieldCheck, ShoppingCart, Truck, Circle, BadgeCent, UserPlus, Store } from 'lucide-react';
 import { Usuario } from './types';
 import { getInitials, getLevelBadgeClass, getLevelBadgeStyle, getLevelBadgeConfig } from './utils';
 
@@ -26,6 +26,8 @@ const getLevelIcon = (level: string) => {
       return <BadgeCent {...iconProps} />;
     case 'logistica':
       return <Truck {...iconProps} />;
+    case 'marketplace':
+      return <Store {...iconProps} />;
     default:
       return <Circle {...iconProps} />;
   }

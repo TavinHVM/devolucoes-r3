@@ -6,28 +6,34 @@ export const getInitials = (firstName: string, lastName: string) => {
 
 export const levelBadgeConfig = {
   adm: {
-    bgColor: '#ff0000ff',
-    textColor: '#ffffff',
+    bgColor: '#c50b0bff',
+    textColor: '#ff6e6eff',
     icon: 'shield-check',
     label: 'Administrador'
   },
   vendas: {
     bgColor: '#0062ffff',
-    textColor: '#ffffff',
+    textColor: '#b6d2ffff',
     icon: 'shopping-cart',
     label: 'Vendas'
   },
   financeiro: {
     bgColor: '#00ffaeff',
-    textColor: '#ffffff',
+    textColor: '#b2ffe8ff',
     icon: 'badge-cent',
     label: 'Financeiro'
   },
   logistica: {
     bgColor: '#ff6a00ff',
-    textColor: '#ffffff',
+    textColor: '#ffab6fff',
     icon: 'truck',
     label: 'Logística'
+  },
+  marketplace: {
+    bgColor: '#ffbb00ff',
+    textColor: '#ffdb79ff',
+    icon: 'store',
+    label: 'Marketplace'
   },
   default: {
     bgColor: '#6b7280',

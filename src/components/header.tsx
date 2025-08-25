@@ -93,8 +93,8 @@ export default function Header() {
 
       {/* Header */}
       <header className="flex items-center justify-between px-6 py-4 bg-slate-800 text-white shadow-md w-full">
-        {/* Logo e Nome */}
-        <div className="flex items-center gap-3">
+        {/* Logo e Nome (clickável) */}
+        <Link href="/" className="flex items-center gap-3 cursor-pointer hover:opacity-80 transition">
           <Image
             src="/favicon.ico"
             alt="Logo"
@@ -110,7 +110,7 @@ export default function Header() {
               </span>
             )}
           </div>
-        </div>
+        </Link>
 
         {/* Navegação */}
         <nav className="flex items-center gap-6">

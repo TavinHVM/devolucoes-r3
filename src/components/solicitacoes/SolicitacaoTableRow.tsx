@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { toast } from "sonner";
 import { TableCell, TableRow } from "@/components/ui/table";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { FileText, Calendar, User, Handshake, Wallet } from "lucide-react";
@@ -21,15 +22,20 @@ interface SolicitacaoTableRowProps {
     canDesdobrar: boolean;
     canAbater: boolean;
     canFinalizar: boolean;
-    canReenviar: boolean;
+  canReenviar: boolean;
+  canDelete?: boolean;
   };
   onRefreshList?: () => void;
+  selected?: boolean;
+  onToggleSelected?: (id: number, checked: boolean) => void;
 }
 
 export const SolicitacaoTableRow: React.FC<SolicitacaoTableRowProps> = ({
   solicitacao,
   userPermissions,
   onRefreshList,
+  selected,
+  onToggleSelected,
 }) => {
   const [dialogOpen, setDialogOpen] = useState(false);
 
@@ -63,6 +69,16 @@ export const SolicitacaoTableRow: React.FC<SolicitacaoTableRowProps> = ({
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogTrigger asChild>
           <TableRow className="border-slate-700 hover:bg-slate-700/30 cursor-pointer hover:text-white">
+            {userPermissions.canDelete && (
+              <TableCell className="w-8" onClick={(e) => e.stopPropagation()}>
+                <Checkbox
+                  className="data-[state=checked]:bg-red-600"
+                  checked={!!selected}
+                  onCheckedChange={(v) => onToggleSelected?.(id, !!v)}
+                  aria-label={`Selecionar solicitação ${id}`}
+                />
+              </TableCell>
+            )}
             <TableCell className="text-center">
               <Badge
                 variant="outline"

@@ -13,6 +13,11 @@ export type Solicitacao = {
   tipo_devolucao: string;
   status: string;
   created_at: string;
+  // No payload de listagem, evitamos enviar os BLOBs; usamos flags de existência
+  has_arquivo_nf?: boolean;
+  has_arquivo_nf_devolucao?: boolean;
+  has_arquivo_recibo?: boolean;
+  // Em detalhes (quando necessário), os campos abaixo podem ser presentes via outra rota
   arquivo_nf?: string;
   arquivo_nf_devolucao?: string;
   arquivo_recibo?: string;
