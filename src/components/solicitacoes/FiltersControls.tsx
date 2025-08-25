@@ -162,7 +162,7 @@ export const FiltersControls: React.FC<FiltersControlsProps> = ({
                           setStartDate(null);
                         }
                       }}
-                      initialFocus
+                      autoFocus
                       className="text-white [&_.rdp-day]:text-white [&_.rdp-day_selected]:bg-blue-600 [&_.rdp-day_selected]:text-white [&_.rdp-day:hover]:bg-slate-700"
                     />
                   </PopoverContent>
@@ -221,7 +221,7 @@ export const FiltersControls: React.FC<FiltersControlsProps> = ({
                         }
                         return false;
                       }}
-                      initialFocus
+                      autoFocus
                       className="text-white [&_.rdp-day]:text-white [&_.rdp-day_selected]:bg-blue-600 [&_.rdp-day_selected]:text-white [&_.rdp-day:hover]:bg-slate-700"
                     />
                   </PopoverContent>
