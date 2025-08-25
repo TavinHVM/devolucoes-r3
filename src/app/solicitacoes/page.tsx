@@ -34,6 +34,10 @@ function SolicitacoesContent() {
     setStatus,
     busca,
     setBusca,
+    startDate,
+    setStartDate,
+    endDate,
+    setEndDate,
     currentPage,
     setCurrentPage,
     totalPages,
@@ -75,6 +79,10 @@ function SolicitacoesContent() {
           setBusca={setBusca}
           status={status}
           setStatus={setStatus}
+          startDate={startDate}
+          setStartDate={setStartDate}
+          endDate={endDate}
+          setEndDate={setEndDate}
           refreshing={refreshing}
           onRefresh={fetchSolicitacoes}
           filteredSolicitacoes={finalSolicitacoes}

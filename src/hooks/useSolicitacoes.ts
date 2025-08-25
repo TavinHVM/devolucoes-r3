@@ -3,11 +3,14 @@ import { Solicitacao, SortColumn } from "@/types/solicitacao";
 import { filterTableHeader } from "@/utils/filters/filterTableHeader";
 import { filterBySearch } from "@/utils/filters/filterBySearch";
 import { filterByStatus } from "@/utils/filters/filterByStatus";
+import { filterByDateRange } from "@/utils/filters/filterByDateRange";
 
 export const useSolicitacoes = () => {
   const [solicitacoes, setSolicitacoes] = useState<Solicitacao[]>([]);
   const [status, setStatus] = useState("Todos");
   const [busca, setBusca] = useState("");
+  const [startDate, setStartDate] = useState<string | null>(null);
+  const [endDate, setEndDate] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [refreshing, setRefreshing] = useState(false);
   const [sortColumns, setSortColumns] = useState<SortColumn[]>([]);
@@ -100,7 +103,8 @@ export const useSolicitacoes = () => {
     "status",
   ]);
 
-  const finalSolicitacoes = filterByStatus(filteredSolicitacoes, status);
+  const dateFilteredSolicitacoes = filterByDateRange(filteredSolicitacoes, startDate, endDate);
+  const finalSolicitacoes = filterByStatus(dateFilteredSolicitacoes, status);
 
   // Pagination
   const indexOfLastItem = currentPage * itemsPerPage;
@@ -121,6 +125,10 @@ export const useSolicitacoes = () => {
     setStatus,
     busca,
     setBusca,
+    startDate,
+    setStartDate,
+    endDate,
+    setEndDate,
     
     // Pagination
     currentPage,
