@@ -12,6 +12,12 @@ interface Produto {
   punit: string;
 }
 
+interface ProdutoDevolvido {
+  cod_prod: number;
+  descricao: string;
+  quantidade_devolvida: number;
+}
+
 interface SortColumn {
   column: string;
   direction: "asc" | "desc";
@@ -23,6 +29,7 @@ interface ProductSelectionStepProps {
   tipoDevolucao: string;
   produtos: Produto[];
   quantidadesDevolucao: Record<string, number>;
+  produtosDevolvidos: ProdutoDevolvido[];
   todosSelecionados: boolean;
   aumentarQuantidade: (codigoProduto: string) => void;
   diminuirQuantidade: (codigoProduto: string) => void;
@@ -49,6 +56,7 @@ export function ProductSelectionStep({
   tipoDevolucao,
   produtos,
   quantidadesDevolucao,
+  produtosDevolvidos,
   todosSelecionados,
   aumentarQuantidade,
   diminuirQuantidade,
@@ -116,6 +124,7 @@ export function ProductSelectionStep({
       <ProductTable
         produtos={filteredAndSortedProducts}
         quantidadesDevolucao={quantidadesDevolucao}
+        produtosDevolvidos={produtosDevolvidos}
         todosSelecionados={todosSelecionados}
         aumentarQuantidade={aumentarQuantidade}
         diminuirQuantidade={diminuirQuantidade}

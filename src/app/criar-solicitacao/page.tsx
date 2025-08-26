@@ -45,6 +45,7 @@ function SolicitacaoContent() {
     isSearchingNF,
     nfExists,
     solicitacoesExistentes,
+    produtosDevolvidos,
     motivoDevolucaoText,
     setMotivoDevolucaoText,
     
@@ -123,6 +124,7 @@ function SolicitacaoContent() {
             tipoDevolucao={tipoDevolucao}
             produtos={produtos}
             quantidadesDevolucao={quantidadesDevolucao}
+            produtosDevolvidos={produtosDevolvidos}
             todosSelecionados={todosSelecionados}
             aumentarQuantidade={aumentarQuantidade}
             diminuirQuantidade={diminuirQuantidade}

@@ -21,6 +21,12 @@ interface Produto {
   punit: string;
 }
 
+interface ProdutoDevolvido {
+  cod_prod: number;
+  descricao: string;
+  quantidade_devolvida: number;
+}
+
 interface SortColumn {
   column: string;
   direction: "asc" | "desc";
@@ -29,6 +35,7 @@ interface SortColumn {
 interface ProductTableProps {
   produtos: Produto[];
   quantidadesDevolucao: Record<string, number>;
+  produtosDevolvidos: ProdutoDevolvido[];
   todosSelecionados: boolean;
   aumentarQuantidade: (codigoProduto: string) => void;
   diminuirQuantidade: (codigoProduto: string) => void;
@@ -44,6 +51,7 @@ interface ProductTableProps {
 export function ProductTable({
   produtos,
   quantidadesDevolucao,
+  produtosDevolvidos,
   todosSelecionados,
   aumentarQuantidade,
   diminuirQuantidade,
@@ -153,6 +161,7 @@ export function ProductTable({
                   onClearSort={onClearSort}
                 />
               </TableHead>
+              <TableHead className="text-slate-300 text-center">Já Devolvido</TableHead>
               <TableHead className="text-slate-300 text-center">Qtd. a Devolver</TableHead>
               <TableHead className="text-slate-300 text-center">Ações</TableHead>
               <TableHead className="text-slate-300 text-center">
@@ -222,6 +231,27 @@ export function ProductTable({
                       >
                         {p.quantidade}
                       </Badge>
+                    </TableCell>
+                    <TableCell className="text-center">
+                      {(() => {
+                        const produtoDevolvido = produtosDevolvidos.find(pd => pd.cod_prod.toString() === p.codigo);
+                        const quantidadeJaDevolvida = produtoDevolvido ? produtoDevolvido.quantidade_devolvida : 0;
+                        
+                        if (quantidadeJaDevolvida > 0) {
+                          return (
+                            <Badge
+                              variant="outline"
+                              className="text-red-400 border-red-500/50"
+                            >
+                              {quantidadeJaDevolvida}
+                            </Badge>
+                          );
+                        } else {
+                          return (
+                            <span className="text-slate-500 text-sm">-</span>
+                          );
+                        }
+                      })()}
                     </TableCell>
                     <TableCell className="text-center">
                       <div className="flex items-center justify-center">

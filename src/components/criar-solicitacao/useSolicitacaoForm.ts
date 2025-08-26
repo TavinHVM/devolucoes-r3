@@ -60,6 +60,12 @@ export function useSolicitacaoForm() {
     cod_cliente: string;
   }[]>([]);
   
+  const [produtosDevolvidos, setProdutosDevolvidos] = useState<{
+    cod_prod: number;
+    descricao: string;
+    quantidade_devolvida: number;
+  }[]>([]);
+  
   // Product filtering and sorting states
   const [productSearchTerm, setProductSearchTerm] = useState<string>("");
   const [productSortBy, setProductSortBy] = useState<string>("codigo-asc");
@@ -245,23 +251,28 @@ export function useSolicitacaoForm() {
     setIsSearchingNF(true);
     
     try {
-      // Primeiro verificar se já existe solicitação com esta NF
+      // Verificar solicitações existentes (apenas para informação)
       const existingResponse = await fetch(`/api/checkSolicitacao/${numeroNF}`);
       if (existingResponse.ok) {
         const checkResult = await existingResponse.json();
-        if (checkResult.existe && checkResult.total > 0) {
+        if (checkResult.total > 0) {
           setNfExists(true);
           setSolicitacoesExistentes(checkResult.solicitacoes || []);
-          toast.error(`Esta nota fiscal já possui ${checkResult.total} solicitação(ões) de devolução`);
-          setIsSearchingNF(false);
-          return;
+          // Não bloqueamos mais, apenas informamos
+          toast.info(`Esta nota fiscal possui ${checkResult.total} solicitação(ões) existente(s)`);
         }
+      }
+
+      // Buscar produtos já devolvidos
+      const produtosJaDevolvidos = await fetch(`/api/produtosDevolvidos/${numeroNF}`);
+      if (produtosJaDevolvidos.ok) {
+        const resultProdutos = await produtosJaDevolvidos.json();
+        setProdutosDevolvidos(resultProdutos.produtos_devolvidos || []);
       }
 
       // Buscar informações da NF
       const infos_nota = await fetchInfosNF(numeroNF);
       if (infos_nota) {
-        setNfExists(false);
         setNomeClient(infos_nota.cliente);
         setNumeroCodigoCliente(infos_nota.codcli.toString());
         setCodigoRca(infos_nota.codusur.toString());
@@ -346,12 +357,6 @@ export function useSolicitacaoForm() {
       return;
     }
 
-    // Verificar se NF existe antes de continuar
-    if (nfExists) {
-      toast.error("Não é possível criar solicitação para uma nota fiscal que já possui solicitações");
-      return;
-    }
-
     if (!nomeClient) {
       toast.error("É necessário buscar as informações da nota fiscal antes de continuar");
       return;
@@ -386,12 +391,27 @@ export function useSolicitacaoForm() {
     const produto = produtos.find((p) => p.codigo === codigoProduto);
     if (produto) {
       const quantidadeAtual = quantidadesDevolucao[codigoProduto] || 0;
-      const quantidadeMaxima = Number(produto.quantidade);
+      const quantidadeOriginal = Number(produto.quantidade);
+      
+      // Verificar quantidade já devolvida
+      const produtoDevolvido = produtosDevolvidos.find(p => p.cod_prod.toString() === codigoProduto);
+      const quantidadeJaDevolvida = produtoDevolvido ? produtoDevolvido.quantidade_devolvida : 0;
+      
+      // Quantidade máxima disponível para devolução
+      const quantidadeMaxima = quantidadeOriginal - quantidadeJaDevolvida;
+      
+      if (quantidadeJaDevolvida >= quantidadeOriginal) {
+        toast.error(`Este produto já foi totalmente devolvido em solicitações anteriores`);
+        return;
+      }
+      
       if (quantidadeAtual < quantidadeMaxima) {
         setQuantidadesDevolucao((prev) => ({
           ...prev,
           [codigoProduto]: quantidadeAtual + 1,
         }));
+      } else {
+        toast.warning(`Quantidade máxima disponível: ${quantidadeMaxima} (${quantidadeJaDevolvida} já devolvidos)`);
       }
     }
   };
@@ -409,24 +429,56 @@ export function useSolicitacaoForm() {
   const alterarQuantidadeInput = (codigoProduto: string, valor: string) => {
     const produto = produtos.find((p) => p.codigo === codigoProduto);
     if (produto) {
+      const quantidadeOriginal = Number(produto.quantidade);
+      
+      // Verificar quantidade já devolvida
+      const produtoDevolvido = produtosDevolvidos.find(p => p.cod_prod.toString() === codigoProduto);
+      const quantidadeJaDevolvida = produtoDevolvido ? produtoDevolvido.quantidade_devolvida : 0;
+      
+      // Quantidade máxima disponível para devolução
+      const quantidadeMaxima = quantidadeOriginal - quantidadeJaDevolvida;
+      
       const novaQuantidade = Math.max(
         0,
-        Math.min(Number(valor) || 0, Number(produto.quantidade))
+        Math.min(Number(valor) || 0, quantidadeMaxima)
       );
+      
       setQuantidadesDevolucao((prev) => ({
         ...prev,
         [codigoProduto]: novaQuantidade,
       }));
+      
+      if ((Number(valor) || 0) > quantidadeMaxima) {
+        toast.warning(`Quantidade máxima disponível: ${quantidadeMaxima} (${quantidadeJaDevolvida} já devolvidos)`);
+      }
     }
   };
 
   const devolverTudo = (codigoProduto: string) => {
     const produto = produtos.find((p) => p.codigo === codigoProduto);
     if (produto) {
+      const quantidadeOriginal = Number(produto.quantidade);
+      
+      // Verificar quantidade já devolvida
+      const produtoDevolvido = produtosDevolvidos.find(p => p.cod_prod.toString() === codigoProduto);
+      const quantidadeJaDevolvida = produtoDevolvido ? produtoDevolvido.quantidade_devolvida : 0;
+      
+      // Quantidade máxima disponível para devolução
+      const quantidadeMaxima = quantidadeOriginal - quantidadeJaDevolvida;
+      
+      if (quantidadeJaDevolvida >= quantidadeOriginal) {
+        toast.error(`Este produto já foi totalmente devolvido em solicitações anteriores`);
+        return;
+      }
+      
       setQuantidadesDevolucao((prev) => ({
         ...prev,
-        [codigoProduto]: Number(produto.quantidade),
+        [codigoProduto]: quantidadeMaxima,
       }));
+      
+      if (quantidadeJaDevolvida > 0) {
+        toast.info(`Selecionando ${quantidadeMaxima} unidades (${quantidadeJaDevolvida} já foram devolvidas)`);
+      }
     }
   };
 
@@ -439,10 +491,30 @@ export function useSolicitacaoForm() {
       setQuantidadesDevolucao(quantidadesZeradas);
     } else {
       const novasQuantidades: Record<string, number> = {};
+      let temProdutoJaDevolvido = false;
+      
       produtos.forEach((produto) => {
-        novasQuantidades[produto.codigo] = Number(produto.quantidade);
+        const quantidadeOriginal = Number(produto.quantidade);
+        
+        // Verificar quantidade já devolvida
+        const produtoDevolvido = produtosDevolvidos.find(p => p.cod_prod.toString() === produto.codigo);
+        const quantidadeJaDevolvida = produtoDevolvido ? produtoDevolvido.quantidade_devolvida : 0;
+        
+        // Quantidade máxima disponível para devolução
+        const quantidadeMaxima = quantidadeOriginal - quantidadeJaDevolvida;
+        
+        novasQuantidades[produto.codigo] = quantidadeMaxima;
+        
+        if (quantidadeJaDevolvida > 0) {
+          temProdutoJaDevolvido = true;
+        }
       });
+      
       setQuantidadesDevolucao(novasQuantidades);
+      
+      if (temProdutoJaDevolvido) {
+        toast.info("Alguns produtos foram ajustados porque já possuem devoluções anteriores");
+      }
     }
   };
 
@@ -539,6 +611,7 @@ export function useSolicitacaoForm() {
     isSearchingNF,
     nfExists,
     solicitacoesExistentes,
+    produtosDevolvidos,
     motivoDevolucaoText,
     setMotivoDevolucaoText,
 
