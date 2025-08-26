@@ -76,9 +76,13 @@ export const QuickActions: React.FC = () => {
                 onClick={() => router.push(action.href)}
               >
                 <IconComponent className="h-8 w-8" />
-                <div className="text-center">
-                  <p className="font-semibold">{action.title}</p>
-                  <p className="text-sm opacity-90">{action.description}</p>
+                <div className="flex flex-col max-w-full">
+                  <div className="">
+                    <p className="font-semibold">{action.title}</p>
+                  </div>
+                  <div className="text-center w-full">
+                    <p className="text-sm opacity-90 break-words max-w-full">{action.description}</p>
+                  </div>
                 </div>
               </Button>
             );
