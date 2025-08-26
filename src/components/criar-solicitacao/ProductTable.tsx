@@ -39,6 +39,7 @@ interface ProductTableProps {
   sortColumns: SortColumn[];
   onSort: (column: string, direction: "asc" | "desc") => void;
   onClearSort: (column: string) => void;
+  getQuantidadeDisponivel: (codigoProduto: string) => number;
 }
 
 export function ProductTable({
@@ -53,7 +54,8 @@ export function ProductTable({
   alternarSelecaoTodos,
   sortColumns,
   onSort,
-  onClearSort
+  onClearSort,
+  getQuantidadeDisponivel,
 }: ProductTableProps) {
   const calcularTotais = () => {
     let totalQuantidade = 0;
@@ -153,6 +155,7 @@ export function ProductTable({
                   onClearSort={onClearSort}
                 />
               </TableHead>
+              <TableHead className="text-slate-300 text-center">Já Devolvido</TableHead>
               <TableHead className="text-slate-300 text-center">Qtd. a Devolver</TableHead>
               <TableHead className="text-slate-300 text-center">Ações</TableHead>
               <TableHead className="text-slate-300 text-center">
@@ -222,6 +225,28 @@ export function ProductTable({
                       >
                         {p.quantidade}
                       </Badge>
+                    </TableCell>
+                    <TableCell className="text-center">
+                      {(() => {
+                        const quantidadeOriginal = Number(p.quantidade);
+                        const quantidadeDisponivel = getQuantidadeDisponivel(p.codigo);
+                        const quantidadeJaDevolvida = quantidadeOriginal - quantidadeDisponivel;
+                        
+                        if (quantidadeJaDevolvida > 0) {
+                          return (
+                            <Badge
+                              variant="outline"
+                              className="text-red-400 border-red-500/50"
+                            >
+                              {quantidadeJaDevolvida}
+                            </Badge>
+                          );
+                        } else {
+                          return (
+                            <span className="text-slate-500 text-sm">-</span>
+                          );
+                        }
+                      })()}
                     </TableCell>
                     <TableCell className="text-center">
                       <div className="flex items-center justify-center">
@@ -387,3 +412,5 @@ export function ProductTable({
     </Card>
   );
 }
+
+export default ProductTable;

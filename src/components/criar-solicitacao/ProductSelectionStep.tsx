@@ -41,6 +41,7 @@ interface ProductSelectionStepProps {
   filteredAndSortedProducts: Produto[];
   handleProductSort: (column: string, direction: "asc" | "desc") => void;
   handleProductClearSort: (column: string) => void;
+  getQuantidadeDisponivel: (codigoProduto: string) => number;
 }
 
 export function ProductSelectionStep({
@@ -65,7 +66,8 @@ export function ProductSelectionStep({
   productSortColumns,
   filteredAndSortedProducts,
   handleProductSort,
-  handleProductClearSort
+  handleProductClearSort,
+  getQuantidadeDisponivel
 }: ProductSelectionStepProps) {
   const isFinalizationEnabled = () => {
     const totalQuantidadeDevolucao = Object.values(quantidadesDevolucao).reduce(
@@ -126,6 +128,7 @@ export function ProductSelectionStep({
         sortColumns={productSortColumns}
         onSort={handleProductSort}
         onClearSort={handleProductClearSort}
+        getQuantidadeDisponivel={getQuantidadeDisponivel}
       />
 
       <div className="flex justify-end mt-6">

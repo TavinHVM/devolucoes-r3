@@ -104,21 +104,30 @@ export async function POST(request: Request) {
         data: solicitacaoToCreate,
       });
 
-      // 2. Salvar TODOS os produtos da nota fiscal na tabela products
-      const produtosToCreate = produtos.map((produto: Produto) => ({
-        numeronf: solicitacao.numero_nf,
-        cod_prod: parseInt(produto.codigo),
-        descricao: produto.descricao,
-        quantidade: parseInt(produto.quantidade), // Quantidade original da nota
-        punit: parseInt(produto.punit),
-      }));
+      // 2. Salvar produtos da nota fiscal (apenas se ainda não existem)
+      for (const produto of produtos) {
+        const produtoExistente = await tx.products.findFirst({
+          where: {
+            numeronf: solicitacao.numero_nf,
+            cod_prod: parseInt(produto.codigo)
+          }
+        });
 
-      await tx.products.createMany({
-        data: produtosToCreate,
-      });
+        if (!produtoExistente) {
+          await tx.products.create({
+            data: {
+              numeronf: solicitacao.numero_nf,
+              cod_prod: parseInt(produto.codigo),
+              descricao: produto.descricao,
+              quantidade: parseInt(produto.quantidade),
+              punit: parseInt(produto.punit)
+            }
+          });
+        }
+      }
 
       console.log(
-        `Salvos ${produtos.length} produtos da nota fiscal na tabela products`
+        `Produtos da nota fiscal verificados/salvos na tabela products`
       );
 
       // 3. Salvar APENAS os produtos selecionados para devolução na tabela returned_products

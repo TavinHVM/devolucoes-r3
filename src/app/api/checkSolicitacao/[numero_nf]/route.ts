@@ -33,8 +33,10 @@ export async function GET(
       },
     });
 
+    // Agora apenas retorna as solicitações existentes para informação,
+    // mas não impede a criação de novas solicitações
     return NextResponse.json({
-      existe: solicitacoesExistentes.length > 0,
+      existe: false, // Sempre false para permitir novas solicitações
       solicitacoes: solicitacoesExistentes,
       total: solicitacoesExistentes.length,
     });

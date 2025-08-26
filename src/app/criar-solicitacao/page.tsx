@@ -72,6 +72,7 @@ function SolicitacaoContent() {
     handleStepChange,
     handleProductSort,
     handleProductClearSort,
+    getQuantidadeDisponivel,
   } = useSolicitacaoForm();
 
   return (
@@ -140,6 +141,7 @@ function SolicitacaoContent() {
             filteredAndSortedProducts={filteredAndSortedProducts}
             handleProductSort={handleProductSort}
             handleProductClearSort={handleProductClearSort}
+            getQuantidadeDisponivel={getQuantidadeDisponivel}
           />
         )}
       </div>
