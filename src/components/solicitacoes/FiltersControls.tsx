@@ -281,6 +281,8 @@ export const FiltersControls: React.FC<FiltersControlsProps> = ({
             <DownloadDialog 
               solicitacoes={filteredSolicitacoes}
               currentFilter={status}
+              startDate={startDate}
+              endDate={endDate}
             />
           </div>
         </div>

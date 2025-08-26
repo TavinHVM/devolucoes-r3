@@ -29,6 +29,8 @@ export async function gerarRelatorioPDF({
   titulo = 'R3 Suprimentos',
   subtitulo = 'Relatório de Solicitações',
   logoBase64,
+  startDate,
+  endDate,
 }: {
   solicitacoes: Solicitacao[];
   status: string;
@@ -36,6 +38,8 @@ export async function gerarRelatorioPDF({
   titulo?: string;
   subtitulo?: string;
   logoBase64?: string; // base64 opcional
+  startDate?: string | null;
+  endDate?: string | null;
 }) {
   const [{ default: jsPDF }, autoTableMod] = await Promise.all([
     import('jspdf'),
@@ -63,7 +67,22 @@ export async function gerarRelatorioPDF({
   const dataAtual = new Date().toLocaleString();
   doc.text(`${subtitulo} - ${dataAtual}`, marginLR + 70, 60);
   doc.setFontSize(12);
-  doc.text(`Filtro aplicado: ${status}${filtroDescricao ? ' - ' + filtroDescricao : ''}`, marginLR + 70, 75);
+  
+  // Construir string do período
+  let periodoString = '';
+  if (startDate && endDate) {
+    const startFormatted = new Date(startDate + 'T00:00:00').toLocaleDateString('pt-BR');
+    const endFormatted = new Date(endDate + 'T00:00:00').toLocaleDateString('pt-BR');
+    periodoString = ` | Período: ${startFormatted} até ${endFormatted}`;
+  } else if (startDate) {
+    const startFormatted = new Date(startDate + 'T00:00:00').toLocaleDateString('pt-BR');
+    periodoString = ` | A partir de: ${startFormatted}`;
+  } else if (endDate) {
+    const endFormatted = new Date(endDate + 'T00:00:00').toLocaleDateString('pt-BR');
+    periodoString = ` | Até: ${endFormatted}`;
+  }
+  
+  doc.text(`Filtro aplicado: ${status}${filtroDescricao ? ' - ' + filtroDescricao : ''}${periodoString}`, marginLR + 70, 75);
   doc.text(`Total de itens: ${solicitacoes.length}`, marginLR + 70, 90);
   // Tabela
   const tableData = solicitacoes.map(s => [

@@ -33,6 +33,8 @@ export default function BaixarRelatorio({ sortedSolicitacoes, status }: Props) {
                   solicitacoes: sortedSolicitacoes,
                   status,
                   logoBase64,
+                  startDate: undefined,
+                  endDate: undefined,
                 });
               }}
             >
