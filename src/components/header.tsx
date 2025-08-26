@@ -114,7 +114,7 @@ export default function Header() {
             <span className="text-xl font-bold">Devoluções R3</span>
             {user && (
               <span className="text-sm text-gray-300">
-                Olá, {getUserDisplayName(user)}
+                Olá, <strong className="text-green-400">{getUserDisplayName(user)}</strong>
               </span>
             )}
           </div>
