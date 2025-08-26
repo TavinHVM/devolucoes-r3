@@ -10,12 +10,18 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { getUserDisplayName, isUserAdmin, canCreateSolicitacao } from "@/lib/auth";
+import ChangePasswordModal from "@/components/ChangePasswordModal";
 
 // Ícones Lucide
-import { Home, FileText, Plus, Users, Power } from "lucide-react";
+import { Home, FileText, Plus, Users, Power, User, Lock, ChevronDown } from "lucide-react";
 
 const navLinks = [
   { href: "/", label: "Início", icon: <Home size={20} /> },
@@ -42,6 +48,8 @@ const navLinks = [
 export default function Header() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const [showChangePassword, setShowChangePassword] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
   const { user, logout } = useAuth();
   const isAdmin = isUserAdmin(user);
   const canCreate = canCreateSolicitacao(user);
@@ -132,16 +140,49 @@ export default function Header() {
             </Link>
           ))}
 
-          {/* Botão de Sair */}
-          <button
-            onClick={() => setOpen(true)}
-            className="flex items-center gap-2 bg-[#e94a4a] hover:bg-[#e94a4ae3] text-white px-3 py-2 rounded-md transition cursor-pointer"
-          >
-            <Power size={20} />
-            <span>Sair</span>
-          </button>
+          {/* Menu do Usuário */}
+          <Popover open={userMenuOpen} onOpenChange={setUserMenuOpen}>
+            <PopoverTrigger asChild>
+              <button className="flex items-center gap-2 bg-slate-700 hover:bg-slate-600 text-white px-3 py-2 rounded-md transition cursor-pointer">
+                <User size={20} />
+                <span>{user?.first_name}</span>
+                <ChevronDown size={16} />
+              </button>
+            </PopoverTrigger>
+            <PopoverContent className="w-48 bg-slate-800 border-slate-700 text-white p-1">
+              <div className="flex flex-col">
+                <button
+                  onClick={() => {
+                    setShowChangePassword(true);
+                    setUserMenuOpen(false);
+                  }}
+                  className="flex items-center gap-2 px-3 py-2 hover:bg-slate-700 rounded-md transition w-full text-left"
+                >
+                  <Lock size={16} />
+                  <span>Alterar Senha</span>
+                </button>
+                <div className="h-px bg-slate-700 my-1" />
+                <button
+                  onClick={() => {
+                    setOpen(true);
+                    setUserMenuOpen(false);
+                  }}
+                  className="flex items-center gap-2 px-3 py-2 hover:bg-slate-700 rounded-md transition w-full text-left text-red-400"
+                >
+                  <Power size={16} />
+                  <span>Sair</span>
+                </button>
+              </div>
+            </PopoverContent>
+          </Popover>
         </nav>
       </header>
+
+      {/* Modal de Alterar Senha */}
+      <ChangePasswordModal
+        open={showChangePassword}
+        onOpenChange={setShowChangePassword}
+      />
     </>
   );
 }
