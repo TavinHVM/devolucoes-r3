@@ -14,6 +14,8 @@ import { gerarRelatorioPDF, gerarRelatorioXLSX, getLogoBase64 } from "@/lib/rela
 interface DownloadDialogProps {
   solicitacoes: Solicitacao[];
   currentFilter: string;
+  startDate?: string | null;
+  endDate?: string | null;
 }
 
 // Configuration for the surprise image feature
@@ -28,6 +30,8 @@ const SURPRISE_CONFIG = {
 export const DownloadDialog: React.FC<DownloadDialogProps> = ({
   solicitacoes,
   currentFilter,
+  startDate,
+  endDate,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
@@ -54,6 +58,8 @@ export const DownloadDialog: React.FC<DownloadDialogProps> = ({
           titulo: "R3 Suprimentos",
           subtitulo: "Relatório de Solicitações",
           logoBase64,
+          startDate,
+          endDate,
         });
       } else {
         gerarRelatorioXLSX({
