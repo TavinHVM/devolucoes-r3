@@ -54,7 +54,7 @@ model solicitacoes {
   finalizada_by        String?
   created_at           DateTime  @default(now())
   updated_at           DateTime? @default(now())
-  reenviada            Boolean?   @default(false)
+  reenviada            Boolean?  @default(false)
 }
 
 model products {

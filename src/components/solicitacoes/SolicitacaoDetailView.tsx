@@ -16,6 +16,7 @@ import {
   MessageSquare,
   AlertTriangle,
   Calendar,
+  RotateCcw,
 } from "lucide-react";
 import { Solicitacao } from "@/types/solicitacao";
 import {
@@ -125,6 +126,7 @@ export const SolicitacaoDetailView: React.FC<SolicitacaoDetailViewProps> = ({
     motivo_recusa,
     status,
     created_at,
+    reenviada,
     // BLOBs podem não vir na listagem; usamos flags quando existirem
     arquivo_nf,
     arquivo_nf_devolucao,
@@ -141,6 +143,12 @@ export const SolicitacaoDetailView: React.FC<SolicitacaoDetailViewProps> = ({
           <div className="flex items-center gap-2">
             <FileText className="h-5 w-5" />
             Detalhes da Solicitação #{id}
+            {reenviada === true && (
+              <div className="flex gap-2 items-center rounded-3xl py-2 px-4 bg-amber-600 text-white">
+                <RotateCcw className="h-4 w-4" />
+                <span>Reenviada</span>
+              </div>
+            )}
           </div>
 
           <div className="flex items-center justify-end">
@@ -166,13 +174,13 @@ export const SolicitacaoDetailView: React.FC<SolicitacaoDetailViewProps> = ({
                 <div className="flex text-slate-400 justify-end text-sm items-center gap-1">
                   <span>Criada em:</span>
                   <Calendar className="h-4 w-4 text-slate-400" />
-                <span className="text-white">
-                  {new Date(created_at).toLocaleDateString()} -{" "}
-                  {new Date(created_at).toLocaleTimeString([], {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
-                </span>
+                  <span className="text-white">
+                    {new Date(created_at).toLocaleDateString()} -{" "}
+                    {new Date(created_at).toLocaleTimeString([], {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </span>
                 </div>
               </div>
             </div>
@@ -407,7 +415,14 @@ export const SolicitacaoDetailView: React.FC<SolicitacaoDetailViewProps> = ({
               )}
 
               {/* Mensagem quando não há arquivos */}
-              {!(has_arquivo_nf || arquivo_nf || has_arquivo_nf_devolucao || arquivo_nf_devolucao || has_arquivo_recibo || arquivo_recibo) && (
+              {!(
+                has_arquivo_nf ||
+                arquivo_nf ||
+                has_arquivo_nf_devolucao ||
+                arquivo_nf_devolucao ||
+                has_arquivo_recibo ||
+                arquivo_recibo
+              ) && (
                 <div className="col-span-full flex flex-col items-center justify-center py-8 text-slate-400">
                   <FileText className="h-12 w-12 mb-3 opacity-50" />
                   <p className="text-lg font-medium">
