@@ -1,52 +1,53 @@
-export const fetchCache = 'force-no-store';
+export const fetchCache = "force-no-store";
 
-import { NextResponse } from 'next/server';
-import db from '../../../lib/db';
+import { NextResponse } from "next/server";
+import db from "../../../lib/db";
 
 type SolicitacaoRow = {
-    id: number;
-    nome: string;
-    filial: string;
-    numero_nf: string;
-    carga: string;
-    nome_cobranca: string | null;
-    cod_cobranca: string;
-    rca: number;
-    cgent: string | null;
-    motivo_devolucao: string;
-    motivo_recusa: string | null;
-    tipo_devolucao: string;
-    cod_cliente: number;
-    status: string;
-    vale: string | null;
-    created_at: Date;
-    updated_at: Date | null;
-    has_arquivo_nf: boolean;
-    has_arquivo_nf_devolucao: boolean;
-    has_arquivo_recibo: boolean;
-    // Campos de auditoria podem existir mas não são usados no front
-    pendente_at?: Date | null;
-    aprovada_at?: Date | null;
-    recusada_at?: Date | null;
-    desdobrada_at?: Date | null;
-    reenviada_at?: Date | null;
-    abatida_at?: Date | null;
-    finalizada_at?: Date | null;
-    pendente_by?: string | null;
-    aprovada_by?: string | null;
-    recusada_by?: string | null;
-    desdobrada_by?: string | null;
-    reenviada_by?: string | null;
-    abatida_by?: string | null;
-    finalizada_by?: string | null;
+  id: number;
+  nome: string;
+  filial: string;
+  numero_nf: string;
+  carga: string;
+  nome_cobranca: string | null;
+  cod_cobranca: string;
+  rca: number;
+  cgent: string | null;
+  motivo_devolucao: string;
+  motivo_recusa: string | null;
+  tipo_devolucao: string;
+  cod_cliente: number;
+  status: string;
+  vale: string | null;
+  reenviada: boolean;
+  created_at: Date;
+  updated_at: Date | null;
+  has_arquivo_nf: boolean;
+  has_arquivo_nf_devolucao: boolean;
+  has_arquivo_recibo: boolean;
+  // Campos de auditoria podem existir mas não são usados no front
+  pendente_at?: Date | null;
+  aprovada_at?: Date | null;
+  recusada_at?: Date | null;
+  desdobrada_at?: Date | null;
+  reenviada_at?: Date | null;
+  abatida_at?: Date | null;
+  finalizada_at?: Date | null;
+  pendente_by?: string | null;
+  aprovada_by?: string | null;
+  recusada_by?: string | null;
+  desdobrada_by?: string | null;
+  reenviada_by?: string | null;
+  abatida_by?: string | null;
+  finalizada_by?: string | null;
 };
 
 // Retorna as solicitações SEM carregar os BLOBs (arquivos) para melhorar a performance.
 // Inclui flags booleanas indicando a existência de cada arquivo.
 export async function GET() {
-    try {
-        // Usamos query raw para evitar materializar os bytes dos arquivos (bytea) na resposta
-        const solicitacoes = await db.$queryRawUnsafe<SolicitacaoRow[]>(`
+  try {
+    // Usamos query raw para evitar materializar os bytes dos arquivos (bytea) na resposta
+    const solicitacoes = await db.$queryRawUnsafe<SolicitacaoRow[]>(`
             SELECT 
                 id,
                 nome,
@@ -63,6 +64,7 @@ export async function GET() {
                 cod_cliente,
                 status,
                 vale,
+                reenviada,
                 pendente_at,
                 aprovada_at,
                 recusada_at,
@@ -87,11 +89,14 @@ export async function GET() {
             ORDER BY created_at DESC
         `);
 
-        // Sempre retornar 200 com array (vazio ou não) para simplificar o consumo no front
-        console.log('Solicitações encontradas! Quantidade:', solicitacoes.length);
-        return NextResponse.json(solicitacoes);
-    } catch (error) {
-        console.error('Erro ao buscar Solicitações:', error);
-        return NextResponse.json({ error: 'Erro ao buscar Solicitações' }, { status: 500 });
-    }
+    // Sempre retornar 200 com array (vazio ou não) para simplificar o consumo no front
+    console.log("Solicitações encontradas! Quantidade:", solicitacoes.length);
+    return NextResponse.json(solicitacoes);
+  } catch (error) {
+    console.error("Erro ao buscar Solicitações:", error);
+    return NextResponse.json(
+      { error: "Erro ao buscar Solicitações" },
+      { status: 500 }
+    );
+  }
 }

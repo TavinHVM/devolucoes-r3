@@ -56,7 +56,8 @@ export async function POST(request: Request) {
         id: id,
       },
       data: {
-        status: "REENVIADA",
+        status: "PENDENTE",
+        reenviada: true, 
         reenviada_at: new Date(),
         reenviada_by: permissionCheck.user?.name || null,
       },

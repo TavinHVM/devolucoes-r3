@@ -4,7 +4,6 @@ import {
   XCircle,
   Clock,
   AlertTriangle,
-  RotateCcw,
   Zap,
   Target,
   FileText,
@@ -18,8 +17,6 @@ export const getStatusIcon = (status: string) => {
       return <XCircle className="h-4 w-4" />;
     case "PENDENTE":
       return <Clock className="h-4 w-4" />;
-    case "REENVIADA":
-      return <RotateCcw className="h-4 w-4" />;
     case "DESDOBRADA":
       return <Target className="h-4 w-4" />;
     case "ABATIDA":
@@ -37,7 +34,6 @@ export const getStatusBadgeVariant = (status: string) => {
     case "FINALIZADA":
     case "RECUSADA":
     case "PENDENTE":
-    case "REENVIADA":
     case "ABATIDA":
     case "DESDOBRADA":
       return "default";
@@ -56,8 +52,6 @@ export const getStatusClass = (status: string) => {
       return `${baseClasses} bg-red-600 hover:bg-red-700 text-white`;
     case "PENDENTE":
       return `${baseClasses} bg-slate-400 hover:bg-slate-500 text-white`;
-    case "REENVIADA":
-      return `${baseClasses} bg-yellow-400 hover:bg-yellow-500 text-white`;
     case "DESDOBRADA":
       return `${baseClasses} bg-blue-500 hover:bg-blue-600 text-white`;
     case "ABATIDA":
