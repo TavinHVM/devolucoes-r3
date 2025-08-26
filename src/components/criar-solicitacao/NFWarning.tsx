@@ -123,7 +123,6 @@ export function NFWarning({ solicitacoes, onDismiss }: NFWarningProps) {
           
           <div className="mt-4 p-3 bg-orange-500/10 border border-orange-400/30 rounded-lg">
             <p className="text-orange-200 text-sm leading-relaxed">
-              💡 <strong>Importante:</strong> Agora é possível criar múltiplas solicitações para a mesma NF. 
               O sistema impedirá apenas a devolução de produtos que já foram devolvidos anteriormente.
             </p>
           </div>

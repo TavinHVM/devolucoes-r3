@@ -21,12 +21,6 @@ interface Produto {
   punit: string;
 }
 
-interface ProdutoDevolvido {
-  cod_prod: number;
-  descricao: string;
-  quantidade_devolvida: number;
-}
-
 interface SortColumn {
   column: string;
   direction: "asc" | "desc";
@@ -35,7 +29,6 @@ interface SortColumn {
 interface ProductTableProps {
   produtos: Produto[];
   quantidadesDevolucao: Record<string, number>;
-  produtosDevolvidos: ProdutoDevolvido[];
   todosSelecionados: boolean;
   aumentarQuantidade: (codigoProduto: string) => void;
   diminuirQuantidade: (codigoProduto: string) => void;
@@ -46,12 +39,12 @@ interface ProductTableProps {
   sortColumns: SortColumn[];
   onSort: (column: string, direction: "asc" | "desc") => void;
   onClearSort: (column: string) => void;
+  getQuantidadeDisponivel: (codigoProduto: string) => number;
 }
 
 export function ProductTable({
   produtos,
   quantidadesDevolucao,
-  produtosDevolvidos,
   todosSelecionados,
   aumentarQuantidade,
   diminuirQuantidade,
@@ -61,7 +54,8 @@ export function ProductTable({
   alternarSelecaoTodos,
   sortColumns,
   onSort,
-  onClearSort
+  onClearSort,
+  getQuantidadeDisponivel,
 }: ProductTableProps) {
   const calcularTotais = () => {
     let totalQuantidade = 0;
@@ -234,8 +228,9 @@ export function ProductTable({
                     </TableCell>
                     <TableCell className="text-center">
                       {(() => {
-                        const produtoDevolvido = produtosDevolvidos.find(pd => pd.cod_prod.toString() === p.codigo);
-                        const quantidadeJaDevolvida = produtoDevolvido ? produtoDevolvido.quantidade_devolvida : 0;
+                        const quantidadeOriginal = Number(p.quantidade);
+                        const quantidadeDisponivel = getQuantidadeDisponivel(p.codigo);
+                        const quantidadeJaDevolvida = quantidadeOriginal - quantidadeDisponivel;
                         
                         if (quantidadeJaDevolvida > 0) {
                           return (
@@ -417,3 +412,5 @@ export function ProductTable({
     </Card>
   );
 }
+
+export default ProductTable;

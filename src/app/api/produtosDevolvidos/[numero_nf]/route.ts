@@ -21,12 +21,18 @@ export async function GET(
       );
     }
 
-    // Buscar solicitações aprovadas/finalizadas para esta NF
-    const solicitacoesAprovadas = await db.solicitacoes.findMany({
+    // ESTRATÉGIA SIMPLIFICADA:
+    // 1. Buscar solicitações aprovadas/finalizadas para esta NF
+    // 2. Para cada uma, somar as quantidades dos produtos devolvidos
+    // 3. Como não há FK, assumimos que produtos em returned_products
+    //    são válidos apenas se há pelo menos uma solicitação aprovada
+
+    // Buscar solicitações válidas (todas exceto recusadas/canceladas)
+    const solicitacoesValidas = await db.solicitacoes.findMany({
       where: {
         numero_nf: numero_nf,
         status: {
-          in: ['aprovada', 'finalizada'] // Só considera devoluções efetivas
+          notIn: ['RECUSADA', 'CANCELADA', 'recusada', 'cancelada']
         }
       },
       select: {
@@ -35,21 +41,22 @@ export async function GET(
       }
     });
 
-    if (solicitacoesAprovadas.length === 0) {
+    // Se não há solicitações válidas, não há produtos devolvidos
+    if (solicitacoesValidas.length === 0) {
       return NextResponse.json({
         produtos_devolvidos: []
       });
     }
 
-    // Buscar produtos devolvidos das solicitações aprovadas
-    const produtosJaDevolvidos = await db.returned_products.findMany({
+    // Buscar produtos devolvidos para esta NF
+    const produtosDevolvidos = await db.returned_products.findMany({
       where: {
         numeronf: numero_nf,
       }
     });
 
-    // Agrupar por produto e somar quantidades já devolvidas
-    const produtosAgrupados = produtosJaDevolvidos.reduce((acc, produto) => {
+    // Agrupar e somar quantidades por produto
+    const produtosAgrupados = produtosDevolvidos.reduce((acc, produto) => {
       const key = produto.cod_prod.toString();
       if (!acc[key]) {
         acc[key] = {

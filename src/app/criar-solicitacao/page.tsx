@@ -45,7 +45,6 @@ function SolicitacaoContent() {
     isSearchingNF,
     nfExists,
     solicitacoesExistentes,
-    produtosDevolvidos,
     motivoDevolucaoText,
     setMotivoDevolucaoText,
     
@@ -73,6 +72,7 @@ function SolicitacaoContent() {
     handleStepChange,
     handleProductSort,
     handleProductClearSort,
+    getQuantidadeDisponivel,
   } = useSolicitacaoForm();
 
   return (
@@ -124,7 +124,6 @@ function SolicitacaoContent() {
             tipoDevolucao={tipoDevolucao}
             produtos={produtos}
             quantidadesDevolucao={quantidadesDevolucao}
-            produtosDevolvidos={produtosDevolvidos}
             todosSelecionados={todosSelecionados}
             aumentarQuantidade={aumentarQuantidade}
             diminuirQuantidade={diminuirQuantidade}
@@ -142,6 +141,7 @@ function SolicitacaoContent() {
             filteredAndSortedProducts={filteredAndSortedProducts}
             handleProductSort={handleProductSort}
             handleProductClearSort={handleProductClearSort}
+            getQuantidadeDisponivel={getQuantidadeDisponivel}
           />
         )}
       </div>
