@@ -146,7 +146,7 @@ export const SolicitacaoDetailView: React.FC<SolicitacaoDetailViewProps> = ({
             {reenviada === true && (
               <div className="flex gap-2 items-center rounded-3xl py-2 px-4 bg-amber-600 text-white">
                 <RotateCcw className="h-4 w-4" />
-                <span>Reenviada</span>
+                <span className="text-sm">Reenviada</span>
               </div>
             )}
           </div>
