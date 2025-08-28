@@ -23,7 +23,6 @@ export type Solicitacao = {
   arquivo_recibo?: string;
   products_list: JSON;
   motivo_recusa: string;
-  reenviada: boolean;
 };
 
 export interface UserProfile {

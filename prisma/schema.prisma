@@ -49,12 +49,10 @@ model solicitacoes {
   aprovada_by          String?
   recusada_by          String?
   desdobrada_by        String?
-  reenviada_by         String?
   abatida_by           String?
   finalizada_by        String?
   created_at           DateTime  @default(now())
   updated_at           DateTime? @default(now())
-  reenviada            Boolean?  @default(false)
 }
 
 model products {

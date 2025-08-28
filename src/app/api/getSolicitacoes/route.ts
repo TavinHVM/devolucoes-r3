@@ -19,7 +19,6 @@ type SolicitacaoRow = {
   cod_cliente: number;
   status: string;
   vale: string | null;
-  reenviada: boolean;
   created_at: Date;
   updated_at: Date | null;
   has_arquivo_nf: boolean;
@@ -30,14 +29,12 @@ type SolicitacaoRow = {
   aprovada_at?: Date | null;
   recusada_at?: Date | null;
   desdobrada_at?: Date | null;
-  reenviada_at?: Date | null;
   abatida_at?: Date | null;
   finalizada_at?: Date | null;
   pendente_by?: string | null;
   aprovada_by?: string | null;
   recusada_by?: string | null;
   desdobrada_by?: string | null;
-  reenviada_by?: string | null;
   abatida_by?: string | null;
   finalizada_by?: string | null;
 };
@@ -64,19 +61,16 @@ export async function GET() {
                 cod_cliente,
                 status,
                 vale,
-                reenviada,
                 pendente_at,
                 aprovada_at,
                 recusada_at,
                 desdobrada_at,
-                reenviada_at,
                 abatida_at,
                 finalizada_at,
                 pendente_by,
                 aprovada_by,
                 recusada_by,
                 desdobrada_by,
-                reenviada_by,
                 abatida_by,
                 finalizada_by,
                 created_at,

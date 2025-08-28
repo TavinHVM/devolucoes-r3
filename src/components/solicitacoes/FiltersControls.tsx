@@ -253,9 +253,6 @@ export const FiltersControls: React.FC<FiltersControlsProps> = ({
                 <SelectItem value="DESDOBRADA" className="text-white">
                   Desdobrada
                 </SelectItem>
-                <SelectItem value="REENVIADA" className="text-white">
-                  Reenviada
-                </SelectItem>
                 <SelectItem value="ABATIDA" className="text-white">
                   Abatida
                 </SelectItem>

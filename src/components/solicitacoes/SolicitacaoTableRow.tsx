@@ -22,8 +22,7 @@ interface SolicitacaoTableRowProps {
     canDesdobrar: boolean;
     canAbater: boolean;
     canFinalizar: boolean;
-  canReenviar: boolean;
-  canDelete?: boolean;
+    canDelete?: boolean;
   };
   onRefreshList?: () => void;
   selected?: boolean;

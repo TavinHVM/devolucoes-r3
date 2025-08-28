@@ -147,23 +147,6 @@ export async function FinalizarSolicitacao(id: number) {
   }
 }
 
-export async function ReenviarSolicitacao(id: number) {
-  try {
-    const response = await fetch(
-      `/api/btnsSolicitacoes/reenviarSolicitacao/${id}`,
-      {
-        method: "POST",
-        headers: getAuthHeaders(false),
-      }
-    );
-    if (!response.ok) {
-      throw new Error("Erro ao mudar Status da solicitação para Reenviada.");
-    }
-  } catch (error) {
-    console.error("Erro ao mudar Status da solicitação para Reenviada:", error);
-  }
-}
-
 export async function ExcluirSolicitacoes(ids: number[]) {
   try {
     const response = await fetch(`/api/solicitacoes/bulk-delete`, {

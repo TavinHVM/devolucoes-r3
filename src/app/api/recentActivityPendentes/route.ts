@@ -17,7 +17,6 @@ export async function GET() {
         aprovada_at: true,
         recusada_at: true,
         desdobrada_at: true,
-        reenviada_at: true,
         abatida_at: true,
         finalizada_at: true,
       },
@@ -42,12 +41,6 @@ export async function GET() {
           status: "created",
           time: solicitacao.created_at,
           action: "Nova solicitação criada",
-          type: "info" as const,
-        },
-        {
-          status: "reenviada",
-          time: solicitacao.reenviada_at,
-          action: "Solicitação reenviada para análise",
           type: "info" as const,
         },
       ].filter((item) => item.time !== null);

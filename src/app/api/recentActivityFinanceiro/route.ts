@@ -17,7 +17,6 @@ export async function GET() {
         aprovada_at: true,
         recusada_at: true,
         desdobrada_at: true,
-        reenviada_at: true,
         abatida_at: true,
         finalizada_at: true,
       },

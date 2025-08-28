@@ -16,7 +16,6 @@ import {
   MessageSquare,
   AlertTriangle,
   Calendar,
-  RotateCcw,
 } from "lucide-react";
 import { Solicitacao } from "@/types/solicitacao";
 import {
@@ -35,7 +34,6 @@ interface SolicitacaoDetailViewProps {
     canDesdobrar: boolean;
     canAbater: boolean;
     canFinalizar: boolean;
-    canReenviar: boolean;
   };
   onActionComplete?: (message: string, type: "success" | "error") => void;
   onCloseDetailDialog?: () => void;
@@ -126,7 +124,6 @@ export const SolicitacaoDetailView: React.FC<SolicitacaoDetailViewProps> = ({
     motivo_recusa,
     status,
     created_at,
-    reenviada,
     // BLOBs podem não vir na listagem; usamos flags quando existirem
     arquivo_nf,
     arquivo_nf_devolucao,
@@ -143,12 +140,6 @@ export const SolicitacaoDetailView: React.FC<SolicitacaoDetailViewProps> = ({
           <div className="flex items-center gap-2">
             <FileText className="h-5 w-5" />
             Detalhes da Solicitação #{id}
-            {reenviada === true && (
-              <div className="flex gap-2 items-center rounded-3xl py-2 px-4 bg-amber-600 text-white">
-                <RotateCcw className="h-4 w-4" />
-                <span className="text-sm">Reenviada</span>
-              </div>
-            )}
           </div>
 
           <div className="flex items-center justify-end">

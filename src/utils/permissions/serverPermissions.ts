@@ -57,7 +57,6 @@ export function hasServerPermission(
     | 'desdobrar'
     | 'abater'
     | 'finalizar'
-    | 'reenviar'
     | 'excluir'
 ): boolean {
   const level = userLevel?.toLowerCase();
@@ -70,7 +69,7 @@ export function hasServerPermission(
       return action === 'desdobrar' || action === 'abater' || action === 'finalizar';
 
     case 'logistica':
-      return action === 'reenviar';
+      return false;
 
     case 'adm':
     case 'administrador':
@@ -96,7 +95,6 @@ export function validateUserPermission(
     | 'desdobrar'
     | 'abater'
     | 'finalizar'
-    | 'reenviar'
     | 'excluir'
 ): { success: boolean; user?: UserTokenPayload; error?: string } {
   const user = getUserFromToken(request);

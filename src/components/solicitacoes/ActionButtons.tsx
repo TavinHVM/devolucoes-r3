@@ -16,7 +16,6 @@ import {
   Target,
   AlertTriangle,
   Zap,
-  RotateCcw,
   CircleCheck,
   CircleX,
 } from "lucide-react";
@@ -28,7 +27,6 @@ import {
   DesdobrarSolicitacao,
   AbaterSolicitacao,
   FinalizarSolicitacao,
-  ReenviarSolicitacao,
 } from "@/utils/solicitacoes/botoesSolicitacoes";
 import {
   Select,
@@ -47,7 +45,6 @@ interface ActionButtonsProps {
     canDesdobrar: boolean;
     canAbater: boolean;
     canFinalizar: boolean;
-    canReenviar: boolean;
   };
   onActionComplete?: (message: string, type: "success" | "error") => void;
   onCloseDetailDialog?: () => void;
@@ -79,7 +76,6 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
   const [confirmDesdobrarOpen, setConfirmDesdobrarOpen] = useState(false);
   const [confirmAbaterOpen, setConfirmAbaterOpen] = useState(false);
   const [confirmFinalizarOpen, setConfirmFinalizarOpen] = useState(false);
-  const [confirmReenviarOpen, setConfirmReenviarOpen] = useState(false);
 
   // Estado de loading para os botões
   const [isLoading, setIsLoading] = useState(false);
@@ -216,29 +212,6 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
         error instanceof Error
           ? error.message
           : "Erro ao finalizar solicitação",
-        "error"
-      );
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleReenviar = async () => {
-    try {
-      setIsLoading(true);
-      await ReenviarSolicitacao(id);
-
-      // Fechar o dialog principal e mostrar toast
-  setConfirmReenviarOpen(false);
-      onActionComplete?.("Solicitação reenviada com sucesso!", "success");
-
-      // Pequeno delay antes de fechar o dialog
-      setTimeout(() => {
-        onCloseDetailDialog?.();
-      }, 100);
-    } catch (error) {
-      onActionComplete?.(
-        error instanceof Error ? error.message : "Erro ao reenviar solicitação",
         "error"
       );
     } finally {
@@ -541,32 +514,6 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
       );
     }
 
-    if (status.toUpperCase() === "RECUSADA" && userPermissions.canReenviar) {
-      return (
-        <Button
-          className={`transition-all duration-300 ${
-            isLoading
-              ? "bg-orange-700 cursor-not-allowed"
-              : "bg-orange-600 hover:bg-orange-700 transform hover:scale-105"
-          }`}
-          onClick={() => setConfirmReenviarOpen(true)}
-          disabled={isLoading}
-        >
-          {isLoading ? (
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-              Processando...
-            </div>
-          ) : (
-            <div className="flex items-center gap-2">
-              <RotateCcw className="h-4 w-4" />
-              Reenviar
-            </div>
-          )}
-        </Button>
-      );
-    }
-
     return null;
   };
 
@@ -619,15 +566,6 @@ export const ActionButtons: React.FC<ActionButtonsProps> = ({
         confirmText="Prosseguir"
         cancelText="Cancelar"
         onConfirm={handleFinalizar}
-        loading={isLoading}
-      />
-      <ConfirmDialog
-        open={confirmReenviarOpen}
-        onOpenChange={setConfirmReenviarOpen}
-        title="Tem certeza que deseja Reenviar?"
-        confirmText="Prosseguir"
-        cancelText="Cancelar"
-        onConfirm={handleReenviar}
         loading={isLoading}
       />
     </div>

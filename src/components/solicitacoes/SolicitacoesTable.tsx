@@ -43,8 +43,7 @@ interface SolicitacoesTableProps {
     canDesdobrar: boolean;
     canAbater: boolean;
     canFinalizar: boolean;
-    canReenviar: boolean;
-  canDelete?: boolean;
+    canDelete?: boolean;
   };
 }
 

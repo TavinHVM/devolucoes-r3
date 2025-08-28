@@ -5,7 +5,6 @@ import {
   Clock,
   CheckCircle2,
   XCircle,
-  RotateCcw,
   Target,
   Zap,
 } from "lucide-react";
@@ -44,13 +43,6 @@ export const StatsCards: React.FC<StatsCardsProps> = ({ solicitacoes }) => {
       icon: XCircle,
       bgColor: "bg-red-500/20",
       iconColor: "text-red-400",
-    },
-    {
-      title: "Reenviadas",
-      value: solicitacoes.filter((s) => s.status.toUpperCase() === "REENVIADA").length,
-      icon: RotateCcw,
-      bgColor: "bg-yellow-500/20",
-      iconColor: "text-yellow-400",
     },
     {
       title: "Desdobradas",
