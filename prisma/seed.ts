@@ -9,55 +9,46 @@ async function main() {
     {
       name: 'canViewSolicitacoes',
       label: 'Ver Solicitações',
-      description: 'Visualizar solicitações de devolução',
       category: 'solicitacoes'
     },
     {
       name: 'canCreateSolicitacoes',
       label: 'Criar Solicitações',
-      description: 'Criar novas solicitações de devolução',
       category: 'solicitacoes'
     },
     {
       name: 'canEditSolicitacoes',
       label: 'Editar Solicitações',
-      description: 'Editar solicitações existentes',
       category: 'solicitacoes'
     },
     {
       name: 'canAprovar',
       label: 'Aprovar Solicitações',
-      description: 'Aprovar solicitações de devolução',
       category: 'solicitacoes'
     },
     {
       name: 'canRecusar',
       label: 'Recusar Solicitações',
-      description: 'Recusar solicitações de devolução',
       category: 'solicitacoes'
     },
     {
       name: 'canDesdobrar',
       label: 'Desdobrar Solicitações',
-      description: 'Desdobrar solicitações aprovadas',
       category: 'solicitacoes'
     },
     {
       name: 'canAbater',
       label: 'Abater Solicitações',
-      description: 'Abater valor das solicitações',
       category: 'solicitacoes'
     },
     {
       name: 'canFinalizar',
       label: 'Finalizar Solicitações',
-      description: 'Finalizar solicitações processadas',
       category: 'solicitacoes'
     },
     {
       name: 'canDeleteSolicitacoes',
       label: 'Excluir Solicitações',
-      description: 'Excluir solicitações do sistema',
       category: 'solicitacoes'
     },
     
@@ -65,31 +56,26 @@ async function main() {
     {
       name: 'canViewUsers',
       label: 'Ver Usuários',
-      description: 'Visualizar lista de usuários',
       category: 'usuarios'
     },
     {
       name: 'canCreateUsers',
       label: 'Criar Usuários',
-      description: 'Cadastrar novos usuários',
       category: 'usuarios'
     },
     {
       name: 'canEditUsers',
       label: 'Editar Usuários',
-      description: 'Editar informações de usuários',
       category: 'usuarios'
     },
     {
       name: 'canDeleteUsers',
       label: 'Excluir Usuários',
-      description: 'Excluir usuários do sistema',
       category: 'usuarios'
     },
     {
       name: 'canManagePermissions',
       label: 'Gerenciar Permissões',
-      description: 'Atribuir e remover permissões de usuários',
       category: 'usuarios'
     },
     
@@ -97,19 +83,16 @@ async function main() {
     {
       name: 'canAccessAdmin',
       label: 'Acesso Administrativo',
-      description: 'Acesso completo ao painel administrativo',
       category: 'sistema'
     },
     {
       name: 'canViewReports',
       label: 'Ver Relatórios',
-      description: 'Visualizar e baixar relatórios',
       category: 'sistema'
     },
     {
       name: 'canSystemSettings',
       label: 'Configurações do Sistema',
-      description: 'Alterar configurações gerais do sistema',
       category: 'sistema'
     }
   ];

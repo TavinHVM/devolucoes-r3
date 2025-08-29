@@ -3,6 +3,7 @@ import { Checkbox } from '../ui/checkbox';
 import { Label } from '../ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Permission } from './types';
+import { Separator } from '../ui/separator';
 
 interface PermissionsSelectProps {
   selectedPermissions: number[];
@@ -65,18 +66,18 @@ export function PermissionsSelect({ selectedPermissions, onPermissionsChange }: 
     const categoryPermissions = permissions
       .filter(p => p.category === category)
       .map(p => p.id);
-    
-    return categoryPermissions.length > 0 && 
-           categoryPermissions.every(id => selectedPermissions.includes(id));
+
+    return categoryPermissions.length > 0 &&
+      categoryPermissions.every(id => selectedPermissions.includes(id));
   };
 
   const isCategoryPartiallySelected = (category: string) => {
     const categoryPermissions = permissions
       .filter(p => p.category === category)
       .map(p => p.id);
-    
+
     return categoryPermissions.some(id => selectedPermissions.includes(id)) &&
-           !categoryPermissions.every(id => selectedPermissions.includes(id));
+      !categoryPermissions.every(id => selectedPermissions.includes(id));
   };
 
   if (loading) {
@@ -108,20 +109,20 @@ export function PermissionsSelect({ selectedPermissions, onPermissionsChange }: 
   return (
     <div className="space-y-4">
       <Label className="text-slate-300 font-medium">Permissões</Label>
-      
+
       {categories.map(category => {
         const categoryPermissions = permissions.filter(p => p.category === category);
         const isSelected = isCategorySelected(category);
         const isPartiallySelected = isCategoryPartiallySelected(category);
-        
+
         return (
           <Card key={category} className="bg-slate-700/50 border-slate-600">
-            <CardHeader className="pb-3">
+            <CardHeader className="px-0 ml-3.5">
               <CardTitle className="text-sm text-slate-200 flex items-center gap-2">
                 <Checkbox
                   checked={isSelected}
                   onCheckedChange={(checked) => toggleCategory(category, checked as boolean)}
-                  className={`border-slate-400 ${isPartiallySelected ? 'data-[state=checked]:bg-blue-600/50' : ''}`}
+                  className={`hover:cursor-pointer border-slate-400 ${isPartiallySelected ? 'data-[state=checked]:bg-blue-600/50' : ''}`}
                 />
                 {getCategoryLabel(category)}
                 <span className="text-xs text-slate-400">
@@ -129,32 +130,28 @@ export function PermissionsSelect({ selectedPermissions, onPermissionsChange }: 
                 </span>
               </CardTitle>
             </CardHeader>
+            <Separator className='p-0 bg-slate-600' />
             <CardContent className="pt-0">
-              <div className="grid grid-cols-1 gap-2">
+              <div className="grid grid-cols-1 gap-5 ml-4">
                 {categoryPermissions.map(permission => (
                   <div key={permission.id} className="flex items-start gap-2">
                     <Checkbox
                       checked={selectedPermissions.includes(permission.id)}
-                      onCheckedChange={(checked) => 
+                      onCheckedChange={(checked) =>
                         handlePermissionChange(permission.id, checked as boolean)
                       }
-                      className="border-slate-400"
+                      className="border-slate-400 hover:cursor-pointer"
                     />
                     <div className="flex-1 min-w-0">
-                      <Label 
-                        className="text-sm text-slate-300 cursor-pointer leading-5"
+                      <Label
+                        className="text-sm text-slate-300 cursor-pointer leading-4"
                         onClick={() => handlePermissionChange(
-                          permission.id, 
+                          permission.id,
                           !selectedPermissions.includes(permission.id)
                         )}
                       >
                         {permission.label}
                       </Label>
-                      {permission.description && (
-                        <p className="text-xs text-slate-400 mt-1">
-                          {permission.description}
-                        </p>
-                      )}
                     </div>
                   </div>
                 ))}
