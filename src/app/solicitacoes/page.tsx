@@ -1,8 +1,8 @@
 "use client";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Header from "../../components/header";
 import { useAuth } from "@/contexts/AuthContext";
-import { getUserPermissions } from "@/utils/permissions/userPermissions";
+import { getUserPermissions, UserPermissions } from "@/utils/permissions/userPermissions";
 import { useSolicitacoes } from "@/hooks/useSolicitacoes";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import {
@@ -23,7 +23,14 @@ export default function VisualizacaoSolicitacoes() {
 function SolicitacoesContent() {
   // Authentication and permissions
   const { user, isAuthenticated, isLoading } = useAuth();
-  const userPermissions = getUserPermissions(user);
+  const [userPermissions, setUserPermissions] = useState<UserPermissions>({
+    canAprovar: false,
+    canRecusar: false,
+    canDesdobrar: false,
+    canAbater: false,
+    canFinalizar: false,
+    canDelete: false,
+  });
 
   // Custom hook for all solicitações logic
   const {
@@ -49,6 +56,17 @@ function SolicitacoesContent() {
     refreshing,
     fetchSolicitacoes,
   } = useSolicitacoes();
+
+  // Load user permissions
+  useEffect(() => {
+    const loadPermissions = async () => {
+      if (user) {
+        const permissions = await getUserPermissions(user);
+        setUserPermissions(permissions);
+      }
+    };
+    loadPermissions();
+  }, [user]);
 
   // Redirect to login if not authenticated
   useEffect(() => {
