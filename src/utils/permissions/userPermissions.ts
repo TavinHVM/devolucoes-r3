@@ -32,14 +32,33 @@ export async function getUserPermissions(user: User | null): Promise<UserPermiss
     // Try new permissions system first
     const newPermissions = await getNewUserPermissions(user);
     
-    return {
-      canAprovar: newPermissions.canAprovar,
-      canRecusar: newPermissions.canRecusar,
-      canDesdobrar: newPermissions.canDesdobrar,
-      canAbater: newPermissions.canAbater,
-      canFinalizar: newPermissions.canFinalizar,
-      canDelete: newPermissions.canDeleteSolicitacoes,
-    };
+    // Verificar se o novo sistema retornou permissões válidas
+    const hasAnyPermission = Object.values(newPermissions).some(permission => permission === true);
+    
+    if (hasAnyPermission) {
+      console.log('Using new permissions system for user:', user.first_name);
+      return {
+        canAprovar: newPermissions.canAprovar,
+        canRecusar: newPermissions.canRecusar,
+        canDesdobrar: newPermissions.canDesdobrar,
+        canAbater: newPermissions.canAbater,
+        canFinalizar: newPermissions.canFinalizar,
+        canDelete: newPermissions.canDeleteSolicitacoes,
+      };
+    } else {
+      console.log('New permissions system returned empty permissions, using fallback for user:', user.first_name);
+      // Se o novo sistema não retornou nenhuma permissão, usar fallback
+      const fallbackPermissions = getUserPermissionsByLevel(user);
+      
+      return {
+        canAprovar: fallbackPermissions.canAprovar,
+        canRecusar: fallbackPermissions.canRecusar,
+        canDesdobrar: fallbackPermissions.canDesdobrar,
+        canAbater: fallbackPermissions.canAbater,
+        canFinalizar: fallbackPermissions.canFinalizar,
+        canDelete: fallbackPermissions.canDeleteSolicitacoes,
+      };
+    }
   } catch (error) {
     console.error('Erro ao buscar permissões, usando fallback:', error);
     

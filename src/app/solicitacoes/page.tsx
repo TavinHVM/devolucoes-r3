@@ -31,6 +31,7 @@ function SolicitacoesContent() {
     canFinalizar: false,
     canDelete: false,
   });
+  const [permissionsLoading, setPermissionsLoading] = useState(true);
 
   // Custom hook for all solicitações logic
   const {
@@ -61,8 +62,18 @@ function SolicitacoesContent() {
   useEffect(() => {
     const loadPermissions = async () => {
       if (user) {
-        const permissions = await getUserPermissions(user);
-        setUserPermissions(permissions);
+        try {
+          setPermissionsLoading(true);
+          const permissions = await getUserPermissions(user);
+          console.log('Permissions loaded in page:', permissions);
+          setUserPermissions(permissions);
+        } catch (error) {
+          console.error('Error loading permissions:', error);
+        } finally {
+          setPermissionsLoading(false);
+        }
+      } else {
+        setPermissionsLoading(false);
       }
     };
     loadPermissions();
@@ -78,6 +89,15 @@ function SolicitacoesContent() {
   // Don't render if not authenticated (will redirect)
   if (!isAuthenticated) {
     return null;
+  }
+
+  // Show loading while permissions are being loaded
+  if (permissionsLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
+        <div className="text-white">Carregando permissões...</div>
+      </div>
+    );
   }
 
   return (
