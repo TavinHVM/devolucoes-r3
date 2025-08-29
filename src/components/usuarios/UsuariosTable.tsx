@@ -6,6 +6,7 @@ import { Button } from '../ui/button';
 import { Edit2, Trash2, Mail, ShieldCheck, ShoppingCart, Truck, Circle, BadgeCent, UserPlus, Store } from 'lucide-react';
 import { Usuario } from './types';
 import { getInitials, getLevelBadgeClass, getLevelBadgeStyle, getLevelBadgeConfig } from './utils';
+import { UserPermissionsBadge } from './UserPermissionsBadge';
 
 interface UsuariosTableProps {
   usuarios: Usuario[];
@@ -14,10 +15,10 @@ interface UsuariosTableProps {
   onCreateUser: () => void;
 }
 
-const getLevelIcon = (level: string) => {
+const getLevelIcon = (level?: string | null) => {
   const iconProps = { size: 14, className: "mr-1" };
 
-  switch (level.toLowerCase()) {
+  switch ((level || '').toLowerCase()) {
     case 'adm':
       return <ShieldCheck {...iconProps} />;
     case 'vendas':
@@ -61,13 +62,14 @@ export function UsuariosTable({ usuarios, onEditUser, onDeleteUser, onCreateUser
               <TableHead className="text-slate-300">Contato</TableHead>
               <TableHead className="text-slate-300">Cargo</TableHead>
               <TableHead className="text-slate-300">Nível</TableHead>
+              <TableHead className="text-slate-300">Permissões</TableHead>
               <TableHead className="text-slate-300 text-right pr-12">Ações</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {usuarios.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={5} className="text-center py-8 text-slate-400">
+                <TableCell colSpan={6} className="text-center py-8 text-slate-400">
                   Nenhum usuário encontrado
                 </TableCell>
               </TableRow>
@@ -108,6 +110,9 @@ export function UsuariosTable({ usuarios, onEditUser, onDeleteUser, onCreateUser
                         {getLevelBadgeConfig(usuario.user_level).label}
                       </span>
                     </Badge>
+                  </TableCell>
+                  <TableCell>
+                    <UserPermissionsBadge permissions={usuario.permissions || []} />
                   </TableCell>
                   <TableCell className="text-right pr-6">
                     <div className="flex items-center justify-end gap-2">

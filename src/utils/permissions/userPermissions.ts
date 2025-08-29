@@ -1,4 +1,5 @@
 import { User } from '@/lib/auth';
+import { getUserPermissions as getNewUserPermissions, getUserPermissionsByLevel } from './userPermissionsNew';
 
 // Define the user permissions based on user level
 export interface UserPermissions {
@@ -11,11 +12,11 @@ export interface UserPermissions {
 }
 
 /**
- * Get user permissions based on their user_level
+ * Get user permissions - now using the new permissions system with fallback
  * @param user The user object
  * @returns UserPermissions object with boolean flags for each permission
  */
-export function getUserPermissions(user: User | null): UserPermissions {
+export async function getUserPermissions(user: User | null): Promise<UserPermissions> {
   if (!user) {
     return {
       canAprovar: false,
@@ -27,69 +28,32 @@ export function getUserPermissions(user: User | null): UserPermissions {
     };
   }
 
-  const userLevel = user.user_level?.toLowerCase();
-
-  switch (userLevel) {
-    case 'vendas':
-      return {
-        canAprovar: true,
-        canRecusar: true,
-        canDesdobrar: false,
-        canAbater: false,
-        canFinalizar: false,
-        canDelete: false,
-      };
-
-    case 'marketplace':
-      return {
-        canAprovar: false,
-        canRecusar: false,
-        canDesdobrar: false,
-        canAbater: false,
-        canFinalizar: false,
-        canDelete: false,
-      };
-
-    case 'financeiro':
-      return {
-        canAprovar: false,
-        canRecusar: false,
-        canDesdobrar: true,
-        canAbater: true,
-        canFinalizar: true,
-        canDelete: false,
-      };
-
-    case 'logistica':
-      return {
-        canAprovar: false,
-        canRecusar: false,
-        canDesdobrar: false,
-        canAbater: false,
-        canFinalizar: false,
-        canDelete: false,
-      };
-
-    case 'adm':
-      return {
-        canAprovar: true,
-        canRecusar: true,
-        canDesdobrar: true,
-        canAbater: true,
-        canFinalizar: true,
-        canDelete: true,
-      };
-
-    default:
-      // No permissions for unknown user levels
-      return {
-        canAprovar: false,
-        canRecusar: false,
-        canDesdobrar: false,
-        canAbater: false,
-        canFinalizar: false,
-        canDelete: false,
-      };
+  try {
+    // Try new permissions system first
+    const newPermissions = await getNewUserPermissions(user);
+    
+    return {
+      canAprovar: newPermissions.canAprovar,
+      canRecusar: newPermissions.canRecusar,
+      canDesdobrar: newPermissions.canDesdobrar,
+      canAbater: newPermissions.canAbater,
+      canFinalizar: newPermissions.canFinalizar,
+      canDelete: newPermissions.canDeleteSolicitacoes,
+    };
+  } catch (error) {
+    console.error('Erro ao buscar permissões, usando fallback:', error);
+    
+    // Fallback to old system based on user_level
+    const fallbackPermissions = getUserPermissionsByLevel(user);
+    
+    return {
+      canAprovar: fallbackPermissions.canAprovar,
+      canRecusar: fallbackPermissions.canRecusar,
+      canDesdobrar: fallbackPermissions.canDesdobrar,
+      canAbater: fallbackPermissions.canAbater,
+      canFinalizar: fallbackPermissions.canFinalizar,
+      canDelete: fallbackPermissions.canDeleteSolicitacoes,
+    };
   }
 }
 
@@ -99,10 +63,10 @@ export function getUserPermissions(user: User | null): UserPermissions {
  * @param action The action to check permission for
  * @returns true if user has permission, false otherwise
  */
-export function hasPermission(
+export async function hasPermission(
   user: User | null,
   action: keyof UserPermissions
-): boolean {
-  const permissions = getUserPermissions(user);
+): Promise<boolean> {
+  const permissions = await getUserPermissions(user);
   return permissions[action];
 }

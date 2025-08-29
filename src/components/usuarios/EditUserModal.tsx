@@ -12,6 +12,9 @@ import {
 } from '../ui/select';
 import { Edit2 } from 'lucide-react';
 import { Usuario, EditUserForm } from './types';
+import { PermissionsSelect } from './PermissionsSelect';
+import { PermissionPresetsManager } from './PermissionPresetsManager';
+import { PermissionPreset } from '@/utils/permissions/presetsApi';
 
 interface EditUserModalProps {
   user: Usuario | null;
@@ -27,10 +30,12 @@ export function EditUserModal({ user, onOpenChange, onSubmit }: EditUserModalPro
     user_level: '',
     email: '',
     password: '', // Opcional para edição
+    permissions: [],
   });
 
   useEffect(() => {
     if (user) {
+      const userPermissions = user.permissions?.map(up => up.permission.id) || [];
       setForm({
         first_name: user.first_name,
         last_name: user.last_name,
@@ -38,6 +43,7 @@ export function EditUserModal({ user, onOpenChange, onSubmit }: EditUserModalPro
         user_level: user.user_level,
         email: user.email,
         password: '', // Não preencher senha existente por segurança
+        permissions: userPermissions,
       });
     }
   }, [user]);
@@ -60,14 +66,14 @@ export function EditUserModal({ user, onOpenChange, onSubmit }: EditUserModalPro
 
   return (
     <Dialog open={!!user} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-slate-800 border-slate-700 text-white max-w-md">
+      <DialogContent className="bg-slate-800 border-slate-700 text-white max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-white">
             <Edit2 className="h-5 w-5" />
             Editar Usuário
           </DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-2 gap-4">
             <div>
               <Label htmlFor="edit_first_name" className="text-slate-300 mb-1">Nome</Label>
@@ -104,18 +110,6 @@ export function EditUserModal({ user, onOpenChange, onSubmit }: EditUserModalPro
           </div>
 
           <div>
-            <Label htmlFor="edit_password" className="text-slate-300 mb-1">Nova Senha (opcional)</Label>
-            <Input
-              id="edit_password"
-              type="password"
-              value={form.password || ''}
-              onChange={e => setForm(f => ({ ...f, password: e.target.value }))}
-              className="bg-slate-700 border-slate-600 text-white"
-              placeholder="Deixe em branco para manter a senha atual"
-            />
-          </div>
-
-          <div>
             <Label htmlFor="edit_role" className="text-slate-300 mb-1">Cargo</Label>
             <Input
               id="edit_role"
@@ -127,12 +121,19 @@ export function EditUserModal({ user, onOpenChange, onSubmit }: EditUserModalPro
           </div>
 
           <div>
-            <Label className="text-slate-300 mb-1">Nível de Acesso</Label>
-            <CustomSelect value={form.user_level} onValueChange={value => setForm(f => ({ ...f, user_level: value }))}>
+            <Label className="text-slate-300 mb-1">Nível de Acesso (Opcional)</Label>
+            {/* Evita value="" pois Radix Select lança erro. */}
+            <CustomSelect
+              value={form.user_level === '' ? '__custom__' : form.user_level}
+              onValueChange={value =>
+                setForm(f => ({ ...f, user_level: value === '__custom__' ? '' : value }))
+              }
+            >
               <SelectTrigger className="bg-slate-700 border-slate-600 text-white w-full">
-                <SelectValue placeholder="Selecione o nível" />
+                <SelectValue placeholder="Selecione o nível (ou configure manualmente)" />
               </SelectTrigger>
               <SelectContent className="bg-slate-700 border-slate-600">
+                <SelectItem value="__custom__" className="text-white">Personalizado</SelectItem>
                 <SelectItem value="adm" className="text-white">Administrador</SelectItem>
                 <SelectItem value="vendas" className="text-white">Vendas</SelectItem>
                 <SelectItem value="financeiro" className="text-white">Financeiro</SelectItem>
@@ -140,6 +141,31 @@ export function EditUserModal({ user, onOpenChange, onSubmit }: EditUserModalPro
                 <SelectItem value="marketplace" className="text-white">Marketplace</SelectItem>
               </SelectContent>
             </CustomSelect>
+          </div>
+
+          <div className="space-y-6">
+            <PermissionPresetsManager
+              currentPermissions={form.permissions || []}
+              onApplyPreset={(preset: PermissionPreset) => {
+                setForm(f => ({ ...f, user_level: preset.name, permissions: preset.permissions.map(p => p.permission.id) }));
+              }}
+            />
+            <PermissionsSelect
+              selectedPermissions={form.permissions || []}
+              onPermissionsChange={(permissions) => setForm(f => ({ ...f, permissions }))}
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="edit_password" className="text-slate-300 mb-1">Nova Senha (opcional)</Label>
+            <Input
+              id="edit_password"
+              type="password"
+              value={form.password || ''}
+              onChange={e => setForm(f => ({ ...f, password: e.target.value }))}
+              className="bg-slate-700 border-slate-600 text-white"
+              placeholder="Deixe em branco para manter a senha atual"
+            />
           </div>
 
           <DialogFooter>

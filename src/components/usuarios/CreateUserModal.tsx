@@ -12,6 +12,9 @@ import {
 } from '../ui/select';
 import { UserPlus } from 'lucide-react';
 import { CreateUserForm } from './types';
+import { PermissionsSelect } from './PermissionsSelect';
+import { PermissionPresetsManager } from './PermissionPresetsManager';
+import { PermissionPreset } from '@/utils/permissions/presetsApi';
 
 interface CreateUserModalProps {
   open: boolean;
@@ -27,6 +30,7 @@ export function CreateUserModal({ open, onOpenChange, onSubmit }: CreateUserModa
     user_level: '',
     email: '',
     password: '',
+    permissions: [],
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -40,6 +44,7 @@ export function CreateUserModal({ open, onOpenChange, onSubmit }: CreateUserModa
         user_level: '',
         email: '',
         password: '',
+        permissions: [],
       });
       onOpenChange(false);
     }
@@ -47,14 +52,14 @@ export function CreateUserModal({ open, onOpenChange, onSubmit }: CreateUserModa
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-slate-800 border-slate-700 text-white max-w-md">
+      <DialogContent className="bg-slate-800 border-slate-700 text-white max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-white">
             <UserPlus className="h-5 w-5" />
             Cadastrar Novo Usuário
           </DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-2 gap-4">
             <div>
               <Label htmlFor="first_name" className="text-slate-300 mb-2">Nome</Label>
@@ -102,12 +107,19 @@ export function CreateUserModal({ open, onOpenChange, onSubmit }: CreateUserModa
           </div>
           
           <div className="w-full">
-            <Label className="text-slate-300 mb-2">Nível de Acesso</Label>
-              <CustomSelect value={form.user_level} onValueChange={value => setForm(f => ({ ...f, user_level: value }))}>
+            <Label className="text-slate-300 mb-2">Nível de Acesso (Opcional)</Label>
+              {/* Radix Select não permite <SelectItem value="">. Usamos um sentinela e convertemos para string vazia no estado. */}
+              <CustomSelect
+                value={form.user_level === '' ? '__custom__' : form.user_level}
+                onValueChange={value =>
+                  setForm(f => ({ ...f, user_level: value === '__custom__' ? '' : value }))
+                }
+              >
                 <SelectTrigger className="bg-slate-700 border-slate-600 text-white w-full">
-                  <SelectValue placeholder="Selecione o nível" />
+                  <SelectValue placeholder="Selecione o nível (ou configure manualmente)" />
                 </SelectTrigger>
                 <SelectContent className="bg-slate-700 border-slate-600">
+                  <SelectItem value="__custom__" className="text-white">Personalizado</SelectItem>
                   <SelectItem value="adm" className="text-white">Administrador</SelectItem>
                   <SelectItem value="vendas" className="text-white">Vendas</SelectItem>
                   <SelectItem value="financeiro" className="text-white">Financeiro</SelectItem>
@@ -115,6 +127,19 @@ export function CreateUserModal({ open, onOpenChange, onSubmit }: CreateUserModa
                   <SelectItem value="marketplace" className="text-white">Marketplace</SelectItem>
                 </SelectContent>
               </CustomSelect>
+          </div>
+
+          <div className="space-y-6">
+            <PermissionPresetsManager
+              currentPermissions={form.permissions || []}
+              onApplyPreset={(preset: PermissionPreset) => {
+                setForm(f => ({ ...f, user_level: preset.name, permissions: preset.permissions.map(p => p.permission.id) }));
+              }}
+            />
+            <PermissionsSelect
+              selectedPermissions={form.permissions || []}
+              onPermissionsChange={(permissions) => setForm(f => ({ ...f, permissions }))}
+            />
           </div>
           
           <div>

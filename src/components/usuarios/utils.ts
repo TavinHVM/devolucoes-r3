@@ -43,12 +43,15 @@ export const levelBadgeConfig = {
   }
 };
 
-export const getLevelBadgeConfig = (level: string) => {
-  return levelBadgeConfig[level.toLowerCase() as keyof typeof levelBadgeConfig] || levelBadgeConfig.default;
+const normalizeLevel = (level?: string | null) => (level || '').toLowerCase();
+
+export const getLevelBadgeConfig = (level?: string | null) => {
+  const key = normalizeLevel(level) as keyof typeof levelBadgeConfig;
+  return levelBadgeConfig[key] || levelBadgeConfig.default;
 };
 
-export const getLevelBadgeClass = (level: string) => {
-  const config = levelBadgeConfig[level.toLowerCase() as keyof typeof levelBadgeConfig] || levelBadgeConfig.default;
+export const getLevelBadgeClass = (level?: string | null) => {
+  const config = getLevelBadgeConfig(level);
   
   const classes = [];
   
@@ -65,8 +68,8 @@ export const getLevelBadgeClass = (level: string) => {
   return classes.join(' ');
 };
 
-export const getLevelBadgeStyle = (level: string) => {
-  const config = levelBadgeConfig[level.toLowerCase() as keyof typeof levelBadgeConfig] || levelBadgeConfig.default;
+export const getLevelBadgeStyle = (level?: string | null) => {
+  const config = getLevelBadgeConfig(level);
   
   const baseStyle: React.CSSProperties = {
     border: 'none',

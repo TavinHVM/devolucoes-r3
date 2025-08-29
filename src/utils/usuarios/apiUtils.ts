@@ -6,8 +6,9 @@ export const createUser = async (userData: {
   password: string;
   role: string;
   user_level: string;
+  permissions?: number[];
 }) => {
-  const response = await fetch('/api/usuarios/create', {
+  const response = await fetch('/api/usuarios', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -16,7 +17,8 @@ export const createUser = async (userData: {
   });
 
   if (!response.ok) {
-    throw new Error('Erro ao criar usuário');
+    const error = await response.json();
+    throw new Error(error.error || 'Erro ao criar usuário');
   }
 
   return await response.json();
@@ -29,17 +31,19 @@ export const editUser = async (id: number, userData: {
   email?: string;
   role?: string;
   user_level?: string;
+  permissions?: number[];
 }) => {
-  const response = await fetch('/api/usuarios/edit', {
+  const response = await fetch(`/api/usuarios/${id}`, {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ id, ...userData }),
+    body: JSON.stringify(userData),
   });
 
   if (!response.ok) {
-    throw new Error('Erro ao editar usuário');
+    const error = await response.json();
+    throw new Error(error.error || 'Erro ao editar usuário');
   }
 
   return await response.json();
@@ -47,16 +51,16 @@ export const editUser = async (id: number, userData: {
 
 // Função para deletar usuário via API
 export const deleteUser = async (id: string) => {
-  const response = await fetch('/api/usuarios/delete', {
+  const response = await fetch(`/api/usuarios/${id}`, {
     method: 'DELETE',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ id }),
   });
 
   if (!response.ok) {
-    throw new Error('Erro ao excluir usuário');
+    const error = await response.json();
+    throw new Error(error.error || 'Erro ao excluir usuário');
   }
 
   return await response.json();

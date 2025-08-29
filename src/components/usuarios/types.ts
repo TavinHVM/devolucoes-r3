@@ -7,12 +7,34 @@ export interface Usuario {
   user_level: string;
   created_at?: string;
   email: string;
+  permissions?: UserPermission[];
 }
 
-export interface CreateUserForm extends Omit<Usuario, 'id' | 'created_at'> {
+export interface UserPermission {
+  id: number;
+  permission: {
+    id: number;
+    name: string;
+    label: string;
+    description?: string;
+    category: string;
+  };
+}
+
+export interface Permission {
+  id: number;
+  name: string;
+  label: string;
+  description?: string;
+  category: string;
+}
+
+export interface CreateUserForm extends Omit<Usuario, 'id' | 'created_at' | 'permissions'> {
   password: string;
+  permissions?: number[]; // IDs das permissões selecionadas
 }
 
-export interface EditUserForm extends Omit<Usuario, 'id' | 'created_at'> {
+export interface EditUserForm extends Omit<Usuario, 'id' | 'created_at' | 'permissions'> {
   password?: string; // Senha opcional para edição
+  permissions?: number[]; // IDs das permissões selecionadas
 }
