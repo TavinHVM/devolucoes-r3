@@ -120,7 +120,7 @@ export async function POST(request: Request) {
               cod_prod: parseInt(produto.codigo),
               descricao: produto.descricao,
               quantidade: parseInt(produto.quantidade),
-              punit: parseInt(produto.punit)
+              punit: parseFloat(produto.punit)
             }
           });
         }
@@ -157,7 +157,7 @@ export async function POST(request: Request) {
             cod_prod: parseInt(produto.codigo),
             descricao: produto.descricao,
             quantidade: quantidadeDevolucao, // Quantidade específica para devolução
-            punit: parseInt(produto.punit),
+            punit: parseFloat(produto.punit),
           };
         });
 

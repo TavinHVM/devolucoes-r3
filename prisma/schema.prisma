@@ -93,7 +93,7 @@ model products {
   cod_prod   Int
   descricao  String
   quantidade Int
-  punit      Int
+  punit      Decimal  @db.Decimal(10, 2)
   created_at DateTime @default(now())
 }
 
@@ -103,7 +103,7 @@ model returned_products {
   cod_prod   Int
   descricao  String
   quantidade Int
-  punit      Int
+  punit      Decimal  @db.Decimal(10, 2)
   created_at DateTime @default(now())
 }
 
