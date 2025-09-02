@@ -140,7 +140,7 @@ export function PermissionsSelect({ selectedPermissions, onPermissionsChange }: 
                       onCheckedChange={(checked) =>
                         handlePermissionChange(permission.id, checked as boolean)
                       }
-                      className="border-slate-400 hover:cursor-pointer"
+                      className="border-slate-200 bg-slate-800 hover:cursor-pointer data-[state=checked]:bg-green-500 data-[state=checked]:border-green-300 border-2v "
                     />
                     <div className="flex-1 min-w-0">
                       <Label
