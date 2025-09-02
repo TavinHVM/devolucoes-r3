@@ -23,6 +23,7 @@ export type Solicitacao = {
   arquivo_recibo?: string;
   products_list: JSON;
   motivo_recusa: string;
+  pendente_by: string;
 };
 
 export interface UserProfile {

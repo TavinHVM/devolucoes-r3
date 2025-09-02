@@ -40,6 +40,7 @@ type FormData = {
   motivo_devolucao: string;
   tipo_devolucao: string;
   cod_cliente: string;
+  pendente_by: string;
 };
 
 interface InfoFormStepProps {

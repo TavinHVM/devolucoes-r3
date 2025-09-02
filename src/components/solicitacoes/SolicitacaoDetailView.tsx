@@ -124,6 +124,7 @@ export const SolicitacaoDetailView: React.FC<SolicitacaoDetailViewProps> = ({
     motivo_recusa,
     status,
     created_at,
+    pendente_by,
     // BLOBs podem não vir na listagem; usamos flags quando existirem
     arquivo_nf,
     arquivo_nf_devolucao,
@@ -137,9 +138,25 @@ export const SolicitacaoDetailView: React.FC<SolicitacaoDetailViewProps> = ({
     <>
       <DialogHeader>
         <DialogTitle className="flex items-center mb-6 gap-2 text-white w-full justify-between">
-          <div className="flex items-center gap-2">
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center gap-2">
             <FileText className="h-5 w-5" />
             Detalhes da Solicitação #{id}
+          </div>
+            <div className="ml-7 flex text-slate-400 justify-start text-sm items-center gap-1">
+              <span>Criada por:</span>
+              <User className="h-4 w-4 text-slate-400" />
+              <span className="text-white">{pendente_by ? pendente_by : "Usuário Desconhecido"}</span>
+              <span>às:</span>
+              <Calendar className="h-4 w-4 text-slate-400" />
+              <span className="text-white">
+                {new Date(created_at).toLocaleDateString()} -{" "}
+                {new Date(created_at).toLocaleTimeString([], {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
+              </span>
+            </div>
           </div>
 
           <div className="flex items-center justify-end">
@@ -162,17 +179,7 @@ export const SolicitacaoDetailView: React.FC<SolicitacaoDetailViewProps> = ({
                     {status.toUpperCase()}
                   </Badge>
                 </div>
-                <div className="flex text-slate-400 justify-end text-sm items-center gap-1">
-                  <span>Criada em:</span>
-                  <Calendar className="h-4 w-4 text-slate-400" />
-                  <span className="text-white">
-                    {new Date(created_at).toLocaleDateString()} -{" "}
-                    {new Date(created_at).toLocaleTimeString([], {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
-                  </span>
-                </div>
+                
               </div>
             </div>
           </div>

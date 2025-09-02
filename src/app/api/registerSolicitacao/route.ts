@@ -39,6 +39,7 @@ export async function POST(request: Request) {
       cod_cliente: parseInt(body.get("cod_cliente") as string),
       status: "PENDENTE",
       arquivo_nf: arquivoNFBuffer,
+      pendente_by: body.get("pendente_by") as string
     };
 
     // Dados dos produtos (JSON string)

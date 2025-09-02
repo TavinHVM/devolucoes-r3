@@ -3,6 +3,8 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
+import { useAuth } from "@/contexts/AuthContext";
+import { getUserDisplayName } from "@/lib/auth";
 import {
   fetchProdutosNF,
   fetchInfosNF,
@@ -28,9 +30,11 @@ const formSchema = z.object({
   motivo_devolucao: z.string().min(1, { message: "" }),
   tipo_devolucao: z.string().min(1, { message: "" }),
   cod_cliente: z.string().min(1, { message: "" }),
+  pendente_by: z.string().min(1, { message: "" }),
 });
 
 export function useSolicitacaoForm() {
+  const { user } = useAuth();
   const [currentStep, setCurrentStep] = useState<1 | 2>(1);
   const [numeroNF, setNumeroNF] = useState<string>("");
   const [codigoRca, setCodigoRca] = useState<string>("");
@@ -40,6 +44,7 @@ export function useSolicitacaoForm() {
   const [nomeCodigoCobranca, setNomeCodigoCobranca] = useState<string>("");
   const [numeroCodigoCobranca, setNumeroCodigoCobranca] = useState<string>("");
   const [numeroCodigoCliente, setNumeroCodigoCliente] = useState<string>("");
+  const [nomeSolicitante, setNomeSolicitante] = useState<string>("");
   const [tipoDevolucao, setTipoDevolucao] = useState<string>("");
   const [identificador, setIdentificador] = useState<string>("");
   const [arquivoNF, setArquivoNF] = useState<File | null>(null);
@@ -202,6 +207,7 @@ export function useSolicitacaoForm() {
       motivo_devolucao: "",
       tipo_devolucao: tipoDevolucao,
       cod_cliente: numeroCodigoCliente,
+      pendente_by: nomeSolicitante,
     },
   });
 
@@ -221,6 +227,13 @@ export function useSolicitacaoForm() {
       }
     }
   }, []);
+
+  // Definir nome do solicitante quando o usuário estiver disponível
+  useEffect(() => {
+    if (user && !nomeSolicitante) {
+      setNomeSolicitante(getUserDisplayName(user));
+    }
+  }, [user, nomeSolicitante]);
 
   // Controlar automaticamente o tipo de devolução baseado na seleção
   useEffect(() => {
@@ -293,6 +306,11 @@ export function useSolicitacaoForm() {
         setCodigoFilial(infos_nota.codfilial);
         setIdentificador(infos_nota.cgcent);
         
+        // Definir nome do solicitante a partir do usuário da sessão
+        if (user) {
+          setNomeSolicitante(getUserDisplayName(user));
+        }
+        
         toast.success("Informações da nota fiscal carregadas com sucesso!");
       } else {
         toast.error("Nota fiscal não encontrada no sistema");
@@ -327,6 +345,8 @@ export function useSolicitacaoForm() {
     form.setValue("tipo_devolucao", tipoDevolucao);
     form.setValue("cod_cliente", numeroCodigoCliente);
     form.setValue("motivo_devolucao", motivoDevolucaoText);
+    form.setValue("pendente_by", nomeSolicitante);
+
   }, [
     nomeClient,
     codigoFilial,
@@ -339,6 +359,7 @@ export function useSolicitacaoForm() {
     tipoDevolucao,
     numeroCodigoCliente,
     motivoDevolucaoText,
+    nomeSolicitante,
     form,
   ]);
 
@@ -525,6 +546,7 @@ export function useSolicitacaoForm() {
       formData.append("motivo_devolucao", motivoDevolucaoText);
       formData.append("tipo_devolucao", tipoDevolucao);
       formData.append("cod_cliente", numeroCodigoCliente);
+      formData.append("pendente_by", nomeSolicitante);
       formData.append("produtos", JSON.stringify(produtos));
       formData.append(
         "quantidadesDevolucao",
