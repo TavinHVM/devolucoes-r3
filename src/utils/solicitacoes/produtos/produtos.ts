@@ -1,11 +1,12 @@
 import db from "@/lib/db";
+import { Decimal } from "@prisma/client/runtime/library";
 
 export interface ProdutoSolicitacao {
   id: number;
   cod_prod: number;
   descricao: string;
   quantidade: number;
-  punit: number;
+  punit: number | Decimal;
   numeronf: string;
   created_at: Date;
 }

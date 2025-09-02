@@ -153,13 +153,13 @@ export function ProdutosCard({ numeroNF }: ProdutosCardProps) {
                         {quantidadeDevolvida}
                       </TableCell>
                       <TableCell className="text-center text-slate-300">
-                        {formatPrice(produto.punit)}
+                        {formatPrice(Number(produto.punit))}
                       </TableCell>
                       <TableCell className="text-center text-white font-medium">
-                        {formatPrice(produto.punit * produto.quantidade)}
+                        {formatPrice(Number(produto.punit) * produto.quantidade)}
                       </TableCell>
                       <TableCell className="text-center text-white font-medium">
-                        {formatPrice(produto.punit * quantidadeDevolvida)}
+                        {formatPrice(Number(produto.punit) * quantidadeDevolvida)}
                       </TableCell>
                       <TableCell className="text-center">
                         <div className="flex justify-center">
@@ -208,7 +208,7 @@ export function ProdutosCard({ numeroNF }: ProdutosCardProps) {
                       {formatPrice(
                         produtos.reduce(
                           (acc, produto) =>
-                            acc + produto.punit * produto.quantidade,
+                            acc + Number(produto.punit) * produto.quantidade,
                           0
                         )
                       )}
@@ -228,7 +228,7 @@ export function ProdutosCard({ numeroNF }: ProdutosCardProps) {
                           );
                           const quantidadeDevolvida =
                             produtoRetornado?.quantidade || 0;
-                          return acc + produto.punit * quantidadeDevolvida;
+                          return acc + Number(produto.punit) * quantidadeDevolvida;
                         }, 0)
                       )}
                     </span>
