@@ -147,6 +147,36 @@ export async function FinalizarSolicitacao(id: number) {
   }
 }
 
+export async function ReenviarSolicitacao(id: number) {
+  try {
+    const response = await fetch(
+      `/api/btnsSolicitacoes/reenviarSolicitacao/${id}`,
+      {
+        method: "POST",
+        headers: getAuthHeaders(false),
+      }
+    );
+    if (!response.ok) {
+      const data = await response.json().catch(() => null);
+
+      const errorMessage =
+        (data && typeof data.error === "string" && data.error) ||
+        "Erro ao reenviar solicitação.";
+
+      throw new Error(errorMessage);
+    }
+
+    return await response.json();
+  } catch (error) {
+    if (error instanceof Error) {
+      toast.error(error.message);
+    } else {
+      toast.error("Erro inesperado ao reenviar solicitação.");
+    }
+    throw error;
+  }
+}
+
 export async function ExcluirSolicitacoes(ids: number[]) {
   try {
     const response = await fetch(`/api/solicitacoes/bulk-delete`, {
