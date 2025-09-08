@@ -64,6 +64,7 @@ export function UsuariosControls({
                   <SelectItem value="vendas" className="text-white">Vendas</SelectItem>
                   <SelectItem value="financeiro" className="text-white">Financeiro</SelectItem>
                   <SelectItem value="logistica" className="text-white">Logística</SelectItem>
+                  <SelectItem value="marketplace" className="text-white">Marketplace</SelectItem>
                 </SelectContent>
               </div>
             </CustomSelect>
