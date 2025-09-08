@@ -97,9 +97,9 @@ export const DownloadDialog: React.FC<DownloadDialogProps> = ({
 
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogTrigger asChild>
-          <Button className="bg-green-600 hover:bg-green-700 text-white h-10 cursor-pointer">
-            <Download className="h-4 w-4 mr-2" />
-            Relatório
+          <Button className="w-full bg-green-600 hover:bg-green-700 text-white h-10 flex items-center justify-center gap-2">
+            <Download className="h-4 w-4" />
+            <span className="text-sm font-medium">Relatório</span>
           </Button>
         </DialogTrigger>
         <DialogContent className="bg-slate-800 border-slate-700 text-white">
@@ -121,7 +121,7 @@ export const DownloadDialog: React.FC<DownloadDialogProps> = ({
             <Button
               onClick={() => handleDownload("pdf")}
               disabled={isDownloading}
-              className="bg-red-600 hover:bg-red-700 text-white h-12 flex items-center justify-start gap-3"
+              className="bg-red-600 hover:bg-red-700 text-white h-12 w-full flex items-center justify-start gap-3"
             >
               <FileText className="h-5 w-5" />
               <div className="flex flex-col items-start">
@@ -133,7 +133,7 @@ export const DownloadDialog: React.FC<DownloadDialogProps> = ({
             <Button
               onClick={() => handleDownload("xlsx")}
               disabled={isDownloading}
-              className="bg-green-600 hover:bg-green-700 text-white h-12 flex items-center justify-start gap-3"
+              className="bg-green-600 hover:bg-green-700 text-white h-12 w-full flex items-center justify-start gap-3"
             >
               <FileSpreadsheet className="h-5 w-5" />
               <div className="flex flex-col items-start">
