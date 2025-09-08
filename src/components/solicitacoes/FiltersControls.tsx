@@ -263,24 +263,29 @@ export const FiltersControls: React.FC<FiltersControlsProps> = ({
             </Select>
           </div>
 
-          <div className="flex gap-2">
-            <Button
-              onClick={onRefresh}
-              disabled={refreshing}
-              className="bg-blue-600 hover:bg-blue-700 text-white h-9 cursor-pointer py-5"
-            >
-              <RefreshCw
-                className={`h-4 w-4 mr-2 ${refreshing ? "animate-spin" : ""}`}
-              />
-              {refreshing ? "Atualizando..." : "Atualizar"}
-            </Button>
+          <div className="flex gap-2 items-center mr-4">
+            {/* Use a fixed width so both buttons keep same size regardless of text */}
+            <div className="w-40">
+              <Button
+                onClick={onRefresh}
+                disabled={refreshing}
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white h-9 cursor-pointer py-5"
+              >
+                <RefreshCw
+                  className={`h-4 w-4 ${refreshing ? "animate-spin" : ""}`}
+                />
+                {refreshing ? "Atualizando..." : "Atualizar"}
+              </Button>
+            </div>
 
-            <DownloadDialog 
-              solicitacoes={filteredSolicitacoes}
-              currentFilter={status}
-              startDate={startDate}
-              endDate={endDate}
-            />
+            <div className="w-40">
+              <DownloadDialog 
+                solicitacoes={filteredSolicitacoes}
+                currentFilter={status}
+                startDate={startDate}
+                endDate={endDate}
+              />
+            </div>
           </div>
         </div>
       </CardContent>
