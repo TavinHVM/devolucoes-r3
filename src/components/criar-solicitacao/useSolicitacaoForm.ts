@@ -554,7 +554,21 @@ export function useSolicitacaoForm() {
       );
 
       if (arquivoNF) {
+        // Validação adicional do arquivo antes do envio
+        const allowedTypes = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
+        if (!allowedTypes.includes(arquivoNF.type)) {
+          toast.error("Tipo de arquivo não suportado. Use apenas PDF, JPG, JPEG ou PNG.");
+          return;
+        }
+        
+        const maxSize = 10 * 1024 * 1024; // 10MB
+        if (arquivoNF.size > maxSize) {
+          toast.error("Arquivo muito grande. O tamanho máximo é 10MB.");
+          return;
+        }
+        
         formData.append("arquivo_nf", arquivoNF);
+        console.log(`Enviando arquivo: ${arquivoNF.name} (${arquivoNF.type}, ${arquivoNF.size} bytes)`);
       }
 
       const response = await fetch("/api/registerSolicitacao", {
@@ -563,8 +577,19 @@ export function useSolicitacaoForm() {
       });
 
       if (!response.ok) {
-        await response.text();
-        throw new Error(`Erro ao criar registro: ${response.status}`);
+        const errorText = await response.text();
+        console.error("Erro na resposta:", errorText);
+        
+        let errorMessage = "Erro desconhecido ao criar solicitação";
+        try {
+          const errorData = JSON.parse(errorText);
+          errorMessage = errorData.error || errorMessage;
+        } catch {
+          // Se não conseguir fazer parse do JSON, usar texto da resposta
+          errorMessage = errorText || errorMessage;
+        }
+        
+        throw new Error(errorMessage);
       }
 
       const result = await response.json();

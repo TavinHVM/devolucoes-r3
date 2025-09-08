@@ -1,6 +1,18 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Configurações para upload de arquivos
+  experimental: {
+    // Optimize package imports to shrink client bundles
+    optimizePackageImports: ["lucide-react", "react-icons"],
+  },
+
+  // Configurações de tamanho de request
+  serverRuntimeConfig: {
+    // Configurações do servidor
+    maxFileSize: '10mb',
+  },
+
   webpack: (config, { isServer }) => {
     if (isServer) {
       // Evita incluir esses módulos no bundle do servidor
@@ -25,13 +37,6 @@ const nextConfig: NextConfig = {
       }
     }
     return config;
-  },
-
-  // Configurações para melhor compatibilidade
-
-  // Optimize package imports to shrink client bundles
-  experimental: {
-    optimizePackageImports: ["lucide-react", "react-icons"],
   },
 
   // Headers para CORS se necessário

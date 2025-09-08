@@ -4,6 +4,15 @@ export const fetchCache = "force-no-store";
 import { NextResponse } from "next/server";
 import db from "../../../lib/db";
 
+// Configuração para permitir uploads maiores (10MB)
+export const config = {
+  api: {
+    bodyParser: {
+      sizeLimit: '10mb',
+    },
+  },
+};
+
 interface Produto {
   codigo: string;
   descricao: string;
@@ -20,8 +29,41 @@ export async function POST(request: Request) {
     let arquivoNFBuffer: Buffer | null = null;
 
     if (arquivoNF) {
-      const arrayBuffer = await arquivoNF.arrayBuffer();
-      arquivoNFBuffer = Buffer.from(arrayBuffer);
+      // Validar tipo de arquivo
+      const allowedTypes = [
+        'application/pdf',
+        'image/jpeg',
+        'image/jpg', 
+        'image/png'
+      ];
+      
+      if (!allowedTypes.includes(arquivoNF.type)) {
+        return NextResponse.json(
+          { error: "Tipo de arquivo não suportado. Use apenas PDF, JPG, JPEG ou PNG." },
+          { status: 400 }
+        );
+      }
+      
+      // Validar tamanho do arquivo (máximo 10MB)
+      const maxSizeInBytes = 10 * 1024 * 1024; // 10MB
+      if (arquivoNF.size > maxSizeInBytes) {
+        return NextResponse.json(
+          { error: "Arquivo muito grande. O tamanho máximo é 10MB." },
+          { status: 400 }
+        );
+      }
+      
+      try {
+        const arrayBuffer = await arquivoNF.arrayBuffer();
+        arquivoNFBuffer = Buffer.from(arrayBuffer);
+        console.log(`Arquivo processado: ${arquivoNF.name} (${arquivoNF.type}, ${arquivoNF.size} bytes)`);
+      } catch (error) {
+        console.error("Erro ao processar arquivo:", error);
+        return NextResponse.json(
+          { error: "Erro ao processar o arquivo enviado." },
+          { status: 400 }
+        );
+      }
     }
 
     // Dados da solicitação
