@@ -67,10 +67,23 @@ export async function POST(request: Request) {
     }
 
     // Dados da solicitação
+    const numeroNF = body.get("numero_nf") as string;
+    
+    // Validação específica do número da NF
+    if (!numeroNF || !/^(\d{4}|\d{6})$/.test(numeroNF)) {
+      console.error(`Número de NF inválido recebido: "${numeroNF}"`);
+      return NextResponse.json(
+        { error: "Número da NF deve ter 4 ou 6 dígitos numéricos" },
+        { status: 400 }
+      );
+    }
+
+    console.log(`Criando solicitação para NF: ${numeroNF} (${numeroNF.length} dígitos)`);
+
     const solicitacaoToCreate = {
       nome: body.get("nome") as string,
       filial: body.get("filial") as string,
-      numero_nf: body.get("numero_nf") as string,
+      numero_nf: numeroNF,
       carga: body.get("carga") as string,
       nome_cobranca: body.get("nome_cobranca") as string,
       cod_cobranca: body.get("cod_cobranca") as string,
@@ -83,6 +96,12 @@ export async function POST(request: Request) {
       arquivo_nf: arquivoNFBuffer,
       pendente_by: body.get("pendente_by") as string
     };
+
+    // Log dos dados da solicitação (sem dados sensíveis)
+    console.log("Dados da solicitação:", {
+      ...solicitacaoToCreate,
+      arquivo_nf: arquivoNFBuffer ? `Buffer(${arquivoNFBuffer.length} bytes)` : null
+    });
 
     // Dados dos produtos (JSON string)
     const produtosJson = body.get("produtos") as string;
@@ -140,16 +159,26 @@ export async function POST(request: Request) {
       `Produtos selecionados para devolução: ${produtosSelecionados.length}`
     );
 
-    // Usar transação para garantir consistência
-    const result = await db.$transaction(async (tx) => {
+    // Abordagem sequencial mais robusta para serverless
+    let solicitacao;
+    
+    try {
       // 1. Criar a solicitação
-      const solicitacao = await tx.solicitacoes.create({
+      solicitacao = await db.solicitacoes.create({
         data: solicitacaoToCreate,
       });
+      console.log("Solicitação criada com ID:", solicitacao.id);
+    } catch (error) {
+      console.error("Erro ao criar solicitação:", error);
+      throw new Error("Falha ao criar a solicitação principal");
+    }
 
+    try {
       // 2. Salvar produtos da nota fiscal (apenas se ainda não existem)
+      const produtosParaSalvar = [];
+      
       for (const produto of produtos) {
-        const produtoExistente = await tx.products.findFirst({
+        const produtoExistente = await db.products.findFirst({
           where: {
             numeronf: solicitacao.numero_nf,
             cod_prod: parseInt(produto.codigo)
@@ -157,22 +186,32 @@ export async function POST(request: Request) {
         });
 
         if (!produtoExistente) {
-          await tx.products.create({
-            data: {
-              numeronf: solicitacao.numero_nf,
-              cod_prod: parseInt(produto.codigo),
-              descricao: produto.descricao,
-              quantidade: parseInt(produto.quantidade),
-              punit: parseFloat(produto.punit)
-            }
+          produtosParaSalvar.push({
+            numeronf: solicitacao.numero_nf,
+            cod_prod: parseInt(produto.codigo),
+            descricao: produto.descricao,
+            quantidade: parseInt(produto.quantidade),
+            punit: parseFloat(produto.punit)
           });
         }
       }
 
-      console.log(
-        `Produtos da nota fiscal verificados/salvos na tabela products`
-      );
+      if (produtosParaSalvar.length > 0) {
+        await db.products.createMany({
+          data: produtosParaSalvar,
+          skipDuplicates: true
+        });
+      }
 
+      console.log(
+        `Produtos da nota fiscal verificados/salvos na tabela products: ${produtosParaSalvar.length}`
+      );
+    } catch (error) {
+      console.error("Erro ao salvar produtos da NF:", error);
+      // Não falhamos aqui, pois a solicitação já foi criada
+    }
+
+    try {
       // 3. Salvar APENAS os produtos selecionados para devolução na tabela returned_products
       console.log(
         "Produtos selecionados para devolução:",
@@ -207,17 +246,22 @@ export async function POST(request: Request) {
       console.log(`Produtos para devolução: ${produtosRetornados.length}`);
 
       if (produtosRetornados.length > 0) {
-        await tx.returned_products.createMany({
+        await db.returned_products.createMany({
           data: produtosRetornados,
+          skipDuplicates: true
         });
       }
 
-      return {
-        solicitacao,
-        totalProdutosNota: produtos.length,
-        produtosParaDevolucao: produtosRetornados.length,
-      };
-    });
+    } catch (error) {
+      console.error("Erro ao salvar produtos devolvidos:", error);
+      // Continuamos mesmo que os produtos devolvidos falhem
+    }
+
+    const result = {
+      solicitacao,
+      totalProdutosNota: produtos.length,
+      produtosParaDevolucao: produtosSelecionados.length,
+    };
 
     console.log("Solicitação criada com sucesso! ID:", result.solicitacao.id);
     console.log(
@@ -227,8 +271,30 @@ export async function POST(request: Request) {
     return NextResponse.json(result);
   } catch (error) {
     console.error("Erro ao criar solicitação:", error);
+    
+    // Log mais detalhado para debug no Vercel
+    if (error instanceof Error) {
+      console.error("Erro detalhado:", {
+        name: error.name,
+        message: error.message,
+        stack: error.stack,
+      });
+    }
+    
+    // Verificar se é um erro específico do Prisma
+    if (error && typeof error === 'object' && 'code' in error) {
+      const prismaError = error as { code: string; meta?: unknown };
+      console.error("Código do erro Prisma:", prismaError.code);
+      console.error("Meta do erro Prisma:", prismaError.meta);
+    }
+    
     return NextResponse.json(
-      { error: "Erro ao criar solicitação" },
+      { 
+        error: "Erro ao criar solicitação",
+        details: error instanceof Error ? error.message : "Erro desconhecido",
+        // Incluir código de erro específico se for do Prisma
+        code: error && typeof error === 'object' && 'code' in error ? (error as { code: string }).code : undefined
+      },
       { status: 500 }
     );
   }

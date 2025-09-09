@@ -7,6 +7,9 @@ const nextConfig: NextConfig = {
     optimizePackageImports: ["lucide-react", "react-icons"],
   },
 
+  // Configuração correta para Next.js 15
+  serverExternalPackages: ["@prisma/client"],
+
   // Configurações de tamanho de request
   serverRuntimeConfig: {
     // Configurações do servidor
