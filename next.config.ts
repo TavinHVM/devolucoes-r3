@@ -13,6 +13,17 @@ const nextConfig: NextConfig = {
     maxFileSize: '10mb',
   },
 
+  // Configurações específicas para Vercel
+  ...(process.env.VERCEL && {
+    experimental: {
+      ...((process.env.VERCEL && {
+        optimizePackageImports: ["lucide-react", "react-icons", "@prisma/client"],
+      }) || {}),
+      // Reduzir o tamanho do bundle para Vercel
+      serverComponentsExternalPackages: ["@prisma/client"],
+    },
+  }),
+
   webpack: (config, { isServer }) => {
     if (isServer) {
       // Evita incluir esses módulos no bundle do servidor

@@ -1,13 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getApiUrl, logEnvironmentStatus } from "@/lib/env-check";
 
 export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ numnota: string }> }
 ) {
   try {
-    // Log do status do ambiente na primeira execução
-    logEnvironmentStatus();
     
     const { numnota } = await params;
 
@@ -29,7 +26,7 @@ export async function GET(
     console.log(`Buscando produtos para NF: ${numnota} (${numnota.length} dígitos)`);
 
     // Faz a requisição para a API externa
-    const externalApiUrl = getApiUrl();
+    const externalApiUrl = process.env.API_URL || "http://192.168.7.104:3001/api";
     
     console.log(`URL da API externa: ${externalApiUrl}/produtos/${numnota}`);
     
