@@ -1,10 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getApiUrl, logEnvironmentStatus } from "@/lib/env-check";
 
 export async function GET(req: NextRequest) {
   try {
     console.log("=== DEBUG NF ENDPOINT ===");
-    logEnvironmentStatus();
     
     const { searchParams } = new URL(req.url);
     const numnota = searchParams.get('numnota');
@@ -28,7 +26,7 @@ export async function GET(req: NextRequest) {
     
     console.log("Validações:", validations);
     
-    const externalApiUrl = getApiUrl();
+    const externalApiUrl = process.env.API_URL || "http://192.168.7.104:3001/api";
     
     // Testar ambos os endpoints
     const tests = await Promise.allSettled([

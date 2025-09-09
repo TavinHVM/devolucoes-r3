@@ -7,22 +7,14 @@ const nextConfig: NextConfig = {
     optimizePackageImports: ["lucide-react", "react-icons"],
   },
 
+  // Configuração correta para Next.js 15
+  serverExternalPackages: ["@prisma/client"],
+
   // Configurações de tamanho de request
   serverRuntimeConfig: {
     // Configurações do servidor
     maxFileSize: '10mb',
   },
-
-  // Configurações específicas para Vercel
-  ...(process.env.VERCEL && {
-    experimental: {
-      ...((process.env.VERCEL && {
-        optimizePackageImports: ["lucide-react", "react-icons", "@prisma/client"],
-      }) || {}),
-      // Reduzir o tamanho do bundle para Vercel
-      serverComponentsExternalPackages: ["@prisma/client"],
-    },
-  }),
 
   webpack: (config, { isServer }) => {
     if (isServer) {
