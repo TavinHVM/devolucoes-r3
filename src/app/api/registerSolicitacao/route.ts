@@ -67,10 +67,23 @@ export async function POST(request: Request) {
     }
 
     // Dados da solicitação
+    const numeroNF = body.get("numero_nf") as string;
+    
+    // Validação específica do número da NF
+    if (!numeroNF || !/^(\d{4}|\d{6})$/.test(numeroNF)) {
+      console.error(`Número de NF inválido recebido: "${numeroNF}"`);
+      return NextResponse.json(
+        { error: "Número da NF deve ter 4 ou 6 dígitos numéricos" },
+        { status: 400 }
+      );
+    }
+
+    console.log(`Criando solicitação para NF: ${numeroNF} (${numeroNF.length} dígitos)`);
+
     const solicitacaoToCreate = {
       nome: body.get("nome") as string,
       filial: body.get("filial") as string,
-      numero_nf: body.get("numero_nf") as string,
+      numero_nf: numeroNF,
       carga: body.get("carga") as string,
       nome_cobranca: body.get("nome_cobranca") as string,
       cod_cobranca: body.get("cod_cobranca") as string,
@@ -83,6 +96,12 @@ export async function POST(request: Request) {
       arquivo_nf: arquivoNFBuffer,
       pendente_by: body.get("pendente_by") as string
     };
+
+    // Log dos dados da solicitação (sem dados sensíveis)
+    console.log("Dados da solicitação:", {
+      ...solicitacaoToCreate,
+      arquivo_nf: arquivoNFBuffer ? `Buffer(${arquivoNFBuffer.length} bytes)` : null
+    });
 
     // Dados dos produtos (JSON string)
     const produtosJson = body.get("produtos") as string;
@@ -227,8 +246,30 @@ export async function POST(request: Request) {
     return NextResponse.json(result);
   } catch (error) {
     console.error("Erro ao criar solicitação:", error);
+    
+    // Log mais detalhado para debug no Vercel
+    if (error instanceof Error) {
+      console.error("Erro detalhado:", {
+        name: error.name,
+        message: error.message,
+        stack: error.stack,
+      });
+    }
+    
+    // Verificar se é um erro específico do Prisma
+    if (error && typeof error === 'object' && 'code' in error) {
+      const prismaError = error as { code: string; meta?: unknown };
+      console.error("Código do erro Prisma:", prismaError.code);
+      console.error("Meta do erro Prisma:", prismaError.meta);
+    }
+    
     return NextResponse.json(
-      { error: "Erro ao criar solicitação" },
+      { 
+        error: "Erro ao criar solicitação",
+        details: error instanceof Error ? error.message : "Erro desconhecido",
+        // Incluir código de erro específico se for do Prisma
+        code: error && typeof error === 'object' && 'code' in error ? (error as { code: string }).code : undefined
+      },
       { status: 500 }
     );
   }
