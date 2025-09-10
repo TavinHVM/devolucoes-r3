@@ -47,6 +47,7 @@ function SolicitacaoContent() {
     solicitacoesExistentes,
     motivoDevolucaoText,
     setMotivoDevolucaoText,
+    isSubmitting,
     
     // Product filtering and sorting states
     productSearchTerm,
@@ -142,6 +143,7 @@ function SolicitacaoContent() {
             handleProductSort={handleProductSort}
             handleProductClearSort={handleProductClearSort}
             getQuantidadeDisponivel={getQuantidadeDisponivel}
+            isSubmitting={isSubmitting}
           />
         )}
       </div>

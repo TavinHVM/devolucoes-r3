@@ -70,6 +70,9 @@ export function useSolicitacaoForm() {
     descricao: string;
     quantidade_devolvida: number;
   }[]>([]);
+  
+  // Estado para controlar se está finalizando solicitação (previne cliques múltiplos)
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   // Função utilitária para calcular quantidade disponível
   const getQuantidadeDisponivel = useCallback((codigoProduto: string) => {
@@ -533,6 +536,11 @@ export function useSolicitacaoForm() {
   };
 
   const finalizarSolicitacao = async () => {
+    // Previne múltiplos cliques
+    if (isSubmitting) return;
+    
+    setIsSubmitting(true);
+    
     try {
       const formData = new FormData();
       formData.append("nome", nomeClient);
@@ -607,6 +615,8 @@ export function useSolicitacaoForm() {
       toast.error(`Erro ao criar solicitação: ${
         error instanceof Error ? error.message : "Erro desconhecido"
       }`);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -654,6 +664,7 @@ export function useSolicitacaoForm() {
     produtosDevolvidos,
     motivoDevolucaoText,
     setMotivoDevolucaoText,
+    isSubmitting,
 
     // Product filtering and sorting states
     productSearchTerm,

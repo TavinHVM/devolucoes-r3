@@ -42,6 +42,7 @@ interface ProductSelectionStepProps {
   handleProductSort: (column: string, direction: "asc" | "desc") => void;
   handleProductClearSort: (column: string) => void;
   getQuantidadeDisponivel: (codigoProduto: string) => number;
+  isSubmitting: boolean;
 }
 
 export function ProductSelectionStep({
@@ -67,7 +68,8 @@ export function ProductSelectionStep({
   filteredAndSortedProducts,
   handleProductSort,
   handleProductClearSort,
-  getQuantidadeDisponivel
+  getQuantidadeDisponivel,
+  isSubmitting
 }: ProductSelectionStepProps) {
   const isFinalizationEnabled = () => {
     const totalQuantidadeDevolucao = Object.values(quantidadesDevolucao).reduce(
@@ -134,11 +136,11 @@ export function ProductSelectionStep({
       <div className="flex justify-end mt-6">
         <Button
           type="button"
-          disabled={!isFinalizationEnabled()}
+          disabled={!isFinalizationEnabled() || isSubmitting}
           onClick={onFinalize}
           className="bg-green-600 hover:bg-green-700 text-white px-8"
         >
-          Finalizar Solicitação
+          {isSubmitting ? "Finalizando..." : "Finalizar Solicitação"}
           <CheckCircle2 className="ml-2 h-4 w-4" />
         </Button>
       </div>
