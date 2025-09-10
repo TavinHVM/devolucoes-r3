@@ -15,13 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Filter,
-  Search,
-  RefreshCw,
-  X,
-  CalendarIcon,
-} from "lucide-react";
+import { Filter, Search, RefreshCw, X, CalendarIcon } from "lucide-react";
 import { Solicitacao } from "@/types/solicitacao";
 import { DownloadDialog } from "./DownloadDialog";
 
@@ -38,6 +32,8 @@ interface FiltersControlsProps {
   onRefresh: () => void;
   // Add filtered solicitacoes for download
   filteredSolicitacoes: Solicitacao[];
+  // Add pagination reset function
+  setCurrentPage: (page: number) => void;
 }
 
 export const FiltersControls: React.FC<FiltersControlsProps> = ({
@@ -52,19 +48,41 @@ export const FiltersControls: React.FC<FiltersControlsProps> = ({
   refreshing,
   onRefresh,
   filteredSolicitacoes,
+  setCurrentPage,
 }) => {
   // Função para criar data sem problemas de timezone
   const createLocalDate = (dateString: string): Date => {
-    const [year, month, day] = dateString.split('-').map(Number);
+    const [year, month, day] = dateString.split("-").map(Number);
     return new Date(year, month - 1, day); // month é 0-indexed
   };
 
   // Função para formatar data local para string
   const formatLocalDate = (date: Date): string => {
     const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
     return `${year}-${month}-${day}`;
+  };
+
+  // Funções para resetar paginação quando filtros mudam
+  const handleSearchChange = (value: string) => {
+    setBusca(value);
+    setCurrentPage(1);
+  };
+
+  const handleStatusChange = (value: string) => {
+    setStatus(value || "Todos");
+    setCurrentPage(1);
+  };
+
+  const handleStartDateChange = (value: string | null) => {
+    setStartDate(value);
+    setCurrentPage(1);
+  };
+
+  const handleEndDateChange = (value: string | null) => {
+    setEndDate(value);
+    setCurrentPage(1);
   };
   return (
     <Card className="bg-slate-800/50 border-slate-700 mb-6">
@@ -87,7 +105,7 @@ export const FiltersControls: React.FC<FiltersControlsProps> = ({
               <Input
                 placeholder="Nome, NF, cliente, RCA..."
                 value={busca}
-                onChange={(e) => setBusca(e.target.value)}
+                onChange={(e) => handleSearchChange(e.target.value)}
                 className="pl-10 bg-slate-700 border-slate-600 text-white placeholder:text-slate-400 h-10"
               />
             </div>
@@ -104,8 +122,8 @@ export const FiltersControls: React.FC<FiltersControlsProps> = ({
                   variant="ghost"
                   size="sm"
                   onClick={() => {
-                    setStartDate(null);
-                    setEndDate(null);
+                    handleStartDateChange(null);
+                    handleEndDateChange(null);
                   }}
                   className="text-xs text-slate-400 hover:text-white h-auto p-1 hover:bg-slate-800"
                 >
@@ -125,13 +143,16 @@ export const FiltersControls: React.FC<FiltersControlsProps> = ({
                       onChange={(e) => {
                         const value = e.target.value;
                         if (value) {
-                          setStartDate(value);
+                          handleStartDateChange(value);
                           // Se a data final for anterior à nova data inicial, limpe a data final
-                          if (endDate && createLocalDate(value) > createLocalDate(endDate)) {
-                            setEndDate(null);
+                          if (
+                            endDate &&
+                            createLocalDate(value) > createLocalDate(endDate)
+                          ) {
+                            handleEndDateChange(null);
                           }
                         } else {
-                          setStartDate(null);
+                          handleStartDateChange(null);
                         }
                       }}
                       className="flex-1 bg-slate-700 border-slate-600 text-white placeholder:text-slate-400 text-sm h-10 pr-10 [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-inner-spin-button]:hidden [&::-webkit-outer-spin-button]:hidden"
@@ -147,21 +168,26 @@ export const FiltersControls: React.FC<FiltersControlsProps> = ({
                       </Button>
                     </PopoverTrigger>
                   </div>
-                  <PopoverContent className="w-auto p-0 bg-slate-800 border-slate-600" align="start">
+                  <PopoverContent
+                    className="w-auto p-0 bg-slate-800 border-slate-600"
+                    align="start"
+                  >
                     <Calendar
                       mode="single"
-                      selected={startDate ? createLocalDate(startDate) : undefined}
+                      selected={
+                        startDate ? createLocalDate(startDate) : undefined
+                      }
                       onSelect={(date) => {
                         if (date) {
                           const formattedDate = formatLocalDate(date);
-                          setStartDate(formattedDate);
-                          
+                          handleStartDateChange(formattedDate);
+
                           // Se a data final for anterior à nova data inicial, limpe a data final
                           if (endDate && date > createLocalDate(endDate)) {
-                            setEndDate(null);
+                            handleEndDateChange(null);
                           }
                         } else {
-                          setStartDate(null);
+                          handleStartDateChange(null);
                         }
                       }}
                       autoFocus
@@ -182,12 +208,15 @@ export const FiltersControls: React.FC<FiltersControlsProps> = ({
                         const value = e.target.value;
                         if (value) {
                           // Verifica se a data final é posterior à data inicial
-                          if (startDate && createLocalDate(value) < createLocalDate(startDate)) {
+                          if (
+                            startDate &&
+                            createLocalDate(value) < createLocalDate(startDate)
+                          ) {
                             return; // Não permite data final anterior à inicial
                           }
-                          setEndDate(value);
+                          handleEndDateChange(value);
                         } else {
-                          setEndDate(null);
+                          handleEndDateChange(null);
                         }
                       }}
                       min={startDate || undefined}
@@ -204,16 +233,19 @@ export const FiltersControls: React.FC<FiltersControlsProps> = ({
                       </Button>
                     </PopoverTrigger>
                   </div>
-                  <PopoverContent className="w-auto p-0 bg-slate-800 border-slate-600" align="start">
+                  <PopoverContent
+                    className="w-auto p-0 bg-slate-800 border-slate-600"
+                    align="start"
+                  >
                     <Calendar
                       mode="single"
                       selected={endDate ? createLocalDate(endDate) : undefined}
                       onSelect={(date) => {
                         if (date) {
                           const formattedDate = formatLocalDate(date);
-                          setEndDate(formattedDate);
+                          handleEndDateChange(formattedDate);
                         } else {
-                          setEndDate(null);
+                          handleEndDateChange(null);
                         }
                       }}
                       disabled={(date) => {
@@ -234,8 +266,10 @@ export const FiltersControls: React.FC<FiltersControlsProps> = ({
 
           {/* Status */}
           <div className="flex-none min-w-[160px]">
-            <label className="text-slate-300 text-sm font-medium block mb-2">Status</label>
-            <Select value={status} onValueChange={(v) => setStatus(v || "Todos")}>
+            <label className="text-slate-300 text-sm font-medium block mb-2">
+              Status
+            </label>
+            <Select value={status} onValueChange={handleStatusChange}>
               <SelectTrigger className="bg-slate-700 border-slate-600 text-white w-full h-10 py-[19px]">
                 <SelectValue placeholder="Todos os status" />
               </SelectTrigger>
@@ -279,7 +313,7 @@ export const FiltersControls: React.FC<FiltersControlsProps> = ({
             </Button>
 
             <div className="h-10">
-              <DownloadDialog 
+              <DownloadDialog
                 solicitacoes={filteredSolicitacoes}
                 currentFilter={status}
                 startDate={startDate}

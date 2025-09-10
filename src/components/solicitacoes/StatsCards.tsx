@@ -7,6 +7,7 @@ import {
   XCircle,
   Target,
   Zap,
+  TriangleAlert,
 } from "lucide-react";
 import { Solicitacao } from "@/types/solicitacao";
 
@@ -52,6 +53,13 @@ export const StatsCards: React.FC<StatsCardsProps> = ({ solicitacoes }) => {
       iconColor: "text-blue-400",
     },
     {
+      title: "Abatidas",
+      value: solicitacoes.filter((s) => s.status.toUpperCase() === "ABATIDA").length,
+      icon: TriangleAlert,
+      bgColor: "bg-yellow-500/20",
+      iconColor: "text-yellow-400",
+    },
+    {
       title: "Finalizadas",
       value: solicitacoes.filter((s) => s.status.toUpperCase() === "FINALIZADA").length,
       icon: Zap,
@@ -61,7 +69,7 @@ export const StatsCards: React.FC<StatsCardsProps> = ({ solicitacoes }) => {
   ];
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-6">
+    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4 mb-6">
       {stats.map((stat, index) => {
         const IconComponent = stat.icon;
         return (

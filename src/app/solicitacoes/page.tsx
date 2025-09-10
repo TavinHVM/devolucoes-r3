@@ -2,7 +2,10 @@
 import { useEffect, useState } from "react";
 import Header from "../../components/header";
 import { useAuth } from "@/contexts/AuthContext";
-import { getUserPermissions, UserPermissions } from "@/utils/permissions/userPermissions";
+import {
+  getUserPermissions,
+  UserPermissions,
+} from "@/utils/permissions/userPermissions";
 import { useSolicitacoes } from "@/hooks/useSolicitacoes";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import {
@@ -65,10 +68,10 @@ function SolicitacoesContent() {
         try {
           setPermissionsLoading(true);
           const permissions = await getUserPermissions(user);
-          console.log('Permissions loaded in page:', permissions);
+          console.log("Permissions loaded in page:", permissions);
           setUserPermissions(permissions);
         } catch (error) {
-          console.error('Error loading permissions:', error);
+          console.error("Error loading permissions:", error);
         } finally {
           setPermissionsLoading(false);
         }
@@ -124,6 +127,7 @@ function SolicitacoesContent() {
           refreshing={refreshing}
           onRefresh={fetchSolicitacoes}
           filteredSolicitacoes={finalSolicitacoes}
+          setCurrentPage={setCurrentPage}
         />
 
         {/* Main Table */}

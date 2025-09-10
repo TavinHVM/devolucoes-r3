@@ -67,7 +67,9 @@ export async function AprovarSolicitacao(
     if (error instanceof Error) {
       toast.error(error.message);
     } else {
-      toast.error("Erro inesperado ao mudar Status da solicitação para Aprovada.");
+      toast.error(
+        "Erro inesperado ao mudar Status da solicitação para Aprovada."
+      );
     }
   }
 }
