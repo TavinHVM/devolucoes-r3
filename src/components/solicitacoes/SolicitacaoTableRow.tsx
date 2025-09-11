@@ -23,6 +23,7 @@ interface SolicitacaoTableRowProps {
     canAbater: boolean;
     canFinalizar: boolean;
     canDelete?: boolean;
+    canAccessAdmin: boolean;
   };
   onRefreshList?: () => void;
   selected?: boolean;

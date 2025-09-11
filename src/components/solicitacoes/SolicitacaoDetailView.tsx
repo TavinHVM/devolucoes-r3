@@ -16,6 +16,10 @@ import {
   MessageSquare,
   AlertTriangle,
   Calendar,
+  FilePlus,
+  CheckCircle2,
+  Target,
+  Zap
 } from "lucide-react";
 import { Solicitacao } from "@/types/solicitacao";
 import {
@@ -34,6 +38,7 @@ interface SolicitacaoDetailViewProps {
     canDesdobrar: boolean;
     canAbater: boolean;
     canFinalizar: boolean;
+    canAccessAdmin: boolean;
   };
   onActionComplete?: (message: string, type: "success" | "error") => void;
   onCloseDetailDialog?: () => void;
@@ -125,6 +130,16 @@ export const SolicitacaoDetailView: React.FC<SolicitacaoDetailViewProps> = ({
     status,
     created_at,
     pendente_by,
+    aprovada_by,
+    aprovada_at,
+    recusada_by,
+    recusada_at,
+    desdobrada_at,
+    desdobrada_by,
+    abatida_at,
+    abatida_by,
+    finalizada_at,
+    finalizada_by,
     // BLOBs podem não vir na listagem; usamos flags quando existirem
     arquivo_nf,
     arquivo_nf_devolucao,
@@ -140,9 +155,9 @@ export const SolicitacaoDetailView: React.FC<SolicitacaoDetailViewProps> = ({
         <DialogTitle className="flex items-center mb-6 gap-2 text-white w-full justify-between">
           <div className="flex flex-col gap-2">
             <div className="flex items-center gap-2">
-            <FileText className="h-5 w-5" />
-            Detalhes da Solicitação #{id}
-          </div>
+              <FileText className="h-5 w-5" />
+              Detalhes da Solicitação #{id}
+            </div>
             <div className="ml-7 flex text-slate-400 justify-start text-sm items-center gap-1">
               <span>Criada por:</span>
               <User className="h-4 w-4 text-slate-400" />
@@ -179,7 +194,7 @@ export const SolicitacaoDetailView: React.FC<SolicitacaoDetailViewProps> = ({
                     {status.toUpperCase()}
                   </Badge>
                 </div>
-                
+
               </div>
             </div>
           </div>
@@ -190,7 +205,7 @@ export const SolicitacaoDetailView: React.FC<SolicitacaoDetailViewProps> = ({
         {/* Informações Gerais */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
           <Card className="bg-slate-700/50 border-slate-600 col-span-2">
-            <CardHeader className="pb-2">
+            <CardHeader>
               <CardTitle className="text-md text-white flex items-center gap-2">
                 <User className="h-4 w-4" />
                 Cliente
@@ -225,7 +240,7 @@ export const SolicitacaoDetailView: React.FC<SolicitacaoDetailViewProps> = ({
           </Card>
 
           <Card className="bg-slate-700/50 border-slate-600">
-            <CardHeader className="pb-2">
+            <CardHeader>
               <CardTitle className="text-md text-white flex items-center gap-2">
                 <FileText className="h-4 w-4" />
                 Nota Fiscal
@@ -254,7 +269,7 @@ export const SolicitacaoDetailView: React.FC<SolicitacaoDetailViewProps> = ({
           </Card>
 
           <Card className="bg-slate-700/50 border-slate-600">
-            <CardHeader className="pb-2">
+            <CardHeader>
               <CardTitle className="text-md text-white flex items-center gap-2">
                 <Package className="h-4 w-4" />
                 Devolução
@@ -266,11 +281,10 @@ export const SolicitacaoDetailView: React.FC<SolicitacaoDetailViewProps> = ({
                   <p className="text-slate-400 text-sm">Tipo de Devolução:</p>
                   <Badge
                     variant="secondary"
-                    className={`text-white text-md w-fit capitalize ${
-                      tipo_devolucao.toUpperCase() === "PARCIAL"
-                        ? "bg-amber-500 hover:bg-amber-500"
-                        : "bg-emerald-500 hover:bg-emerald-500"
-                    }`}
+                    className={`text-white text-md w-fit capitalize ${tipo_devolucao.toUpperCase() === "PARCIAL"
+                      ? "bg-amber-500 hover:bg-amber-500"
+                      : "bg-emerald-500 hover:bg-emerald-500"
+                      }`}
                   >
                     {tipo_devolucao}
                   </Badge>
@@ -280,11 +294,10 @@ export const SolicitacaoDetailView: React.FC<SolicitacaoDetailViewProps> = ({
                     <p className="text-slate-400 text-sm">Vale:</p>
                     <Badge
                       variant="secondary"
-                      className={`text-white text-md w-fit capitalize ${
-                        (vale as string).toUpperCase() === "SIM"
-                          ? "bg-green-500 hover:bg-green-500"
-                          : "bg-red-800 hover:bg-red-800"
-                      }`}
+                      className={`text-white text-md w-fit capitalize ${(vale as string).toUpperCase() === "SIM"
+                        ? "bg-green-500 hover:bg-green-500"
+                        : "bg-red-800 hover:bg-red-800"
+                        }`}
                     >
                       {vale}
                     </Badge>
@@ -303,6 +316,198 @@ export const SolicitacaoDetailView: React.FC<SolicitacaoDetailViewProps> = ({
           </Card>
         </div>
 
+        {userPermissions.canAccessAdmin && (
+          <Card className="bg-slate-700/50 border-slate-600">
+            <CardHeader>
+              <CardTitle className="text-white flex items-center gap-2">
+                <MessageSquare className="h-5 w-5 text-blue-400" />
+                Histórico de Ações
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {/* Criada por */}
+                <div className="flex items-start gap-3 p-3 bg-sky-500/10 rounded-lg border-l-4 border-sky-500 mx-4">
+                  <div className="flex items-center gap-2 mt-0.5">
+                    <FilePlus className="h-5 w-5 text-sky-500" />
+                  </div>
+                  <div className="flex-1 space-y-1">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-slate-300 font-medium">Criada por:</span>
+                      <div className="flex items-center gap-1">
+                        <User className="h-4 w-4 text-blue-400" />
+                        <span className="text-white font-semibold">
+                          {pendente_by ? pendente_by : "Usuário Desconhecido"}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm">
+                      <Calendar className="h-4 w-4 text-slate-400" />
+                      <span className="text-slate-300">
+                        {new Date(created_at).toLocaleDateString()} às{" "}
+                        {new Date(created_at).toLocaleTimeString([], {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Aprovada */}
+                {aprovada_at && (
+                  <div className="flex items-start gap-3 p-3 bg-green-500/10 rounded-lg border-l-4 border-green-500 mx-4">
+                    <div className="flex items-center gap-2 mt-0.5">
+                      <CheckCircle2 className="h-5 w-5 text-green-500" />
+                    </div>
+                    <div className="flex-1 space-y-1">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="text-slate-300 font-medium">Aprovada por:</span>
+                        <div className="flex items-center gap-1">
+                          <User className="h-4 w-4 text-blue-400" />
+                          <span className="text-white font-semibold">
+                            {aprovada_by ? aprovada_by : "Usuário Desconhecido"}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm">
+                        <Calendar className="h-4 w-4 text-slate-400" />
+                        <span className="text-slate-300">
+                          {new Date(aprovada_at).toLocaleDateString()} às{" "}
+                          {new Date(aprovada_at).toLocaleTimeString([], {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Recusada */}
+                {recusada_at && (
+                  <div className="flex items-start gap-3 p-3 bg-red-500/10 rounded-lg border-l-4 border-red-500 mx-4">
+                    <div className="flex items-center gap-2 mt-0.5">
+                      <AlertTriangle className="h-5 w-5 text-red-500" />
+                    </div>
+                    <div className="flex-1 space-y-1">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="text-slate-300 font-medium">Recusada por:</span>
+                        <div className="flex items-center gap-1">
+                          <User className="h-4 w-4 text-blue-400" />
+                          <span className="text-white font-semibold">
+                            {recusada_by ? recusada_by : "Usuário Desconhecido"}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm">
+                        <Calendar className="h-4 w-4 text-slate-400" />
+                        <span className="text-slate-300">
+                          {new Date(recusada_at).toLocaleDateString()} às{" "}
+                          {new Date(recusada_at).toLocaleTimeString([], {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Desdobrada */}
+                {desdobrada_at && (
+                  <div className="flex items-start gap-3 p-3 bg-blue-500/10 rounded-lg border-l-4 border-blue-500 mx-4">
+                    <div className="flex items-center gap-2 mt-0.5">
+                      <Target className="h-5 w-5 text-blue-500" />
+                    </div>
+                    <div className="flex-1 space-y-1">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="text-slate-300 font-medium">Desdobrada por:</span>
+                        <div className="flex items-center gap-1">
+                          <User className="h-4 w-4 text-blue-400" />
+                          <span className="text-white font-semibold">
+                            {desdobrada_by ? desdobrada_by : "Usuário Desconhecido"}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm">
+                        <Calendar className="h-4 w-4 text-slate-400" />
+                        <span className="text-slate-300">
+                          {new Date(desdobrada_at).toLocaleDateString()} às{" "}
+                          {new Date(desdobrada_at).toLocaleTimeString([], {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Abatida */}
+                {abatida_at && (
+                  <div className="flex items-start gap-3 p-3 bg-yellow-500/10 rounded-lg border-l-4 border-yellow-500 mx-4">
+                    <div className="flex items-center gap-2 mt-0.5">
+                      <AlertTriangle className="h-5 w-5 text-yellow-500" />
+                    </div>
+                    <div className="flex-1 space-y-1">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="text-slate-300 font-medium">Abatida por:</span>
+                        <div className="flex items-center gap-1">
+                          <User className="h-4 w-4 text-blue-400" />
+                          <span className="text-white font-semibold">
+                            {abatida_by ? abatida_by : "Usuário Desconhecido"}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm">
+                        <Calendar className="h-4 w-4 text-slate-400" />
+                        <span className="text-slate-300">
+                          {new Date(abatida_at).toLocaleDateString()} às{" "}
+                          {new Date(abatida_at).toLocaleTimeString([], {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Finalizada */}
+                {finalizada_at && (
+                  <div className="flex items-start gap-3 p-3 bg-lime-500/10 rounded-lg border-l-4 border-lime-500 mx-4">
+                    <div className="flex items-center gap-2 mt-0.5">
+                      <Zap className="h-5 w-5 text-lime-500" />
+                    </div>
+                    <div className="flex-1 space-y-1">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="text-slate-300 font-medium">Finalizada por:</span>
+                        <div className="flex items-center gap-1">
+                          <User className="h-4 w-4 text-blue-400" />
+                          <span className="text-white font-semibold">
+                            {finalizada_by ? finalizada_by : "Usuário Desconhecido"}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm">
+                        <Calendar className="h-4 w-4 text-slate-400" />
+                        <span className="text-slate-300">
+                          {new Date(finalizada_at).toLocaleDateString()} às{" "}
+                          {new Date(finalizada_at).toLocaleTimeString([], {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Motivo da Devolução */}
         <Card className="bg-slate-700/50 border-slate-600">
           <CardHeader>
@@ -312,11 +517,11 @@ export const SolicitacaoDetailView: React.FC<SolicitacaoDetailViewProps> = ({
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="mx-4 p-4 bg-slate-600/30 rounded-lg border border-slate-600/50">
+            <div className="p-4 bg-slate-600/30 rounded-lg border border-slate-600/50 mx-4">
               <div className="flex items-start gap-3">
                 <div className="w-1 h-full bg-blue-400 rounded-full min-h-[20px]"></div>
                 <div className="flex-1 max-w-full">
-                  <p className="text-slate-200 leading-relaxed text-base font-medium wrap-anywhere max-h-[200px] overflow-auto px-6">
+                  <p className="text-slate-200 leading-relaxed text-base font-medium wrap-anywhere max-h-[200px] overflow-auto">
                     {motivo_devolucao}
                   </p>
                 </div>
@@ -421,16 +626,16 @@ export const SolicitacaoDetailView: React.FC<SolicitacaoDetailViewProps> = ({
                 has_arquivo_recibo ||
                 arquivo_recibo
               ) && (
-                <div className="col-span-full flex flex-col items-center justify-center py-8 text-slate-400">
-                  <FileText className="h-12 w-12 mb-3 opacity-50" />
-                  <p className="text-lg font-medium">
-                    Nenhum arquivo disponível
-                  </p>
-                  <p className="text-sm">
-                    Esta solicitação não possui arquivos anexados
-                  </p>
-                </div>
-              )}
+                  <div className="col-span-full flex flex-col items-center justify-center py-8 text-slate-400">
+                    <FileText className="h-12 w-12 mb-3 opacity-50" />
+                    <p className="text-lg font-medium">
+                      Nenhum arquivo disponível
+                    </p>
+                    <p className="text-sm">
+                      Esta solicitação não possui arquivos anexados
+                    </p>
+                  </div>
+                )}
             </div>
           </CardContent>
         </Card>
@@ -445,7 +650,7 @@ export const SolicitacaoDetailView: React.FC<SolicitacaoDetailViewProps> = ({
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="mx-4 p-4 bg-red-600/10 rounded-lg border border-red-500/30">
+              <div className="p-4 bg-red-600/10 rounded-lg border border-red-500/30">
                 <div className="flex items-start gap-3">
                   <div className="w-1 h-full bg-red-400 rounded-full min-h-[20px]"></div>
                   <div className="flex-1">

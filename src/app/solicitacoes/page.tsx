@@ -33,6 +33,7 @@ function SolicitacoesContent() {
     canAbater: false,
     canFinalizar: false,
     canDelete: false,
+    canAccessAdmin: false,
   });
   const [permissionsLoading, setPermissionsLoading] = useState(true);
 

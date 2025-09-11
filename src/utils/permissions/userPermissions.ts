@@ -9,6 +9,7 @@ export interface UserPermissions {
   canAbater: boolean;
   canFinalizar: boolean;
   canDelete: boolean;
+  canAccessAdmin: boolean;
 }
 
 /**
@@ -25,6 +26,7 @@ export async function getUserPermissions(user: User | null): Promise<UserPermiss
       canAbater: false,
       canFinalizar: false,
       canDelete: false,
+      canAccessAdmin: false,
     };
   }
 
@@ -44,6 +46,7 @@ export async function getUserPermissions(user: User | null): Promise<UserPermiss
         canAbater: newPermissions.canAbater,
         canFinalizar: newPermissions.canFinalizar,
         canDelete: newPermissions.canDeleteSolicitacoes,
+        canAccessAdmin: newPermissions.canAccessAdmin,
       };
     } else {
       console.log('New permissions system returned empty permissions, using fallback for user:', user.first_name);
@@ -57,6 +60,7 @@ export async function getUserPermissions(user: User | null): Promise<UserPermiss
         canAbater: fallbackPermissions.canAbater,
         canFinalizar: fallbackPermissions.canFinalizar,
         canDelete: fallbackPermissions.canDeleteSolicitacoes,
+        canAccessAdmin: fallbackPermissions.canAccessAdmin,
       };
     }
   } catch (error) {
@@ -72,6 +76,7 @@ export async function getUserPermissions(user: User | null): Promise<UserPermiss
       canAbater: fallbackPermissions.canAbater,
       canFinalizar: fallbackPermissions.canFinalizar,
       canDelete: fallbackPermissions.canDeleteSolicitacoes,
+      canAccessAdmin: fallbackPermissions.canAccessAdmin,
     };
   }
 }

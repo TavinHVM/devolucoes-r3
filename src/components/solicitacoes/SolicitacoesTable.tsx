@@ -44,6 +44,7 @@ interface SolicitacoesTableProps {
     canAbater: boolean;
     canFinalizar: boolean;
     canDelete?: boolean;
+    canAccessAdmin: boolean;
   };
 }
 

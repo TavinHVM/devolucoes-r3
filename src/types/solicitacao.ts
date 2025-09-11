@@ -24,6 +24,16 @@ export type Solicitacao = {
   products_list: JSON;
   motivo_recusa: string;
   pendente_by: string;
+  aprovada_by: string;
+  aprovada_at: string;
+  recusada_by: string;
+  recusada_at: string;
+  desdobrada_at: string;
+  desdobrada_by: string;
+  abatida_at: string;
+  abatida_by: string;
+  finalizada_at: string;
+  finalizada_by: string;
 };
 
 export interface UserProfile {
