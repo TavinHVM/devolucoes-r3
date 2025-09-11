@@ -59,29 +59,28 @@ export const QuickActions: React.FC = () => {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className={`grid grid-cols-1 ${
-          filteredActions.length === 1 
-            ? 'md:grid-cols-1' 
-            : filteredActions.length === 2 
-            ? 'md:grid-cols-2' 
-            : 'md:grid-cols-3'
-        } gap-4 px-4`}>
+        <div
+          className="grid gap-4 px-4"
+          style={{
+            gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))'
+          }}
+        >
           {filteredActions.map((action, index) => {
             const IconComponent = action.icon;
             return (
               <Button
                 key={index}
                 variant="ghost"
-                className={`h-auto p-6 flex flex-col items-center gap-3 ${action.color} text-white hover:text-white transition-all duration-200 hover:scale-105 w-full`}
+                className={`h-auto p-6 flex flex-col items-center gap-3 ${action.color} text-white hover:text-white transition-all duration-200 hover:scale-105 w-full min-w-0 max-w-full overflow-hidden`}
                 onClick={() => router.push(action.href)}
               >
                 <IconComponent className="h-8 w-8" />
-                <div className="flex flex-col max-w-full">
-                  <div className="">
-                    <p className="font-semibold">{action.title}</p>
+                <div className="flex flex-col max-w-full w-full">
+                  <div className="w-full">
+                    <p className="font-semibold truncate w-full">{action.title}</p>
                   </div>
                   <div className="text-center w-full">
-                    <p className="text-sm opacity-90 break-words max-w-full">{action.description}</p>
+                    <p className="text-sm opacity-90 break-words w-full truncate">{action.description}</p>
                   </div>
                 </div>
               </Button>
