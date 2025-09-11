@@ -167,7 +167,7 @@ export default function Header() {
                     setOpen(true);
                     setUserMenuOpen(false);
                   }}
-                  className="flex items-center gap-2 px-3 py-2 hover:bg-slate-700 rounded-md transition w-full text-left text-red-400"
+                  className="flex items-center gap-2 px-3 py-2 bg-[#e94a4a] hover:bg-[#e94a4ae3] rounded-md transition w-full text-left text-white"
                 >
                   <Power size={16} />
                   <span>Sair</span>
