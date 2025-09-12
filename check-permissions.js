@@ -38,18 +38,6 @@ async function checkPermissions() {
     });
     console.log('User permissions:', userPermissions);
     
-    // Verificar presets
-    const presets = await prisma.permission_presets.findMany({
-      include: {
-        permissions: {
-          include: {
-            permission: true
-          }
-        }
-      }
-    });
-    console.log('Permission presets:', presets);
-    
   } catch (error) {
     console.error('Error:', error);
   } finally {

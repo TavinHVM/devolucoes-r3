@@ -13,8 +13,6 @@ import {
 import { Edit2 } from 'lucide-react';
 import { Usuario, EditUserForm } from './types';
 import { PermissionsSelect } from './PermissionsSelect';
-import { PermissionPresetsManager } from './PermissionPresetsManager';
-import { PermissionPreset } from '@/utils/permissions/presetsApi';
 
 interface EditUserModalProps {
   user: Usuario | null;
@@ -144,12 +142,6 @@ export function EditUserModal({ user, onOpenChange, onSubmit }: EditUserModalPro
           </div>
 
           <div className="space-y-6">
-            <PermissionPresetsManager
-              currentPermissions={form.permissions || []}
-              onApplyPreset={(preset: PermissionPreset) => {
-                setForm(f => ({ ...f, user_level: preset.name, permissions: preset.permissions.map(p => p.permission.id) }));
-              }}
-            />
             <PermissionsSelect
               selectedPermissions={form.permissions || []}
               onPermissionsChange={(permissions) => setForm(f => ({ ...f, permissions }))}

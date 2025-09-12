@@ -13,8 +13,6 @@ import {
 import { UserPlus } from 'lucide-react';
 import { CreateUserForm } from './types';
 import { PermissionsSelect } from './PermissionsSelect';
-import { PermissionPresetsManager } from './PermissionPresetsManager';
-import { PermissionPreset } from '@/utils/permissions/presetsApi';
 
 interface CreateUserModalProps {
   open: boolean;
@@ -130,12 +128,6 @@ export function CreateUserModal({ open, onOpenChange, onSubmit }: CreateUserModa
           </div>
 
           <div className="space-y-6">
-            <PermissionPresetsManager
-              currentPermissions={form.permissions || []}
-              onApplyPreset={(preset: PermissionPreset) => {
-                setForm(f => ({ ...f, user_level: preset.name, permissions: preset.permissions.map(p => p.permission.id) }));
-              }}
-            />
             <PermissionsSelect
               selectedPermissions={form.permissions || []}
               onPermissionsChange={(permissions) => setForm(f => ({ ...f, permissions }))}
