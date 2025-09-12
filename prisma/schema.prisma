@@ -8,46 +8,36 @@ datasource db {
 }
 
 model user_profiles {
-  id         Int      @id @default(autoincrement())
-  first_name String
-  last_name  String
-  password   String
-  role       String
-  user_level String?  // Mantido para compatibilidade, mas será opcional
-  email      String
-  created_at DateTime @default(now())
-  updated_at DateTime @default(now())
-  permission_preset_id Int? // Referência opcional a um preset de permissões
-  permission_preset    permission_presets? @relation(fields: [permission_preset_id], references: [id], onDelete: SetNull)
-  
-  // Relação com permissões
+  id          Int                @id @default(autoincrement())
+  first_name  String
+  last_name   String
+  password    String
+  role        String
+  user_level  String?
+  email       String
+  created_at  DateTime           @default(now())
+  updated_at  DateTime           @default(now())
   permissions user_permissions[]
 }
 
 model permissions {
-  id          Int      @id @default(autoincrement())
-  name        String   @unique
+  id          Int                @id @default(autoincrement())
+  name        String             @unique
   label       String
   description String?
-  category    String   // 'solicitacoes', 'usuarios', 'sistema'
-  created_at  DateTime @default(now())
-  
-  // Relação com usuários
-  users user_permissions[]
-  // Relação com presets
-  presets permission_preset_permissions[]
+  category    String
+  created_at  DateTime           @default(now())
+  users       user_permissions[]
 }
 
 model user_permissions {
-  id            Int         @id @default(autoincrement())
+  id            Int           @id @default(autoincrement())
   user_id       Int
   permission_id Int
-  created_at    DateTime    @default(now())
-  
-  // Relações
-  user       user_profiles @relation(fields: [user_id], references: [id], onDelete: Cascade)
-  permission permissions   @relation(fields: [permission_id], references: [id], onDelete: Cascade)
-  
+  created_at    DateTime      @default(now())
+  permission    permissions   @relation(fields: [permission_id], references: [id], onDelete: Cascade)
+  user          user_profiles @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
   @@unique([user_id, permission_id])
 }
 
@@ -105,29 +95,4 @@ model returned_products {
   quantidade Int
   punit      Decimal  @db.Decimal(10, 2)
   created_at DateTime @default(now())
-}
-
-// Presets (grupos) de permissões reutilizáveis (Níveis de Acesso)
-model permission_presets {
-  id          Int       @id @default(autoincrement())
-  name        String    @unique
-  description String?
-  created_at  DateTime  @default(now())
-  updated_at  DateTime  @default(now())
-
-  permissions permission_preset_permissions[]
-  users       user_profiles[]
-}
-
-// Relação many-to-many entre presets e permissions (com metadata futura se precisar)
-model permission_preset_permissions {
-  id            Int         @id @default(autoincrement())
-  preset_id     Int
-  permission_id Int
-  created_at    DateTime    @default(now())
-
-  preset     permission_presets @relation(fields: [preset_id], references: [id], onDelete: Cascade)
-  permission permissions         @relation(fields: [permission_id], references: [id], onDelete: Cascade)
-
-  @@unique([preset_id, permission_id])
 }
